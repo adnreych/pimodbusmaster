@@ -1,4 +1,4 @@
-package deviceconfig;
+package net.lockoil.deviceconfig;
 
 import com.intelligt.modbus.jlibmodbus.Modbus;
 import com.intelligt.modbus.jlibmodbus.serial.SerialParameters;

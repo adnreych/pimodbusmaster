@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import lombok.extern.log4j.Log4j2;
-import net.lockoil.pimodbusmaster.model.ModbusReadRequest;
+import net.lockoil.pimodbusmaster.model.ReadRequest;
 import net.lockoil.pimodbusmaster.service.ModbusRequest;
 
 @Log4j2
@@ -32,7 +32,7 @@ public class CourseResource {
   }
   
   @PostMapping("/modbusread")
-  public ResponseEntity<String> getResponse(@RequestBody ModbusReadRequest modbusReadRequest) {
+  public ResponseEntity<String> getResponse(@RequestBody ReadRequest modbusReadRequest) {
 	String response = modbusRequest.read(modbusReadRequest).toString();
 	String result = response != null ? response : "Ошибка чтения данных";
 	modbusRequest.courses.add(result);

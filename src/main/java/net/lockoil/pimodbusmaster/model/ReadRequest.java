@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class ModbusReadRequest {
+public class ReadRequest {
 	private int slave;
 	private int address;
 	private int count;

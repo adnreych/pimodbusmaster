@@ -3,6 +3,7 @@ package net.lockoil.pimodbusmaster.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import com.intelligt.modbus.jlibmodbus.Modbus;
@@ -15,8 +16,8 @@ import com.intelligt.modbus.jlibmodbus.serial.SerialPortException;
 import com.intelligt.modbus.jlibmodbus.serial.SerialPortFactoryJSSC;
 import com.intelligt.modbus.jlibmodbus.serial.SerialUtils;
 
-import deviceconfig.DeviceConfig;
-import net.lockoil.pimodbusmaster.model.ModbusReadRequest;
+import net.lockoil.deviceconfig.DeviceConfig;
+import net.lockoil.pimodbusmaster.model.ReadRequest;
 import net.lockoil.pimodbusmaster.model.ReadResponse;
 
 
@@ -24,9 +25,10 @@ import net.lockoil.pimodbusmaster.model.ReadResponse;
 public class ModbusRequest {
 	
 	public static List<String> courses = new ArrayList<>();
+	private final Logger log = Logger.getLogger(this.getClass().getSimpleName());
 	
 	
-	public List<ReadResponse> read(ModbusReadRequest modbusReadRequest) {
+	public List<ReadResponse> read(ReadRequest modbusReadRequest) {
 		List<ReadResponse> responses = new ArrayList<>();
 		
 		int slave = modbusReadRequest.getSlave(); 
@@ -44,6 +46,7 @@ public class ModbusRequest {
                // print values
             for (int value : registerValues) {
             	address++;
+            	log.info("addr: " + address + " val: " + value);
             	responses.add(new ReadResponse(address, value));
              }
 		} catch (SerialPortException | ModbusIOException e) {
@@ -63,4 +66,5 @@ public class ModbusRequest {
 		
 		return responses;
 	}
+	
 }
