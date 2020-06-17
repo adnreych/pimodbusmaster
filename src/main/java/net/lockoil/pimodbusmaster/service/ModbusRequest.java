@@ -16,7 +16,7 @@ import com.intelligt.modbus.jlibmodbus.serial.SerialPortException;
 import com.intelligt.modbus.jlibmodbus.serial.SerialPortFactoryJSSC;
 import com.intelligt.modbus.jlibmodbus.serial.SerialUtils;
 
-import net.lockoil.deviceconfig.DeviceConfig;
+import net.lockoil.pimodbusmaster.deviceconfig.DeviceConfig;
 import net.lockoil.pimodbusmaster.model.ReadRequest;
 import net.lockoil.pimodbusmaster.model.ReadResponse;
 

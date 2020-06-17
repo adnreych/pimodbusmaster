@@ -1,6 +1,5 @@
-package net.lockoil.deviceconfig;
+package net.lockoil.pimodbusmaster.deviceconfig;
 
-import com.intelligt.modbus.jlibmodbus.Modbus;
 import com.intelligt.modbus.jlibmodbus.serial.SerialParameters;
 import com.intelligt.modbus.jlibmodbus.serial.SerialPort;
 import com.intelligt.modbus.jlibmodbus.serial.SerialPortFactoryJSSC;

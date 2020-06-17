@@ -16,7 +16,7 @@ import lombok.extern.log4j.Log4j2;
 import net.lockoil.pimodbusmaster.model.ReadRequest;
 import net.lockoil.pimodbusmaster.service.ModbusRequest;
 
-@Log4j2
+
 //@CrossOrigin(origins = { "http://localhost:3000", "http://localhost:4200", "http://192.168.88.23:3000" })
 @CrossOrigin
 @RestController
@@ -30,6 +30,11 @@ public class CourseResource {
   public List<String> getAll() {
 	return modbusRequest.courses;
   }
+  
+  /*@GetMapping("/index.html")
+  public String getMain() {
+	return "index";
+  } */
   
   @PostMapping("/modbusread")
   public ResponseEntity<String> getResponse(@RequestBody ReadRequest modbusReadRequest) {

@@ -9,12 +9,12 @@ class InstructorApp extends Component {
                 <>
                     <h1>Instructor Application</h1>
                     <Switch>
-						<Route path="/read" exact component={ModbusReadComponent} /> 
+						<Route path="/" exact component={ModbusReadComponent} />
                     </Switch>
-					<ModbusReadComponent />
                 </>
             </Router>
         )
     }
 }
+
 export default InstructorApp

@@ -23,7 +23,7 @@ class ModbusReadComponent extends Component {
 
     getModbusResponse() {
 		const _this = this;
-	        ModbusService.getModbusResponse()//HARDCODED
+	        ModbusService.getModbusResponse()
 	            .then(
 	                response => {
 	                    console.log(response);
@@ -46,7 +46,7 @@ class ModbusReadComponent extends Component {
 	
 		ModbusService.modbusRequest(modbusRequest)
 			.then(() => {
-				_this.props.history.push(`/`);
+				_this.props.history.push(`/read`);
 				_this.getModbusResponse();
 			})
 						     
