@@ -46,7 +46,9 @@ hs_err_pid*
 .env.development.local
 .env.test.local
 .env.production.local
+.attach_pid*
 
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+log_file.log*

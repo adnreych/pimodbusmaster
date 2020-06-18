@@ -51,16 +51,19 @@ public class ModbusRequest {
              }
 		} catch (SerialPortException | ModbusIOException e) {
 			courses.add("Ошибка " + e.getClass().getSimpleName());
+			log.info(e.getClass().getSimpleName());
 			e.printStackTrace();
 		} catch (RuntimeException e) {
                 throw e;
             } catch (Exception e) {
                 e.printStackTrace();
+                log.info(e.getClass().getSimpleName());
             } finally {
                 try {
                 	modbusMaster.disconnect();
                 } catch (ModbusIOException e) {
                     e.printStackTrace();
+                    log.info(e.getClass().getSimpleName());
                 }
             }
 		

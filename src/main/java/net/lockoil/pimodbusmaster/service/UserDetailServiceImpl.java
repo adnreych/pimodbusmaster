@@ -1,5 +1,6 @@
 package net.lockoil.pimodbusmaster.service;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,6 +17,7 @@ import net.lockoil.pimodbusmaster.repository.UserRepository;
  **/
 @Service
 public class UserDetailServiceImpl implements UserDetailsService  {
+	private final Logger log = Logger.getLogger(this.getClass().getSimpleName());
 	private final UserRepository repository;
 
 	@Autowired

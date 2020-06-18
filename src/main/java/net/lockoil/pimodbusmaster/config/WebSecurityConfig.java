@@ -7,6 +7,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 import net.lockoil.pimodbusmaster.service.UserDetailServiceImpl;
 
 
@@ -14,6 +15,7 @@ import net.lockoil.pimodbusmaster.service.UserDetailServiceImpl;
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+	
     @Autowired
     private UserDetailServiceImpl userDetailsService;	
 	
