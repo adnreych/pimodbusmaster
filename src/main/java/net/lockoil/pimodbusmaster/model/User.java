@@ -17,9 +17,8 @@ public class User {
     @Column(name = "username", nullable = false, unique = true)
     private String username;
 
-    @JsonIgnore
     @Column(name = "password", nullable = false)
-    private String passwordHash;
+    private String password;
 
     @Column(name = "role", nullable = false)
     private String role;
@@ -30,7 +29,7 @@ public class User {
 	public User(String username, String passwordHash, String role) {
 		super();
 		this.username = username;
-		this.passwordHash = passwordHash;
+		this.password = passwordHash;
 		this.role = role;
 	}
 
@@ -51,11 +50,11 @@ public class User {
 	}
 
 	public String getPasswordHash() {
-		return passwordHash;
+		return password;
 	}
 
 	public void setPasswordHash(String passwordHash) {
-		this.passwordHash = passwordHash;
+		this.password = passwordHash;
 	}
 
 	public String getRole() {

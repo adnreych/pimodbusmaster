@@ -1,5 +1,6 @@
 package net.lockoil.pimodbusmaster.config;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -16,33 +17,35 @@ import net.lockoil.pimodbusmaster.service.UserDetailServiceImpl;
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	
+	private final Logger log = Logger.getLogger(this.getClass().getSimpleName());
+	
     @Autowired
     private UserDetailServiceImpl userDetailsService;	
+    
 	
     @Override
     protected void configure(HttpSecurity http) throws Exception {
     	
-    	
-		http
-		.authorizeRequests()
-			.antMatchers("/public/**").permitAll()
-			.anyRequest().authenticated()
-			.and()
-		.formLogin()
-			.loginPage("/login.html")
-			.defaultSuccessUrl("/index.html", true)
-			.failureUrl("/login.html?error=true")
-			.permitAll()
-			.and()
-		.httpBasic()
-			.and()
-		.csrf().disable()
-		.logout()
-			.logoutSuccessUrl("/");
+        http
+        .csrf().disable()   
+        .authorizeRequests()
+        .antMatchers("/**")
+        			.permitAll()
+                .and()
+	                .formLogin()
+	                .loginPage("/index.html")
+	                .defaultSuccessUrl("/index.html", true)
+	                .loginProcessingUrl("/login_process")
+	                .failureUrl("/?login_error")
+	                .permitAll();
+        
     }
+    
     	
     @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+    @Override
+    public void configure(AuthenticationManagerBuilder auth) throws Exception {
+    	log.info("auth" + auth.toString() + " userservice " + userDetailsService.toString());
         auth.userDetailsService(userDetailsService).passwordEncoder(new BCryptPasswordEncoder(10));
     }
      
