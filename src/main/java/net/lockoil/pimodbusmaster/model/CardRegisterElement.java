@@ -9,12 +9,14 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Type;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import net.lockoil.pimodbusmaster.util.Common;
 
 @Entity
 @Data
-@AllArgsConstructor
 @Table(name = "registers")
 public class CardRegisterElement {
 	
@@ -26,7 +28,8 @@ public class CardRegisterElement {
 	@Column(name = "device_id")
 	private Long deviceId;
 	
-	@Column(name = "register_metadata") // определить hstoreType
+	@Column(name = "register_metadata")
+	@Type(type = Common.HSTORE_TYPE)
 	private Map<String, String> registerMetadata;
 	
 	@Column(name = "register_name")
