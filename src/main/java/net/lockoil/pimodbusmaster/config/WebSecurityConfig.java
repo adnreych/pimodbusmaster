@@ -36,9 +36,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
 	                .formLogin()                
 	                .loginPage("/index.html")
-	                .loginProcessingUrl("/login_process")     
+	                .loginProcessingUrl("/auth/login")     
 	                .failureHandler(customAuthenticationFailureHandler())
-	                .permitAll();
+	                .permitAll()
+	            .and()
+	    			.logout()
+	    			.logoutUrl("/auth/logout")
+	    			.logoutSuccessUrl("/index.html?logout")
+	    			.permitAll();;
         
     }
     
@@ -51,7 +56,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
-    	log.info("auth" + auth.toString() + " userservice " + userDetailsService.toString());
         auth.userDetailsService(userDetailsService).passwordEncoder(new BCryptPasswordEncoder(10));
     }
      

@@ -59,14 +59,14 @@ class LoginPage extends React.Component {
                         <label htmlFor="username">Username</label>
                         <input type="text" className="form-control" name="username" value={username} onChange={this.handleChange} />
                         {submitted && !username &&
-                            <div className="help-block">Username is required</div>
+                            <div className="help-block">Введите логин</div>
                         }
                     </div>
                     <div className={'form-group' + (submitted && !password ? ' has-error' : '')}>
                         <label htmlFor="password">Password</label>
                         <input type="password" className="form-control" name="password" value={password} onChange={this.handleChange} />
                         {submitted && !password &&
-                            <div className="help-block">Password is required</div>
+                            <div className="help-block">Введите пароль</div>
                         }
                     </div>
                     <div className="form-group">
@@ -77,7 +77,7 @@ class LoginPage extends React.Component {
                     </div>
 
                     {error &&
-                        <div className={'alert alert-danger'}>{this.error}</div>
+                        <div className={'alert alert-danger'}>Неверный логин или пароль</div>
                     }
                 </form>
             </div>

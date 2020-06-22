@@ -20,7 +20,7 @@ async function login(username, password) {
 	  }
 	}
 
-	await axios.post('/login_process', qs.stringify(requestBody), config)
+	await axios.post('/auth/login', qs.stringify(requestBody), config)
 	  .then((result) => {
 		  console.log("result: ", result);
 		  localStorage.setItem('user', JSON.stringify(requestBody));
@@ -28,9 +28,18 @@ async function login(username, password) {
 }
 
 
-function logout() {
-    // remove user from local storage to log user out
-    localStorage.removeItem('user');
+async function logout() {
+	
+	var user = localStorage.getItem('user');
+	
+	await axios.post('/auth/logout', user)
+	  .then((result) => {
+		  console.log("result: ", result);
+		  localStorage.removeItem('user');
+	  })
+	  .catch((err) => {
+				  console.log("ERROR: ", err);
+			  });
 }
 
 /*function getAll() {
