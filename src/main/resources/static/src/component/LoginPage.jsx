@@ -39,25 +39,20 @@ class LoginPage extends React.Component {
         this.setState({ loading: true });
         userService.login(username, password)
             .then(
-                user => {
-					console.log("USER", user);
+                () => {
                     this.props.history.push("/");
-                },
-                error => {
-					console.log("ERROR", error);
-					this.setState({ error, loading: false })
-				}
-            );
+                }
+            )
+			.catch((err) => {
+				  console.log("ERROR: ", err);
+					this.setState({ error: err, loading: false });
+			  });
     }
 
     render() {
         const { username, password, submitted, loading, error } = this.state;
         return (
             <div className="col-md-6 col-md-offset-3">
-                <div className="alert alert-info">
-                    Username: test<br />
-                    Password: test
-                </div>
                 <h2>Login</h2>
                 <form name="form" onSubmit={this.handleSubmit}>
                     <div className={'form-group' + (submitted && !username ? ' has-error' : '')}>

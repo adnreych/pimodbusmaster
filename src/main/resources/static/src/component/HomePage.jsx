@@ -18,7 +18,7 @@ class HomePage extends React.Component {
             user: JSON.parse(localStorage.getItem('user')),
             users: { loading: true }
         });
-        userService.getAll().then(users => this.setState({ users }));
+  //      userService.getAll().then(users => this.setState({ users }));
     }
 
     render() {
