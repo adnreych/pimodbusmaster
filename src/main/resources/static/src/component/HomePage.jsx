@@ -1,8 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import { userService } from '../service/UserService';
-
 class HomePage extends React.Component {
     constructor(props) {
         super(props);
@@ -25,22 +23,19 @@ class HomePage extends React.Component {
         const { user, users } = this.state;
         return (
             <div className="col-md-6 col-md-offset-3">
-                <h1>Hi {user.firstName}!</h1>
-                <p>You're logged in with React & Basic HTTP Authentication!!</p>
-                <h3>Users from secure api end point:</h3>
-                {users.loading && <em>Loading users...</em>}
-                {users.length &&
-                    <ul>
-                        {users.map((user, index) =>
-                            <li key={user.id}>
-                                {user.firstName + ' ' + user.lastName}
-                            </li>
-                        )}
-                    </ul>
-                }
-                <p>
-                    <Link to="/login">Logout</Link>
+                <h1>Здравствуйте {user.username}!</h1>
+                <h3>Что вы хотите сделать?</h3>
+
+				<p>
+                    <Link to="/read">Прочитать регистры</Link>
                 </p>
+
+				
+				<p>
+                    <Link to="/login">Выйти</Link>
+                </p>
+
+
             </div>
         );
     }

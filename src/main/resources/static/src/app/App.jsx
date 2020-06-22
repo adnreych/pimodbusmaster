@@ -4,6 +4,8 @@ import { BrowserRouter as Router, Route } from 'react-router-dom';
 import { PrivateRoute } from '../component/PrivateRoute';
 import { HomePage } from '../component/HomePage';
 import { LoginPage } from '../component/LoginPage';
+import ModbusReadComponent from '../component/ModbusReadComponent';
+
 
 class App extends React.Component {
     render() {
@@ -14,7 +16,8 @@ class App extends React.Component {
                         <Router>
                             <div>
 								<Route path="/login" component={LoginPage} />
-                                <PrivateRoute exact path="/" component={HomePage} />                             
+                                <PrivateRoute exact path="/" component={HomePage} />     
+								<PrivateRoute exact path="/read" component={ModbusReadComponent} />                            
                             </div>
                         </Router>
                     </div>
