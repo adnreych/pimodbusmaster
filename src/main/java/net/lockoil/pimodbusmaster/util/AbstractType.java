@@ -1,8 +1,11 @@
 package net.lockoil.pimodbusmaster.util;
 
 import java.io.Serializable;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import org.hibernate.HibernateException;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.usertype.UserType;
 
 /**
@@ -44,4 +47,5 @@ public abstract class AbstractType implements UserType {
 	public Object deepCopy(Object value) throws HibernateException {
 		return value;
 	}
+
 }

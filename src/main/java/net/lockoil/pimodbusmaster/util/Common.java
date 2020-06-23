@@ -7,7 +7,7 @@ import net.lockoil.pimodbusmaster.model.CardRegisterElement;
 import net.lockoil.pimodbusmaster.model.LoadRegistersResource;
 
 public class Common {
-	public static final String HSTORE_TYPE = "net.lockoil.spicetrackerrest.util.HStoreType";
+	public static final String HSTORE_TYPE = "net.lockoil.pimodbusmaster.util.HStoreType";
 	
 	public static CardRegisterElement parseRegisterElement(LoadRegistersResource loadRegistersResource) {
 		

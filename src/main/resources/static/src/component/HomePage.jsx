@@ -30,6 +30,10 @@ class HomePage extends React.Component {
                     <Link to="/read">Прочитать регистры</Link>
                 </p>
 
+				<p>
+                    <Link to="/loadregisters">Загрузить регистры</Link>
+                </p>
+
 				
 				<p>
                     <Link to="/login">Выйти</Link>
