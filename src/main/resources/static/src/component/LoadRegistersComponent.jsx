@@ -12,7 +12,8 @@ class LoadRegistersComponent extends Component {
 
 		this.state = {
 					data: [],
-					fileInfo: []
+					fileInfo: [],
+					error: []
 		        }
 
         this.papaparseOptions = {
@@ -30,6 +31,13 @@ class LoadRegistersComponent extends Component {
     }
 
 	fileLoaded = (data, fileInfo) => {
+		this.setState({ error: []});
+		data.forEach(element => {
+			if (element.max < element.min) this.setState( prevState => ({ error: [...prevState.error, "Ошибка в регистре " + element.address + " Максимальное значение не может быть меньше минимального"]}));
+			if (!Number.isInteger(element.address)) this.setState( prevState => ({ error: [...prevState.error, "Ошибка в регистре " + element.address + " Адрес должен быть целым числом"]}));
+			if (!Number.isInteger(element.count)) this.setState( prevState => ({ error: [...prevState.error, "Ошибка в регистре " + element.address + " Количество регистров должно быть целым числом"]}));
+		});
+		
 		console.log(data, fileInfo);
 		this.setState({data: data, fileInfo: fileInfo});
 	};
@@ -37,6 +45,17 @@ class LoadRegistersComponent extends Component {
 	onError = (e) => {
 		console.log("ERRORLOADFILE", e);
 	};
+	
+	renderErrors() {
+      return this.state.error.map((e) => {
+         return (
+            <p>
+				{e}
+            </p>
+         )
+      })
+   }
+	
 	
 	renderTableData() {
       return this.state.data.map((current, index) => {
@@ -76,8 +95,15 @@ class LoadRegistersComponent extends Component {
 	
  
 	  render() {
+		
+		const {error } = this.state;
+		
 	    return (
 		<div>
+			{error &&
+                        <div className={'alert alert-danger'}>{this.renderErrors()}</div>
+                    }
+
 	      <CSVReader
 	        cssClass="csv-reader-input"
 	        label="Выберите файл"
