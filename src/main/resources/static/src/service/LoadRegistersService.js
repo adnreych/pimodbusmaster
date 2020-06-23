@@ -5,7 +5,7 @@ const PATH = `/api/loadregisters`
 class LoadRegistersService {
 
     
-    load(registers) {
+	load(registers) {
         return axios.post(`${PATH}`, registers);
     }
    

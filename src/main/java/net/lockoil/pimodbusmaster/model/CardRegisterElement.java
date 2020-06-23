@@ -1,7 +1,5 @@
 package net.lockoil.pimodbusmaster.model;
 
-import java.util.Map;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -9,11 +7,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.Type;
-
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import net.lockoil.pimodbusmaster.util.Common;
 
 @Entity
 @Data
@@ -28,12 +22,23 @@ public class CardRegisterElement {
 	@Column(name = "device_id")
 	private Long deviceId;
 	
-	@Column(name = "register_metadata")
-	@Type(type = Common.HSTORE_TYPE)
-	private Map<String, String> registerMetadata;
-	
 	@Column(name = "register_name")
 	private String name;
+	
+	@Column(name = "address")
+	private Integer address;
+	
+	@Column(name = "register_count")
+	private Integer count;
+	
+	@Column(name = "is_read")
+	private Boolean isRead;
+	
+	@Column(name = "is_write")
+	private Boolean isWrite;
+	
+	@Column(name = "register_type")
+	private String type;
 	
 	@Column(name = "suffix")
 	private String suffix;

@@ -1,8 +1,5 @@
 package net.lockoil.pimodbusmaster.util;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import net.lockoil.pimodbusmaster.model.CardRegisterElement;
 import net.lockoil.pimodbusmaster.model.LoadRegistersResource;
 
@@ -13,12 +10,11 @@ public class Common {
 		
 		Long deviceId = loadRegistersResource.getDeviceId();
 		String name = loadRegistersResource.getName();
-		Map<String, String> metadata = new HashMap<>();
-		metadata.putIfAbsent("address", loadRegistersResource.getAddress().toString());
-		metadata.putIfAbsent("count", loadRegistersResource.getCount().toString());
-		metadata.putIfAbsent("isWrite", loadRegistersResource.getIsWrite().toString());
-		metadata.putIfAbsent("isRead", loadRegistersResource.getIsRead().toString());
-		metadata.putIfAbsent("type", loadRegistersResource.getType());
+		Integer address = loadRegistersResource.getAddress();
+		Integer count = loadRegistersResource.getCount();
+		Boolean isWrite = loadRegistersResource.getIsWrite();
+		Boolean isRead = loadRegistersResource.getIsRead();
+		String type = loadRegistersResource.getType();
 		String suffix = loadRegistersResource.getSuffix() != null ? loadRegistersResource.getSuffix() : null;
 		Long min = loadRegistersResource.getMinValue() != null ? loadRegistersResource.getMinValue() : null;
 		Long max = loadRegistersResource.getMaxValue() != null ? loadRegistersResource.getMaxValue() : null;
@@ -27,7 +23,11 @@ public class Common {
 		CardRegisterElement cardRegisterElement = new CardRegisterElement();
 		cardRegisterElement.setDeviceId(deviceId);
 		cardRegisterElement.setName(name);
-		cardRegisterElement.setRegisterMetadata(metadata);
+		cardRegisterElement.setAddress(address);
+		cardRegisterElement.setCount(count);
+		cardRegisterElement.setIsRead(isRead);
+		cardRegisterElement.setIsWrite(isWrite);
+		cardRegisterElement.setType(type);
 		cardRegisterElement.setSuffix(suffix);
 		cardRegisterElement.setMinValue(min);
 		cardRegisterElement.setMaxValue(max);

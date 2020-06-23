@@ -13,7 +13,8 @@ class LoadRegistersComponent extends Component {
 		this.state = {
 					data: [],
 					fileInfo: [],
-					error: []
+					error: null,
+					loading: false,
 		        }
 
         this.papaparseOptions = {
@@ -28,7 +29,23 @@ class LoadRegistersComponent extends Component {
 			}
 	  };
 
+	  this.handleClick = this.handleClick.bind(this);
+
     }
+
+  	handleClick() {    
+		this.setState({ loading: true });
+		LoadRegistersService.load(this.state.data)  
+			.then(
+                () => {
+                    this.props.history.push("/");
+                }
+            )
+			.catch((err) => {
+				  console.log("ERROR: ", err);
+					this.setState({ error: err, loading: false });
+			  });
+	}
 
 	fileLoaded = (data, fileInfo) => {
 		this.setState({ error: []});
@@ -37,6 +54,8 @@ class LoadRegistersComponent extends Component {
 			if (!Number.isInteger(element.address)) this.setState( prevState => ({ error: [...prevState.error, "Ошибка в регистре " + element.address + " Адрес должен быть целым числом"]}));
 			if (!Number.isInteger(element.count)) this.setState( prevState => ({ error: [...prevState.error, "Ошибка в регистре " + element.address + " Количество регистров должно быть целым числом"]}));
 		});
+		
+		if (this.state.error.length == 0) this.setState({ error: null});
 		
 		console.log(data, fileInfo);
 		this.setState({data: data, fileInfo: fileInfo});
@@ -96,7 +115,7 @@ class LoadRegistersComponent extends Component {
  
 	  render() {
 		
-		const {error } = this.state;
+		const {data, error, loading} = this.state;
 		
 	    return (
 		<div>
@@ -134,6 +153,13 @@ class LoadRegistersComponent extends Component {
 				</tbody>
 
 			</table>
+			
+			<div className="form-group">
+                        <button className="btn btn-primary" onClick={this.handleClick} disabled={error || (data.length==0)}>Добавить устройство</button>
+                        {loading &&
+                            <img src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
+                        }
+                    </div>
 
 		</div>
 	    )
