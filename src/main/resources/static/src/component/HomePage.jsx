@@ -1,5 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import DeviceService from '../service/DeviceService';
+import Button from 'muicss/lib/react/button';
+import Option from 'muicss/lib/react/option';
+import Select from 'muicss/lib/react/select';
 
 class HomePage extends React.Component {
     constructor(props) {
@@ -7,8 +11,13 @@ class HomePage extends React.Component {
 
         this.state = {
             user: {},
-            users: []
+            users: [],
+			devices: [],
+			currDevice: ""
         };
+
+		this.handleChange = this.handleChange.bind(this);
+		this.handleSubmit = this.handleSubmit.bind(this);
     }
 
     componentDidMount() {
@@ -16,11 +25,33 @@ class HomePage extends React.Component {
             user: JSON.parse(localStorage.getItem('user')),
             users: { loading: true }
         });
-  //      userService.getAll().then(users => this.setState({ users }));
+        DeviceService.getAll()
+			.then(devices => {
+				this.setState({ devices: devices.data })
+			})
+			.catch((err) => {
+					  console.log("ERROR: ", err);
+				  });
     }
 
+	renderSelectData() {
+	      return this.state.devices.map((current, index) => {
+	         return (
+				<Option value={index} label={current.name} />
+	         )
+	      })
+	   }
+
+		
+	handleSubmit(event) {
+		event.preventDefault();
+		this.setState({currDevice: event.target.value});  
+	    alert('Вы выбрали: ' + this.state.currDevice);
+			// обработка перехода к устройству   
+	  }
+
     render() {
-        const { user, users } = this.state;
+        const { user } = this.state;
         return (
             <div className="col-md-6 col-md-offset-3">
                 <h1>Здравствуйте {user.username}!</h1>
@@ -38,6 +69,16 @@ class HomePage extends React.Component {
 				<p>
                     <Link to="/login">Выйти</Link>
                 </p>
+
+				<form onSubmit={this.handleSubmit}>
+			        <label>
+			          Выберите устройство:
+						<Select name="input" defaultValue="0">
+				          {this.renderSelectData()}
+				        </Select>
+			        </label>
+			        <input type="submit" value="Перейти" />
+			      </form>
 
 
             </div>

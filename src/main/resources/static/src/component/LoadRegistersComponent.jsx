@@ -2,10 +2,11 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom'
 import CSVReader from 'react-csv-reader'
 import LoadRegistersService from '../service/LoadRegistersService';
+import DeviceService from '../service/DeviceService';
+import * as Strings from '../helpers/strings';
 
 
 class LoadRegistersComponent extends Component {
-	// организовать загрузку файла
 	
 	constructor(props) {
         super(props);
@@ -15,6 +16,8 @@ class LoadRegistersComponent extends Component {
 					fileInfo: [],
 					error: null,
 					loading: false,
+					success: null,
+					deviceName: ""
 		        }
 
         this.papaparseOptions = {
@@ -30,25 +33,40 @@ class LoadRegistersComponent extends Component {
 	  };
 
 	  this.handleClick = this.handleClick.bind(this);
+	  this.handleChangeDeviceName = this.handleChangeDeviceName.bind(this);
 
     }
 
   	handleClick() {    
+		var data = this.state.data;
 		this.setState({ loading: true });
-		LoadRegistersService.load(this.state.data)  
+		console.log("DEVICE: ", this.state.deviceName);
+		DeviceService.save(this.state.deviceName)
 			.then(
-                () => {
-                    this.props.history.push("/");
-                }
+	                (request) => {
+						data.forEach(element => element.device = request.data)
+	                    LoadRegistersService.load(data)
+				.then(
+	                () => {
+	                    this.setState( prevState => ({ success: ["Данные успешно загружены"], loading: false}));
+	                }
+	            )
+				.catch((err) => {
+					  console.log("ERROR: ", err);
+						this.setState( prevState => ({ error: ["Ошибка загрузки данных"], loading: false}));
+				  });
+	                }
             )
 			.catch((err) => {
 				  console.log("ERROR: ", err);
-					this.setState({ error: err, loading: false });
+					this.setState( prevState => ({ error: ["Ошибка загрузки данных"], loading: false}));
 			  });
+		
 	}
 
 	fileLoaded = (data, fileInfo) => {
-		this.setState({ error: []});
+		this.setState({ error: [], success: null});
+		//csv validation 
 		data.forEach(element => {
 			if (element.max < element.min) this.setState( prevState => ({ error: [...prevState.error, "Ошибка в регистре " + element.address + " Максимальное значение не может быть меньше минимального"]}));
 			if (!Number.isInteger(element.address)) this.setState( prevState => ({ error: [...prevState.error, "Ошибка в регистре " + element.address + " Адрес должен быть целым числом"]}));
@@ -109,29 +127,43 @@ class LoadRegistersComponent extends Component {
 		if (headerName.trim().localeCompare("Мин") == 0) return "min";
 		if (headerName.trim().localeCompare("Макс") == 0) return "max";	
 	}
+	
+	handleChangeDeviceName(e) {
+        this.setState({ deviceName: e.target.value });
+		console.log("DEVICE: ", this.state.deviceName);
+    }
+
 
 	
 	
- 
 	  render() {
 		
-		const {data, error, loading} = this.state;
+		const {data, error, loading, success} = this.state;
 		
 	    return (
 		<div>
 			{error &&
                         <div className={'alert alert-danger'}>{this.renderErrors()}</div>
                     }
+			
+			{success &&
+                        <div className={'alert alert-success'}>{this.state.success}</div>
+                    }
 
-	      <CSVReader
-	        cssClass="csv-reader-input"
-	        label="Выберите файл"
-	        onFileLoaded={this.fileLoaded}
-	        onError={this.onError}
-	        parserOptions={this.papaparseOptions}
-	        inputId="registrTable"
-	        inputStyle={{color: 'red'}}
-	      />
+			<label>
+          		Название устройства:
+          	<input type="text" onChange={this.handleChangeDeviceName} />
+			</label>
+
+		      <CSVReader
+		        cssClass="csv-reader-input"
+		        label="Выберите файл"
+		        onFileLoaded={this.fileLoaded}
+		        onError={this.onError}
+		        parserOptions={this.papaparseOptions}
+		        inputId="registrTable"
+		        inputStyle={{color: 'red'}}
+		      />
 
 			<table border="1">
 			   <caption>Таблица регистров</caption>
@@ -157,7 +189,7 @@ class LoadRegistersComponent extends Component {
 			<div className="form-group">
                         <button className="btn btn-primary" onClick={this.handleClick} disabled={error || (data.length==0)}>Добавить устройство</button>
                         {loading &&
-                            <img src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
+                            <img src={Strings.LOADING} />
                         }
                     </div>
 
