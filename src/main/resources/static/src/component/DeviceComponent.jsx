@@ -9,11 +9,17 @@ class DeviceComponent extends Component {
 
 		this.state = {
 					data: [],
+					loading: false,
 		        }
 
 		this.handleClickRead = this.handleClickRead.bind(this);
 		this.handleClickWrite = this.handleClickWrite.bind(this);
 
+    }
+
+
+	componentDidMount() {
+        console.log("props: ", this.props);
     }
 
 	handleClickRead = (address, count) => {    
@@ -66,7 +72,7 @@ class DeviceComponent extends Component {
 	
   	render() {
 		
-		const {data} = this.state;
+		const {data, loading} = this.state;
 		
 	    return (
 		<div>
@@ -93,7 +99,7 @@ class DeviceComponent extends Component {
 			</table>
 			
 			<div className="form-group">
-                        <button className="btn btn-primary" onClick={this.handleClick} disabled={error || (data.length==0)}>Удалить устройство</button>
+                        <button className="btn btn-primary">Удалить устройство</button>
                         {loading &&
                             <img src={Strings.LOADING} />
                         }

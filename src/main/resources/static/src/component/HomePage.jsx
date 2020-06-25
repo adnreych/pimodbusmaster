@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import DeviceService from '../service/DeviceService';
-import Button from 'muicss/lib/react/button';
 import Option from 'muicss/lib/react/option';
 import Select from 'muicss/lib/react/select';
 
@@ -42,12 +41,16 @@ class HomePage extends React.Component {
 	      })
 	   }
 
+	
+	handleChange(event) {    
+		this.setState({currDevice: event.target.value});  
+	  }
 		
 	handleSubmit(event) {
-		event.preventDefault();
-		this.setState({currDevice: event.target.value});  
+		event.preventDefault(); 
+		
 	    alert('Вы выбрали: ' + this.state.currDevice);
-			// обработка перехода к устройству   
+		this.props.history.push(`/device/${this.state.devices[this.state.currDevice].id}`);   
 	  }
 
     render() {
@@ -73,7 +76,7 @@ class HomePage extends React.Component {
 				<form onSubmit={this.handleSubmit}>
 			        <label>
 			          Выберите устройство:
-						<Select name="input" defaultValue="0">
+						<Select name="input" defaultValue="0" value={this.state.currDevice} onChange={this.handleChange}>
 				          {this.renderSelectData()}
 				        </Select>
 			        </label>
