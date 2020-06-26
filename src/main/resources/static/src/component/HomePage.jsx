@@ -26,7 +26,9 @@ class HomePage extends React.Component {
         });
         DeviceService.getAll()
 			.then(devices => {
-				this.setState({ devices: devices.data })
+				this.setState({ 
+					devices: devices.data,
+					})
 			})
 			.catch((err) => {
 					  console.log("ERROR: ", err);
@@ -74,7 +76,7 @@ class HomePage extends React.Component {
 				<form onSubmit={this.handleSubmit}>
 			        <label>
 			          Выберите устройство:
-						<Select name="input" defaultValue="0" value={this.state.currDevice} onChange={this.handleChange}>
+						<Select name="input" value={this.state.currDevice} onChange={this.handleChange}>
 				          {this.renderSelectData()}
 				        </Select>
 			        </label>

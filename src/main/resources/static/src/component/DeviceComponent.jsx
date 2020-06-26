@@ -146,10 +146,10 @@ class DeviceComponent extends Component {
 			   <td>{String(isWrite)}</td>
                <td>{type}</td>
                <td>{multiplier}</td>
+			   <td>{suffix}</td>
 			   <td>{min}</td>
                <td>{max}</td>
-				
-				<td>{suffix}</td>
+							
 						<td><input type="text" placeholder="Значение" 
 								value={this.state.inputValues[index]} 
 								ref={index}
@@ -174,7 +174,7 @@ class DeviceComponent extends Component {
 	
   	render() {
 		
-		const {device, name, address, loading} = this.state;
+		const {name, address, loading} = this.state;
 		
 	    return (
 		<div>
