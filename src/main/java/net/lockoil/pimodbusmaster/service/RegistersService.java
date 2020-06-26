@@ -37,6 +37,12 @@ public class RegistersService {
 		return registerRepository.findByDeviceId(id);
 	}
 	
+	public void deleteByDeviceId(Long id) {
+		List<CardRegisterElement> cardRegisterElements = new ArrayList<>();
+		cardRegisterElements = getDeviceRegisters(id);
+		registerRepository.deleteAll(cardRegisterElements);
+	}
+	
 	
 	public CardRegisterElement parseRegisterElement(LoadRegistersResource loadRegistersResource) {
 		

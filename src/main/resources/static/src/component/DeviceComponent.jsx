@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import * as Strings from '../helpers/strings';
 import LoadRegistersService from '../service/LoadRegistersService';
 import ModbusService from '../service/ModbusService';
+import DeviceService from '../service/DeviceService';
+import { confirmAlert } from 'react-confirm-alert';
+import 'react-confirm-alert/src/react-confirm-alert.css'; 
 
 
 class DeviceComponent extends Component {
@@ -19,6 +22,7 @@ class DeviceComponent extends Component {
 
 		this.handleClickRead = this.handleClickRead.bind(this);
 		this.handleClickWrite = this.handleClickWrite.bind(this);
+		this.deleteDevice = this.deleteDevice.bind(this);
 
     }
 
@@ -99,6 +103,33 @@ class DeviceComponent extends Component {
 		this.setState({inputValues: inputValues});
 	  }
 
+	deleteDevice(id) {	
+		confirmAlert({
+	      title: 'Подтвердите удаление устройства',
+	      buttons: [
+	        {
+	          label: 'Да',
+	          onClick: () => {
+				DeviceService.deleteDevice(id)
+					.then((response) => {
+						console.log("response: ", response);	
+						this.props.history.push("/");
+					})
+					.catch((err) => {
+							  console.log("ERROR: ", err);
+							  this.setState({ loading: false });
+						  });
+					}
+	        },
+	        {
+	          label: 'Нет',
+	          onClick: () => {}
+	        }
+	      ]
+	    });
+		
+	}
+
 	
 	
 	renderTableData() {
@@ -170,7 +201,7 @@ class DeviceComponent extends Component {
 			</table>
 			
 			<div className="form-group">
-                        <button className="btn btn-primary">Удалить устройство</button>
+                        <button className="btn btn-primary" onClick={() => this.deleteDevice(this.props.match.params.id)} >Удалить устройство</button>
                         {loading &&
                             <img src={Strings.LOADING} />
                         }

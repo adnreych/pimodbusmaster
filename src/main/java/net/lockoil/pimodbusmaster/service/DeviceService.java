@@ -17,6 +17,9 @@ public class DeviceService {
 	private final Logger log = Logger.getLogger(this.getClass().getSimpleName());
 	
 	private final DeviceRepository deviceRepository;
+	
+	@Autowired
+	RegistersService loadNewCardService;
 
 	@Autowired
 	public DeviceService(DeviceRepository deviceRepository) {
@@ -34,6 +37,11 @@ public class DeviceService {
 	
 	public List<Device> findAll() {
 		return deviceRepository.findAll();
+	}
+	
+	public void delete(Long id) {
+		loadNewCardService.deleteByDeviceId(id);
+		deviceRepository.deleteById(id);
 	}
 	
 }
