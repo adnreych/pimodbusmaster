@@ -14,36 +14,33 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import lombok.extern.log4j.Log4j2;
 import net.lockoil.pimodbusmaster.model.ReadRequest;
-import net.lockoil.pimodbusmaster.service.ModbusRequest;
+import net.lockoil.pimodbusmaster.model.ReadResponse;
+import net.lockoil.pimodbusmaster.model.WriteRequest;
+import net.lockoil.pimodbusmaster.service.ModbusRequestService;
 
 
 //@CrossOrigin(origins = { "http://localhost:3000", "http://localhost:4200", "http://192.168.88.23:3000" })
 @CrossOrigin
 @RestController
-public class CourseResource {
+public class ReadWriteController {
 
   
   @Autowired
-  private ModbusRequest modbusRequest;
+  private ModbusRequestService modbusRequestService;
   
   @GetMapping("/modbusread")
   public List<String> getAll() {
-	return modbusRequest.courses;
+	return modbusRequestService.courses;
+  }
+
+  @PostMapping("/modbusread")
+  public List<ReadResponse> modbusRead(@RequestBody ReadRequest modbusReadRequest) {
+	return modbusRequestService.read(modbusReadRequest);
   }
   
-  /*@GetMapping("/index.html")
-  public String getMain() {
-	return "index";
-  } */
-  
-  @PostMapping("/modbusread")
-  public ResponseEntity<String> getResponse(@RequestBody ReadRequest modbusReadRequest) {
-	String response = modbusRequest.read(modbusReadRequest).toString();
-	String result = response != null ? response : "Ошибка чтения данных";
-	modbusRequest.courses.add(result);
-	URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/").buildAndExpand(result)
-	        .toUri();
-	return ResponseEntity.created(uri).build();
+  @PostMapping("/api/modbuswrite")
+  public void modbusWrite(@RequestBody WriteRequest modbusWriteRequest) {
+	modbusRequestService.write(modbusWriteRequest);
   }
 
 }

@@ -19,10 +19,11 @@ import com.intelligt.modbus.jlibmodbus.serial.SerialUtils;
 import net.lockoil.pimodbusmaster.deviceconfig.DeviceConfig;
 import net.lockoil.pimodbusmaster.model.ReadRequest;
 import net.lockoil.pimodbusmaster.model.ReadResponse;
+import net.lockoil.pimodbusmaster.model.WriteRequest;
 
 
 @Service
-public class ModbusRequest {
+public class ModbusRequestService {
 	
 	public static List<String> courses = new ArrayList<>();
 	private final Logger log = Logger.getLogger(this.getClass().getSimpleName());
@@ -68,6 +69,38 @@ public class ModbusRequest {
             }
 		
 		return responses;
+	}
+	
+	public void write(WriteRequest modbusWriteRequestRequest) {
+		
+		int slave = modbusWriteRequestRequest.getSlave(); 
+		int startAddress = modbusWriteRequestRequest.getAddress(); 
+		int[] values = modbusWriteRequestRequest.getValues();
+		
+		
+		Modbus.setLogLevel(Modbus.LogLevel.LEVEL_DEBUG);
+        
+        ModbusMaster modbusMaster = null;
+		try {
+			modbusMaster = ModbusMasterFactory.createModbusMasterRTU(DeviceConfig.getStandartDevice());
+			modbusMaster.connect();
+			modbusMaster.writeMultipleRegisters(slave, startAddress, values);
+		} catch (SerialPortException | ModbusIOException e) {
+			log.info(e.getClass().getSimpleName());
+			e.printStackTrace();
+		} catch (RuntimeException e) {
+                throw e;
+            } catch (Exception e) {
+                e.printStackTrace();
+                log.info(e.getClass().getSimpleName());
+            } finally {
+                try {
+                	modbusMaster.disconnect();
+                } catch (ModbusIOException e) {
+                    e.printStackTrace();
+                    log.info(e.getClass().getSimpleName());
+                }
+            }
 	}
 	
 }

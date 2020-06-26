@@ -2,11 +2,13 @@ package net.lockoil.pimodbusmaster.controller;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,7 +18,7 @@ import net.lockoil.pimodbusmaster.model.CardRegisterElement;
 import net.lockoil.pimodbusmaster.model.Device;
 import net.lockoil.pimodbusmaster.model.LoadRegistersResource;
 import net.lockoil.pimodbusmaster.service.DeviceService;
-import net.lockoil.pimodbusmaster.service.LoadNewCardService;
+import net.lockoil.pimodbusmaster.service.RegistersService;
 import net.lockoil.pimodbusmaster.util.Common;
 
 @CrossOrigin
@@ -24,7 +26,7 @@ import net.lockoil.pimodbusmaster.util.Common;
 public class LoadRegistersController {
 	
 	@Autowired
-	LoadNewCardService loadNewCardService;
+	RegistersService loadNewCardService;
 	
 	@PostMapping("/api/loadregisters")
 	  public ResponseEntity<String> loadRegisters(@RequestBody ArrayList<LoadRegistersResource> loadRegistersResources) {
@@ -40,6 +42,12 @@ public class LoadRegistersController {
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/loadregisters").buildAndExpand(cardRegisterElements.size())
 		        .toUri();
 		return ResponseEntity.created(uri).build();
+	  }
+	
+
+	@GetMapping("/api/device/{id}")
+	  public List<CardRegisterElement> getDevice(@PathVariable(value="id") Long id) {	
+		return loadNewCardService.getDeviceRegisters(id);
 	  }
 	
 }

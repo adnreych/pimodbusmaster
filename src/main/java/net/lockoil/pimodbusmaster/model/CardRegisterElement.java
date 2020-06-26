@@ -22,7 +22,7 @@ public class CardRegisterElement {
 	@Column(name = "id", updatable = false, insertable = false)
 	private Long id;
 	
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "device_id")
 	private Device device;
 	

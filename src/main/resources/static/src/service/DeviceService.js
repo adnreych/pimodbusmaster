@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const SAVE = `/api/savedevice`
-const GET_ALL = `/api/devices`	
+const GET_ALL = `/api/devices`
 
 class DeviceService {
 

@@ -22,4 +22,7 @@ public class Device {
 	@Column(name = "name")
 	private String name;
 	
+	@Column(name = "address")
+	private Integer address;
+	
 }

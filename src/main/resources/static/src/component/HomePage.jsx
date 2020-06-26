@@ -48,8 +48,6 @@ class HomePage extends React.Component {
 		
 	handleSubmit(event) {
 		event.preventDefault(); 
-		
-	    alert('Вы выбрали: ' + this.state.currDevice);
 		this.props.history.push(`/device/${this.state.devices[this.state.currDevice].id}`);   
 	  }
 

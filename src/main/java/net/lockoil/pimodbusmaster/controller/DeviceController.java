@@ -23,11 +23,8 @@ public class DeviceController {
 	DeviceService deviceService;
 	
 	@PostMapping("/api/savedevice")
-	  public Long saveDevice(@RequestBody String deviceName) {	
-		Device device = new Device();
-		device.setName(deviceName);
-		
-		device = deviceService.save(device);
+	  public Long saveDevice(@RequestBody Device device) {	
+		deviceService.save(device);
 		
 		log.debug("SAVEDEVICE " + device.toString());
 			

@@ -17,7 +17,8 @@ class LoadRegistersComponent extends Component {
 					error: null,
 					loading: false,
 					success: null,
-					deviceName: ""
+					deviceName: "",
+					deviceAddress: ""
 		        }
 
         this.papaparseOptions = {
@@ -34,6 +35,7 @@ class LoadRegistersComponent extends Component {
 
 	  this.handleClick = this.handleClick.bind(this);
 	  this.handleChangeDeviceName = this.handleChangeDeviceName.bind(this);
+	  this.handleChangeDeviceAddress = this.handleChangeDeviceAddress.bind(this);
 
     }
 
@@ -41,7 +43,13 @@ class LoadRegistersComponent extends Component {
 		var data = this.state.data;
 		this.setState({ loading: true });
 		console.log("DEVICE: ", this.state.deviceName);
-		DeviceService.save(this.state.deviceName)
+		
+		let device = {
+            name: this.state.deviceName,
+           	address: this.state.deviceAddress
+        }
+
+		DeviceService.save(device)
 			.then(
 	                (request) => {
 						data.forEach(element => element.device = request.data)
@@ -103,8 +111,8 @@ class LoadRegistersComponent extends Component {
                <td>{name}</td>
                <td>{address}</td>
                <td>{count}</td>
-               <td>{isRead}</td>
-			   <td>{isWrite}</td>
+               <td>{String(isRead)}</td>
+			   <td>{String(isWrite)}</td>
                <td>{type}</td>
                <td>{multiplier}</td>
                <td>{suffix}</td>
@@ -130,7 +138,16 @@ class LoadRegistersComponent extends Component {
 	
 	handleChangeDeviceName(e) {
         this.setState({ deviceName: e.target.value });
-		console.log("DEVICE: ", this.state.deviceName);
+    }
+
+	handleChangeDeviceAddress(e) {
+		if (e.target.value < 0 || e.target.value > 247) {
+			this.setState( { error: []});
+			this.setState( prevState => ({ error: [...prevState.error, "Значение адреса может быть от 0 до 247"]}));
+		} else {
+			this.setState( { error: null});
+			this.setState({ deviceAddress: e.target.value });
+		}    	
     }
 
 
@@ -153,6 +170,11 @@ class LoadRegistersComponent extends Component {
 			<label>
           		Название устройства:
           	<input type="text" onChange={this.handleChangeDeviceName} />
+			</label>
+			
+			<label>
+          		Адрес устройства:
+          	<input type="number" onChange={this.handleChangeDeviceAddress} />
 			</label>
 
 		      <CSVReader
