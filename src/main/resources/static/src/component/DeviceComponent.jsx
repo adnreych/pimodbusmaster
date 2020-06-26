@@ -46,13 +46,13 @@ class DeviceComponent extends Component {
 		
 		this.setState({ loading: true })
 		
-		let modbusRequest = {
+		let readRequest = {
             slave: this.state.address,
            	address: address,
 			count: count
         }
 		
-		ModbusService.modbusRequest(modbusRequest)
+		ModbusService.modbusRead(readRequest)
 			.then((response) => {
 				console.log("response: ", response);
 				var inputValues = this.state.inputValues;
@@ -72,9 +72,32 @@ class DeviceComponent extends Component {
 				  });
 	}
 		
-	handleClickWrite = (address, value) => {    
+	handleClickWrite = (address, value, index) => {    
 			
+		this.setState({ loading: true })
+		
+		let writeRequest = {
+            slave: this.state.address,
+           	address: address,
+			values: [value]
+        }
+		
+		ModbusService.modbusWrite(writeRequest)
+			.then((response) => {
+				console.log("response: ", response);	
+				this.setState({ loading: false });
+			})
+			.catch((err) => {
+					  console.log("ERROR: ", err);
+					  this.setState({ loading: false });
+				  });
 	}
+	
+	handleChange(event, index) {    
+		var inputValues = this.state.inputValues;
+		inputValues[index] = event.target.value;
+		this.setState({inputValues: inputValues});
+	  }
 
 	
 	
@@ -96,7 +119,10 @@ class DeviceComponent extends Component {
                <td>{max}</td>
 				
 				<td>{suffix}</td>
-						<td><input type="text" placeholder="Значение" value={this.state.inputValues[index]} ref={index} /></td>
+						<td><input type="text" placeholder="Значение" 
+								value={this.state.inputValues[index]} 
+								ref={index}
+								onChange={(event) => this.handleChange(event, index)} /></td>
                         <td><button className="btn btn-primary" onClick={() => this.handleClickRead(address, count, index)} disabled={!isRead}>Чтение</button></td>
                         {loading &&
                             <img src={Strings.LOADING} />

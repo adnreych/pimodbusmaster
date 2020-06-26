@@ -1,15 +1,20 @@
 import axios from 'axios'
 
-const PATH = `/modbusread`
+const READ = `/api/modbusread`
+const WRITE = `/api/modbuswrite`
 
 class ModbusService {
 
     getModbusResponse() {
-        return axios.get(`${PATH}`);
+        return axios.get(`${READ}`);
     }
     
-    modbusRequest(modbusRequest) {
-        return axios.post(`${PATH}`, modbusRequest);
+    modbusRead(readRequest) {
+        return axios.post(`${READ}`, readRequest);
+    }
+    
+    modbusWrite(writeRequest) {
+        return axios.post(`${WRITE}`, writeRequest);
     }
    
 
