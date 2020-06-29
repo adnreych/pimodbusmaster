@@ -11,6 +11,7 @@ import lombok.Data;
 @AllArgsConstructor
 public class LoadRegistersResource {
 	
+	private Long id;
 	private Long device;
 	private String name;
 	private Integer address;

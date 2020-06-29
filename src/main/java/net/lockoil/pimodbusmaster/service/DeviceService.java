@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import net.lockoil.pimodbusmaster.exceptions.DeviceNotFoundException;
 import net.lockoil.pimodbusmaster.model.Device;
@@ -39,6 +40,7 @@ public class DeviceService {
 		return deviceRepository.findAll();
 	}
 	
+	@Transactional
 	public void delete(Long id) {
 		loadNewCardService.deleteByDeviceId(id);
 		deviceRepository.deleteById(id);

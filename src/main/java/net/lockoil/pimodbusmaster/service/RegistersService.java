@@ -43,6 +43,14 @@ public class RegistersService {
 		registerRepository.deleteAll(cardRegisterElements);
 	}
 	
+	public void changeRegister(CardRegisterElement cardRegisterElement) {
+		registerRepository.save(cardRegisterElement);
+	}
+	
+	public void deleteRegister(Long id) {
+		registerRepository.deleteById(id);
+	}
+	
 	
 	public CardRegisterElement parseRegisterElement(LoadRegistersResource loadRegistersResource) {
 		
@@ -62,6 +70,7 @@ public class RegistersService {
 		Device device;
 		
 		try {
+			if (loadRegistersResource.getId() != null) cardRegisterElement.setId(loadRegistersResource.getId());
 			device = deviceService.findById(deviceId);		
 			cardRegisterElement.setDevice(device);
 			cardRegisterElement.setName(name);
