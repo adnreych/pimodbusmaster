@@ -7,10 +7,14 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import net.lockoil.pimodbusmaster.exceptions.DeviceNotFoundException;
 import net.lockoil.pimodbusmaster.model.CardRegisterElement;
 import net.lockoil.pimodbusmaster.model.Device;
 import net.lockoil.pimodbusmaster.model.LoadRegistersResource;
+import net.lockoil.pimodbusmaster.model.modbustypes.TypeSupportable;
 import net.lockoil.pimodbusmaster.repository.RegistersRepository;
 
 @Service
@@ -65,7 +69,10 @@ public class RegistersService {
 		Long min = loadRegistersResource.getMinValue() != null ? loadRegistersResource.getMinValue() : null;
 		Long max = loadRegistersResource.getMaxValue() != null ? loadRegistersResource.getMaxValue() : null;
 		Long multiplier = loadRegistersResource.getMultiplier() != null ? loadRegistersResource.getMultiplier() : null;
+		String group = loadRegistersResource.getGroup() != null ? loadRegistersResource.getGroup() : "Без группы";
+		List<TypeSupportable> legends = loadRegistersResource.getLegends() != null ? loadRegistersResource.getLegends() : null;
 		
+		ObjectMapper mapper = new ObjectMapper();
 		CardRegisterElement cardRegisterElement = new CardRegisterElement();
 		Device device;
 		
@@ -83,7 +90,11 @@ public class RegistersService {
 			cardRegisterElement.setMinValue(min);
 			cardRegisterElement.setMaxValue(max);
 			cardRegisterElement.setMultiplier(multiplier);
+			cardRegisterElement.setGroup(group);
+			cardRegisterElement.setLegends(mapper.writeValueAsString(legends));
 		} catch (DeviceNotFoundException e) {
+			e.printStackTrace();
+		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 		}
 		

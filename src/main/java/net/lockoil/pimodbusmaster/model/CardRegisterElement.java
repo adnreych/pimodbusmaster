@@ -1,5 +1,7 @@
 package net.lockoil.pimodbusmaster.model;
 
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -11,6 +13,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import lombok.Data;
+import net.lockoil.pimodbusmaster.model.modbustypes.TypeSupportable;
 
 @Entity
 @Data
@@ -55,5 +58,11 @@ public class CardRegisterElement {
 	
 	@Column(name = "max_value")
 	private Long maxValue;
+	
+	@Column(name = "register_group")
+	private String group;
+	
+	@Column(name = "legends")
+	private String legends;
 
 }

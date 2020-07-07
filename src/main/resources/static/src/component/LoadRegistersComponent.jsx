@@ -1,6 +1,4 @@
 import React, { Component } from 'react';
-import ReactDOM from 'react-dom'
-import CSVReader from 'react-csv-reader'
 import LoadRegistersService from '../service/LoadRegistersService';
 import DeviceService from '../service/DeviceService';
 import * as Strings from '../helpers/strings';
@@ -21,23 +19,126 @@ class LoadRegistersComponent extends Component {
 					deviceAddress: ""
 		        }
 
-        this.papaparseOptions = {
-	    header: true,
-	    dynamicTyping: true,
-	    skipEmptyLines: true,
-	    transformHeader: header =>
-	      	{
-				header
-			        .toLowerCase();
-				return this.renameHeader(header)
-			}
-	  };
-
 	  this.handleClick = this.handleClick.bind(this);
 	  this.handleChangeDeviceName = this.handleChangeDeviceName.bind(this);
 	  this.handleChangeDeviceAddress = this.handleChangeDeviceAddress.bind(this);
+	  this.onFileUploadHandler = this.onFileUploadHandler.bind(this);
+	  this.handleModbusTypeLegend = this.handleModbusTypeLegend.bind(this);
 
     }
+
+
+	onFileUploadHandler = event=> {
+			const reader = new FileReader();
+			reader.readAsText(event.target.files[0]);
+	    	reader.onloadend = evt => {
+		      const readerData = evt.target.result;
+		      const parser = new DOMParser();
+		      const xmlStr = parser.parseFromString(readerData, "text/xml");
+		      var XMLParser = require("react-xml-parser");
+		      var xml = new XMLParser().parseFromString(
+		        new XMLSerializer().serializeToString(xmlStr.documentElement)
+		      );
+			  this.setState({ deviceName : xml.attributes.deviceName,
+							  deviceAddress : xml.attributes.deviceAddress});
+			  var xmlData = xml.getElementsByTagName('Register');
+			  var data = [];
+			  console.log("xmlDATA", xmlData);
+			  xmlData.forEach(element => {
+				var dataElement = {};
+				element.children.forEach(e =>  {				
+					switch(e.name) {
+						case "Name":
+							dataElement.name = e.value;
+							break;
+						case "Address":
+							dataElement.address = e.value;
+							break;
+						case "Count":
+							dataElement.count = e.value;
+							break;
+						case "IsRead":
+							dataElement.isRead = e.value;
+							break;
+						case "IsWrite":
+							dataElement.isWrite = e.value;
+							break;
+						case "Type":
+							dataElement.type = e.value; // обработка нестандартных типов
+							if (e.value == "Bit" || e.value == "Variable") dataElement.legends = this.handleModbusTypeLegend(element, e.value);
+							break;
+						case "Multiplier":
+							dataElement.multiplier = e.value;
+							break;
+						case "Suffix":
+							dataElement.suffix = e.value;
+							break;
+						case "Min":
+							dataElement.min = e.value;
+							break;
+						case "Max":
+							dataElement.max = e.value;
+							break;
+						case "Group":
+							dataElement.group = e.value;
+							break;
+					}
+				})
+				data.push(dataElement)
+			})
+			
+			this.setState({ error: [], success: null});
+			//xml validation 
+			data.forEach(element => {
+				if (+element.max < +element.min) this.setState( prevState => ({ error: [...prevState.error, "Ошибка в регистре " + element.address + " Максимальное значение не может быть меньше минимального"]}));
+				if (!Number.isInteger(+element.address)) this.setState( prevState => ({ error: [...prevState.error, "Ошибка в регистре " + element.address + " Адрес должен быть целым числом"]}));
+				if (!Number.isInteger(+element.count)) this.setState( prevState => ({ error: [...prevState.error, "Ошибка в регистре " + element.address + " Количество регистров должно быть целым числом"]}));
+				if (!Number.isInteger(+element.max)) this.setState( prevState => ({ error: [...prevState.error, "Ошибка в регистре " + element.address + " Максимальное значение должно быть целым числом"]}));
+				if (!Number.isInteger(+element.min)) this.setState( prevState => ({ error: [...prevState.error, "Ошибка в регистре " + element.address + " Минимальное значение должно быть целым числом"]}));
+				if ((element.isWrite != "false" && element.isWrite != "true") || (element.isRead != "false" && element.isRead != "true"))
+					this.setState( prevState => ({ error: [...prevState.error, "Ошибка в регистре " + element.address + " Допустимые значения чтения и записи: true, false"]}));
+			});
+			
+			if (this.state.error.length == 0) this.setState({ error: null});
+			this.setState({ data : data});
+			console.log("data", data);
+    	};
+	}
+	
+	handleModbusTypeLegend(legend, value) {
+		var legends = {};
+		if (value == "Variable") {
+			legends = legend.children.find(obj => {
+			  return obj.name == "Vars"
+			})
+			var variables = []
+			legends.children.forEach(e => {
+				var variable = {			
+					description: e.value,
+					value : e.attributes.value
+				}
+				variables.push(variable)
+			})
+			return variables;
+		} else if (value == "Bit") {
+			legends = legend.children.find(obj => {
+			  return obj.name == "Bits"
+			})
+			var bits = []
+			legends.children.forEach(e => {
+				var possibleValues = [];
+				e.children.forEach(possibleValue => possibleValues.push(possibleValue.value))
+				var bit = {
+		            startBit: e.attributes.start,
+		           	bitQuantity: e.attributes.quantity,
+					description: e.attributes.bitName,
+					possibleValues: possibleValues
+		        }
+				bits.push(bit)
+			})
+			return bits;
+		}
+	}
 
   	handleClick() {    
 		var data = this.state.data;
@@ -71,25 +172,6 @@ class LoadRegistersComponent extends Component {
 			  });
 		
 	}
-
-	fileLoaded = (data, fileInfo) => {
-		this.setState({ error: [], success: null});
-		//csv validation 
-		data.forEach(element => {
-			if (element.max < element.min) this.setState( prevState => ({ error: [...prevState.error, "Ошибка в регистре " + element.address + " Максимальное значение не может быть меньше минимального"]}));
-			if (!Number.isInteger(element.address)) this.setState( prevState => ({ error: [...prevState.error, "Ошибка в регистре " + element.address + " Адрес должен быть целым числом"]}));
-			if (!Number.isInteger(element.count)) this.setState( prevState => ({ error: [...prevState.error, "Ошибка в регистре " + element.address + " Количество регистров должно быть целым числом"]}));
-		});
-		
-		if (this.state.error.length == 0) this.setState({ error: null});
-		
-		console.log(data, fileInfo);
-		this.setState({data: data, fileInfo: fileInfo});
-	};
-	
-	onError = (e) => {
-		console.log("ERRORLOADFILE", e);
-	};
 	
 	renderErrors() {
       return this.state.error.map((e) => {
@@ -104,12 +186,25 @@ class LoadRegistersComponent extends Component {
 	
 	renderTableData() {
       return this.state.data.map((current, index) => {
-         const { name, address, count, isRead, isWrite, type, multiplier, suffix, min, max } = current;
+         const { name, address, count, isRead, isWrite, type, multiplier, suffix, min, max, group, legends } = current;
 		console.log("current", current);
+		var legendStrings = []
+		if (type == "Variable") {
+			legends.forEach(e => {
+				var str = `${e.description} : ${e.value} \n`
+				legendStrings.push(str)
+			})
+		} else if (type == "Bit") {
+			legends.forEach(e => {
+				var str = `${e.description} (биты ${+e.startBit} - ${e.startBit+e.bitQuantity-1}) : ${e.possibleValues} \n`
+				legendStrings.push(str)
+			})
+		}
          return (
             <tr key={index}>
                <td>{name}</td>
                <td>{address}</td>
+			   <td>{legendStrings}</td>
                <td>{count}</td>
                <td>{String(isRead)}</td>
 			   <td>{String(isWrite)}</td>
@@ -118,23 +213,11 @@ class LoadRegistersComponent extends Component {
                <td>{suffix}</td>
 			   <td>{min}</td>
                <td>{max}</td>
+			   <td>{group}</td>
             </tr>
          )
       })
    }
-
-	renameHeader(headerName) {
-		if (headerName.trim().localeCompare("Название") == 0) return "name";
-		if (headerName.trim().localeCompare("Адрес") == 0) return "address";
-		if (headerName.trim().localeCompare("Количество") == 0) return "count";
-		if (headerName.trim().localeCompare("Чтение") == 0) return "isRead";
-		if (headerName.trim().localeCompare("Запись") == 0) return "isWrite";
-		if (headerName.trim().localeCompare("Тип") == 0) return "type";
-		if (headerName.trim().localeCompare("Множитель") == 0) return "multiplier";
-		if (headerName.trim().localeCompare("Суффикс") == 0) return "suffix";
-		if (headerName.trim().localeCompare("Мин") == 0) return "min";
-		if (headerName.trim().localeCompare("Макс") == 0) return "max";	
-	}
 	
 	handleChangeDeviceName(e) {
         this.setState({ deviceName: e.target.value });
@@ -169,29 +252,25 @@ class LoadRegistersComponent extends Component {
 
 			<label>
           		Название устройства:
-          	<input type="text" onChange={this.handleChangeDeviceName} />
+          	<input type="text" value={this.state.deviceName} onChange={this.handleChangeDeviceName} />
 			</label>
 			
 			<label>
           		Адрес устройства:
-          	<input type="number" onChange={this.handleChangeDeviceAddress} />
+          	<input type="number" value={this.state.deviceAddress} onChange={this.handleChangeDeviceAddress} />
 			</label>
-
-		      <CSVReader
-		        cssClass="csv-reader-input"
-		        label="Выберите файл"
-		        onFileLoaded={this.fileLoaded}
-		        onError={this.onError}
-		        parserOptions={this.papaparseOptions}
-		        inputId="registrTable"
-		        inputStyle={{color: 'red'}}
-		      />
+			
+			<label>
+          		Загрузите файл
+          	 <input type="file" name="file" onChange={this.onFileUploadHandler}/>
+			</label>
 
 			<table border="1">
 			   <caption>Таблица регистров</caption>
 			   <tr>
 				<th>Название</th>
 			    <th>Адрес</th>
+				<th>Описание</th>
 			    <th>Количество</th>
 			    <th>Чтение</th>
 			    <th>Запись</th>
@@ -200,6 +279,7 @@ class LoadRegistersComponent extends Component {
 			    <th>Суффикс</th>
 				<th>Мин.</th>
 				<th>Макс.</th>
+				<th>Группа</th>
 			   </tr>
 
 				<tbody>
