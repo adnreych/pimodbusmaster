@@ -116,6 +116,22 @@
 		
 		<!-- jwt end -->
 		
+		<dependency>
+		    <groupId>org.javatuples</groupId>
+		    <artifactId>javatuples</artifactId>
+		    <version>1.2</version>
+		</dependency>
+		
+		<!-- tests start -->
+		
+		<dependency>
+		    <groupId>junit</groupId>
+		    <artifactId>junit</artifactId>
+		    <scope>test</scope>
+		</dependency>
+		
+		<!-- tests end -->
+		
 	</dependencies>
 
 	<build>

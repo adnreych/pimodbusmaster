@@ -5,6 +5,8 @@ import ModbusService from '../service/ModbusService';
 import DeviceService from '../service/DeviceService';
 import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css'; 
+import Option from 'muicss/lib/react/option';
+import Select from 'muicss/lib/react/select';
 
 
 class DeviceComponent extends Component {
@@ -30,6 +32,7 @@ class DeviceComponent extends Component {
 		this.deleteRegister = this.deleteRegister.bind(this);
 		this.handleChangeRegister = this.handleChangeRegister.bind(this);
 		this.handleChangeCurrentRegister = this.handleChangeCurrentRegister.bind(this);
+		this.deepFreeze = this.deepFreeze.bind(this);
 
     }
 
@@ -81,7 +84,8 @@ class DeviceComponent extends Component {
 			})
 			.catch((err) => {
 					  console.log("ERROR: ", err);
-					  this.setState({ loading: false })
+					  this.setState({ loading: false,
+									  error: "Ошибка чтения значения" })
 				  });
 	}
 		
@@ -102,13 +106,16 @@ class DeviceComponent extends Component {
 			})
 			.catch((err) => {
 					  console.log("ERROR: ", err);
-					  this.setState({ loading: false });
+					  this.setState({ loading: false,
+									  error: "Ошибка записи значения" });
 				  });
 	}
 	
 	async handleChangeRegister(current, index) {  
 		await this.setState({ currentChange: current });
 		let { name, address, count, isRead, isWrite, type, multiplier, suffix, min, max } = current;
+		const device  = this.deepFreeze(this.state.device);// не замораживать состояние
+		console.log("DEVICEBEFORE: ", device);
 		confirmAlert({
 		  closeOnClickOutside: true,
 		  customUI: ({ onClose }) => {
@@ -121,10 +128,16 @@ class DeviceComponent extends Component {
 					<label>Количество</label>
 	                <input type="text" className="form-control" defaultValue={count} onChange={(event) => this.handleChangeCurrentRegister(event, "count")}  />
 					<label>Чтение</label>
-	                <input type="text" className="form-control" defaultValue={String(isRead)} onChange={(event) => this.handleChangeCurrentRegister(event, "isRead")}  />
-					<label>Запись</label>
-	                <input type="text" className="form-control" defaultValue={String(isWrite)} onChange={(event) => this.handleChangeCurrentRegister(event, "isWrite")}  />
-					<label>Тип</label>
+					<Select name="input" defaultValue={String(isRead)} onChange={(event) => this.handleChangeCurrentRegister(event, "isRead")}>
+				          <Option value="true" label="true" />
+						  <Option value="false" label="false" />
+				    </Select>
+	               	<label>Запись</label>
+					<Select name="input" defaultValue={String(isWrite)} onChange={(event) => this.handleChangeCurrentRegister(event, "isWrite")}>
+				          <Option value="true" label="true" />
+						  <Option value="false" label="false" />
+				    </Select>
+	                <label>Тип</label>
 	                <input type="text" className="form-control" defaultValue={type} onChange={(event) => this.handleChangeCurrentRegister(event, "type")}  />
 					<label>Множитель</label>
 	                <input type="text" className="form-control" defaultValue={multiplier} onChange={(event) => this.handleChangeCurrentRegister(event, "multiplier")}  />
@@ -135,15 +148,21 @@ class DeviceComponent extends Component {
 					<label>Макс</label>
 	                <input type="text" className="form-control" defaultValue={max} onChange={(event) => this.handleChangeCurrentRegister(event, "max")}  />
 			        <button 
-					  onClick={onClose}>Отмена</button>
+					  onClick={() => {
+						console.log("DEVICEAFTER: ", device);
+							this.setState({device: device});
+							onClose();	
+						}}>Отмена</button>
 			        <button
 			          onClick={() => {
 							this.setState({ loading: true });
 							console.log("currentOnChange: ", current);
 								LoadRegistersService.changeRegister(current)
 									.then(() => {
-										this.setState( { success: []});
+										var device = this.state.device;
+										device[index] = current;
 										this.setState({
+											device: device,
 											loading: false,
 											error: null,
 											success: "Данные обновлены успешно"});
@@ -169,6 +188,21 @@ class DeviceComponent extends Component {
 		currentChange[key] = event.target.value;
 		this.setState({ currentChange: currentChange });	
 	}
+	
+	deepFreeze = (o) => {
+	  Object.freeze(o);
+	  var _this = this;
+	  Object.getOwnPropertyNames(o).forEach(function(prop) {
+	    if (o.hasOwnProperty(prop)
+	    && o[prop] !== null
+	    && (typeof o[prop] === "object" || typeof o[prop] === "function")
+	    && !Object.isFrozen(o[prop])) {
+	        _this.deepFreeze(o[prop]);
+	      }
+	  });
+	
+	  return o;
+	}
 
 	
 	handleChange = (event, index) => {    
@@ -189,11 +223,12 @@ class DeviceComponent extends Component {
 						var device = this.state.device;
 						device.splice(index, 1);
 						this.setState({ device: device });	
-					//	this.props.history.push(`/device/${this.props.match.params.id}`);  
 					})
 					.catch((err) => {
 							  console.log("ERROR: ", err);
-							  this.setState({ loading: false });
+							  this.setState({ 
+								loading: false,
+								error: "Ошибка при удалении регистра" });
 						  });
 					}
 	        },
@@ -214,12 +249,13 @@ class DeviceComponent extends Component {
 	          onClick: () => {
 				DeviceService.deleteDevice(id)
 					.then((response) => {
-						console.log("response: ", response);
 						this.props.history.push("/");
 					})
 					.catch((err) => {
 							  console.log("ERROR: ", err);
-							  this.setState({ loading: false });
+							  this.setState({ 
+								loading: false,
+								error: "Ошибка при удалении устройства" });
 						  });
 					}
 	        },
