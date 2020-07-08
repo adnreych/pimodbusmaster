@@ -3,6 +3,7 @@ import * as Strings from '../helpers/strings';
 import LoadRegistersService from '../service/LoadRegistersService';
 import ModbusService from '../service/ModbusService';
 import DeviceService from '../service/DeviceService';
+import SpecialModbusTypesComponent from './SpecialModbusTypesComponent';
 import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css'; 
 import Option from 'muicss/lib/react/option';
@@ -22,7 +23,9 @@ class DeviceComponent extends Component {
 					inputValues: [],
 					error: null,
 					success: null,
-					currentChange: null
+					currentChange: null,
+					addedRegister: {},
+					currentLegend: ""
 		        }
 
 
@@ -33,6 +36,8 @@ class DeviceComponent extends Component {
 		this.handleChangeRegister = this.handleChangeRegister.bind(this);
 		this.handleChangeCurrentRegister = this.handleChangeCurrentRegister.bind(this);
 		this.deepFreeze = this.deepFreeze.bind(this);
+		this.addRegister = this.addRegister.bind(this);
+		this.handleChangeAddedRegister = this.handleChangeAddedRegister.bind(this);
 
     }
 
@@ -73,11 +78,16 @@ class DeviceComponent extends Component {
 				console.log("response: ", response);
 				var inputValues = this.state.inputValues;
 				inputValues[index] = response.data[0];
-				if (response.data[0] == null) inputValues[index] = 0;
-				 else inputValues[index] = response.data[0].value;
-				this.setState({
-					loading: false,
-					inputValues: inputValues});
+				if (response.data[0] == null) {
+					this.setState({ loading: false,
+									  error: "Не удалось прочитать значения регистров" })
+				}
+				else {
+					inputValues[index] = response.data[0].value;
+					this.setState({
+						loading: false,
+						inputValues: inputValues});
+				}
 				console.log("inputValues index: ", index);
 				console.log("inputValues: ", inputValues);
 		
@@ -102,7 +112,14 @@ class DeviceComponent extends Component {
 		ModbusService.modbusWrite(writeRequest)
 			.then((response) => {
 				console.log("response: ", response);	
-				this.setState({ loading: false });
+				if (response == "OK") {
+					this.setState({ loading: false,
+								    success: "Запись значений выполнена успешно" });
+				} else {
+					this.setState({ loading: false,
+									  error: "Ошибка записи значения" });
+				}
+				
 			})
 			.catch((err) => {
 					  console.log("ERROR: ", err);
@@ -112,10 +129,9 @@ class DeviceComponent extends Component {
 	}
 	
 	async handleChangeRegister(current, index) {  
-		await this.setState({ currentChange: current });
-		let { name, address, count, isRead, isWrite, type, multiplier, suffix, min, max } = current;
-		const device  = this.deepFreeze(this.state.device);// не замораживать состояние
-		console.log("DEVICEBEFORE: ", device);
+		await this.setState({ currentChange: current, currentLegend: type });
+		let { name, address, count, isRead, isWrite, type, multiplier, suffix, min, max, group, legends } = current;
+		const device = this.deepFreeze(this.state.device);
 		confirmAlert({
 		  closeOnClickOutside: true,
 		  customUI: ({ onClose }) => {
@@ -147,10 +163,14 @@ class DeviceComponent extends Component {
 	                <input type="text" className="form-control" defaultValue={min} onChange={(event) => this.handleChangeCurrentRegister(event, "min")}  />
 					<label>Макс</label>
 	                <input type="text" className="form-control" defaultValue={max} onChange={(event) => this.handleChangeCurrentRegister(event, "max")}  />
+					<label>Группа</label>
+	                <input type="text" className="form-control" defaultValue={group} onChange={(event) => this.handleChangeCurrentRegister(event, "group")} />
+					<label>Описание</label>
+					<SpecialModbusTypesComponent targetType={this.state.currentLegend} />
 			        <button 
 					  onClick={() => {
-						console.log("DEVICEAFTER: ", device);
-							this.setState({device: device});
+							this.setState({device: device,
+										   currentLegend: ""});
 							onClose();	
 						}}>Отмена</button>
 			        <button
@@ -183,9 +203,105 @@ class DeviceComponent extends Component {
 		}); 
 	  }
 
+
+	addRegister() {
+		this.setState({
+			addedRegister : {
+				device: this.state.device[0].device,
+				name: "",
+				address: "",
+				count: "",
+				isRead: true,
+				isWrite: false,
+				type: "",
+				multiplier: "",
+				suffix: "",
+				mix: 0,
+				max: 0,
+				group: "",
+				legends: null
+			}
+		})
+		let { name, address, count, isRead, isWrite, type, multiplier, suffix, min, max, group } = this.state.addedRegister;
+		confirmAlert({
+		  closeOnClickOutside: true,
+		  customUI: ({ onClose }) => {
+		    return (
+		      <div className='custom-ui'>
+			        <label>Название</label>
+	                <input type="text" className="form-control" defaultValue={name} onChange={(event) => this.handleChangeAddedRegister(event, "name")}/>
+					<label>Адрес</label>
+	                <input type="text" className="form-control" defaultValue={address} onChange={(event) => this.handleChangeAddedRegister(event, "address")} />
+					<label>Количество</label>
+	                <input type="text" className="form-control" defaultValue={count} onChange={(event) => this.handleChangeAddedRegister(event, "count")} />
+					<label>Чтение</label>
+					<Select name="input" defaultValue={String(isRead)} onChange={(event) => this.handleChangeAddedRegister(event, "isRead")} >
+				          <Option value="true" label="true" />
+						  <Option value="false" label="false" />
+				    </Select>
+	               	<label>Запись</label>
+					<Select name="input" defaultValue={String(isWrite)} onChange={(event) => this.handleChangeAddedRegister(event, "isWrite")} >
+				          <Option value="true" label="true" />
+						  <Option value="false" label="false" />
+				    </Select>
+	                <label>Тип</label>
+	                <input type="text" className="form-control" defaultValue={type} onChange={(event) => this.handleChangeAddedRegister(event, "type")} />
+					<label>Множитель</label>
+	                <input type="text" className="form-control" defaultValue={multiplier} onChange={(event) => this.handleChangeAddedRegister(event, "multiplier")} />
+					<label>Суффикс</label>
+	                <input type="text" className="form-control" defaultValue={suffix} onChange={(event) => this.handleChangeAddedRegister(event, "suffix")} />
+					<label>Мин</label>
+	                <input type="text" className="form-control" defaultValue={min} onChange={(event) => this.handleChangeAddedRegister(event, "min")} />
+					<label>Макс</label>
+	                <input type="text" className="form-control" defaultValue={max} onChange={(event) => this.handleChangeAddedRegister(event, "max")} />
+					<label>Группа</label>
+	                <input type="text" className="form-control" defaultValue={group} onChange={(event) => this.handleChangeAddedRegister(event, "group")} />
+			        <button 
+					  onClick={() => {
+							onClose();	
+						}}>Отмена</button>
+			        <button
+			          onClick={() => {
+							this.setState({ loading: true });
+								LoadRegistersService.addRegister(this.state.addedRegister)
+									.then(() => {		
+										var device = this.state.device;
+											device.push(this.state.addedRegister);
+											this.setState({
+												device: device,
+												loading: false,
+												error: null,
+												success: "Данные обновлены успешно"
+											})	
+									})
+									.catch((err) => {
+											 console.log("ERROR: ", err);
+											  this.setState({ 
+												loading: false, 
+												error: "Ошибка добавления регистра",
+												success: null })
+										  });
+								onClose();		
+							}}>Сохранить</button>
+		      </div>
+		    );
+		  }
+		});
+	}
+	
+	handleChangeAddedRegister = (event, key) => {
+		var addedRegister = this.state.addedRegister;
+		addedRegister[key] = event.target.value;
+		this.setState({ addedRegister: addedRegister });	
+	}
+
 	handleChangeCurrentRegister = (event, key) => {
 		var currentChange = this.state.currentChange;
 		currentChange[key] = event.target.value;
+		if (key == "type") {
+			this.setState({ currentLegend: event.target.value });
+		}
+		console.log("currentLegend", this.state.currentLegend)
 		this.setState({ currentChange: currentChange });	
 	}
 	
@@ -345,6 +461,7 @@ class DeviceComponent extends Component {
 			
 			<div className="form-group">
                         <button className="btn btn-primary" onClick={() => this.deleteDevice(this.props.match.params.id)} >Удалить устройство</button>
+						<button className="btn btn-primary" onClick={() => this.addRegister()} >Добавить регистр</button>
                         {loading &&
                             <img src={Strings.LOADING} />
                         }

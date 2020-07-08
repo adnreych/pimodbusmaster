@@ -4,6 +4,7 @@ const PATH = `/api/registers/load`
 const GET_DEVICE = `/api/device/`
 const CHANGE_REGISTER = `/api/registers/change`
 const DELETE_REGISTER = `/api/registers/delete/`
+const ADD_REGISTER = `/api/registers/add`
 
 class LoadRegistersService {
     
@@ -22,6 +23,10 @@ class LoadRegistersService {
 	
 	deleteRegister(registerId) {
 		return axios.delete(`${DELETE_REGISTER}` + registerId);
+	}
+	
+	addRegister(register) {
+		return axios.post(`${ADD_REGISTER}`, register);
 	}
 
 }

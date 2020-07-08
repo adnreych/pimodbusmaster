@@ -39,8 +39,8 @@ public class ReadWriteController {
   }
   
   @PostMapping("/api/modbuswrite")
-  public void modbusWrite(@RequestBody WriteRequest modbusWriteRequest) {
-	modbusRequestService.write(modbusWriteRequest);
+  public String modbusWrite(@RequestBody WriteRequest modbusWriteRequest) {
+	  return modbusRequestService.write(modbusWriteRequest);
   }
 
 }

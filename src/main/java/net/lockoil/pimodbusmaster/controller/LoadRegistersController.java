@@ -63,4 +63,10 @@ public class LoadRegistersController {
 		registersService.deleteRegister(id);		
 	  }
 	
+	@PostMapping("/api/registers/add")
+	  public void addRegister(@RequestBody LoadRegistersResource loadRegistersResource) {		
+			CardRegisterElement cardRegisterElement = registersService.parseRegisterElement(loadRegistersResource);
+			registersService.addRegister(cardRegisterElement);
+	  }
+	
 }

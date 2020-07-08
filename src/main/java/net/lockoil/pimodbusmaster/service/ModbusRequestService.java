@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 
 import com.intelligt.modbus.jlibmodbus.Modbus;
 import com.intelligt.modbus.jlibmodbus.exception.ModbusIOException;
+import com.intelligt.modbus.jlibmodbus.exception.ModbusNumberException;
+import com.intelligt.modbus.jlibmodbus.exception.ModbusProtocolException;
 import com.intelligt.modbus.jlibmodbus.master.ModbusMaster;
 import com.intelligt.modbus.jlibmodbus.master.ModbusMasterFactory;
 import com.intelligt.modbus.jlibmodbus.serial.SerialParameters;
@@ -71,8 +73,8 @@ public class ModbusRequestService {
 		return responses;
 	}
 	
-	public void write(WriteRequest modbusWriteRequestRequest) {
-		
+	public String write(WriteRequest modbusWriteRequestRequest) {
+
 		int slave = modbusWriteRequestRequest.getSlave(); 
 		int startAddress = modbusWriteRequestRequest.getAddress(); 
 		int[] values = modbusWriteRequestRequest.getValues();
@@ -85,22 +87,21 @@ public class ModbusRequestService {
 			modbusMaster = ModbusMasterFactory.createModbusMasterRTU(DeviceConfig.getStandartDevice());
 			modbusMaster.connect();
 			modbusMaster.writeMultipleRegisters(slave, startAddress, values);
-		} catch (SerialPortException | ModbusIOException e) {
+			return "OK";
+		} catch (SerialPortException | ModbusIOException | ModbusProtocolException | ModbusNumberException | RuntimeException e) {
 			log.info(e.getClass().getSimpleName());
 			e.printStackTrace();
-		} catch (RuntimeException e) {
-                throw e;
-            } catch (Exception e) {
-                e.printStackTrace();
-                log.info(e.getClass().getSimpleName());
-            } finally {
+		}
+		finally {
                 try {
-                	modbusMaster.disconnect();
+                	if (modbusMaster.isConnected()) modbusMaster.disconnect();  	
+                	return "ERROR";
                 } catch (ModbusIOException e) {
                     e.printStackTrace();
-                    log.info(e.getClass().getSimpleName());
+                    log.info(e.getClass().getSimpleName());              
                 }
-            }
+        }
+		return "ERROR";
 	}
 	
 }

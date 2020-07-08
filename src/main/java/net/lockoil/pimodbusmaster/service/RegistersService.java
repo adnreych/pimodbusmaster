@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import net.lockoil.pimodbusmaster.exceptions.DeviceNotFoundException;
@@ -55,6 +56,10 @@ public class RegistersService {
 		registerRepository.deleteById(id);
 	}
 	
+	public void addRegister(CardRegisterElement cardRegisterElement) {
+		registerRepository.save(cardRegisterElement);
+	}
+	
 	
 	public CardRegisterElement parseRegisterElement(LoadRegistersResource loadRegistersResource) {
 		
@@ -73,6 +78,7 @@ public class RegistersService {
 		List<TypeSupportable> legends = loadRegistersResource.getLegends() != null ? loadRegistersResource.getLegends() : null;
 		
 		ObjectMapper mapper = new ObjectMapper();
+		
 		CardRegisterElement cardRegisterElement = new CardRegisterElement();
 		Device device;
 		

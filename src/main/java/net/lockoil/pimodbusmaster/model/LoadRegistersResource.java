@@ -5,6 +5,8 @@ import java.util.Map;
 
 import javax.persistence.Column;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import net.lockoil.pimodbusmaster.model.modbustypes.TypeSupportable;
