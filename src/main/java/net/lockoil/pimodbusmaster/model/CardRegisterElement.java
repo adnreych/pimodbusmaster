@@ -62,7 +62,7 @@ public class CardRegisterElement {
 	@Column(name = "register_group")
 	private String group;
 	
-	@Column(name = "legends")
+	@Column(name = "legends", columnDefinition="json")
 	private String legends;
 
 }

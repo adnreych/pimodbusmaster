@@ -64,7 +64,8 @@ class LoadRegistersComponent extends Component {
 							dataElement.isWrite = e.value;
 							break;
 						case "Type":
-							dataElement.type = e.value; // обработка нестандартных типов
+							dataElement.type = e.value; 
+							// обработка нестандартных типов
 							if (e.value == "Bit" || e.value == "Variable") dataElement.legends = this.handleModbusTypeLegend(element, e.value);
 							break;
 						case "Multiplier":
@@ -115,7 +116,8 @@ class LoadRegistersComponent extends Component {
 			legends.children.forEach(e => {
 				var variable = {			
 					description: e.value,
-					value : e.attributes.value
+					value : e.attributes.value,
+					type: "varType"
 				}
 				variables.push(variable)
 			})
@@ -132,7 +134,8 @@ class LoadRegistersComponent extends Component {
 		            startBit: e.attributes.start,
 		           	bitQuantity: e.attributes.quantity,
 					description: e.attributes.bitName,
-					possibleValues: possibleValues
+					possibleValues: possibleValues,
+					type: "bitType"
 		        }
 				bits.push(bit)
 			})
@@ -196,7 +199,8 @@ class LoadRegistersComponent extends Component {
 			})
 		} else if (type == "Bit") {
 			legends.forEach(e => {
-				var str = `${e.description} (биты ${+e.startBit} - ${e.startBit+e.bitQuantity-1}) : ${e.possibleValues} \n`
+				var end = Number(e.startBit) + Number(e.bitQuantity) - 1;
+				var str = `${e.description} (биты ${e.startBit} - ${end}) : ${e.possibleValues} \n`
 				legendStrings.push(str)
 			})
 		}
