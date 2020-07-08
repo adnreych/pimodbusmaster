@@ -129,9 +129,11 @@ class DeviceComponent extends Component {
 	}
 	
 	async handleChangeRegister(current, index) {  
-		await this.setState({ currentChange: current, currentLegend: type });
+		await this.setState({ currentChange: current });
 		let { name, address, count, isRead, isWrite, type, multiplier, suffix, min, max, group, legends } = current;
-		const device = this.deepFreeze(this.state.device);
+		this.setState({ currentChange: current, currentLegend: type });
+		const device = JSON.stringify(this.state.device);
+
 		confirmAlert({
 		  closeOnClickOutside: true,
 		  customUI: ({ onClose }) => {
@@ -169,7 +171,7 @@ class DeviceComponent extends Component {
 					<SpecialModbusTypesComponent targetType={this.state.currentLegend} />
 			        <button 
 					  onClick={() => {
-							this.setState({device: device,
+							this.setState({device: JSON.parse(device),
 										   currentLegend: ""});
 							onClose();	
 						}}>Отмена</button>
@@ -304,22 +306,6 @@ class DeviceComponent extends Component {
 		console.log("currentLegend", this.state.currentLegend)
 		this.setState({ currentChange: currentChange });	
 	}
-	
-	deepFreeze = (o) => {
-	  Object.freeze(o);
-	  var _this = this;
-	  Object.getOwnPropertyNames(o).forEach(function(prop) {
-	    if (o.hasOwnProperty(prop)
-	    && o[prop] !== null
-	    && (typeof o[prop] === "object" || typeof o[prop] === "function")
-	    && !Object.isFrozen(o[prop])) {
-	        _this.deepFreeze(o[prop]);
-	      }
-	  });
-	
-	  return o;
-	}
-
 	
 	handleChange = (event, index) => {    
 		var inputValues = this.state.inputValues;
