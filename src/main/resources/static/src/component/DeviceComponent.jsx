@@ -35,7 +35,6 @@ class DeviceComponent extends Component {
 		this.deleteRegister = this.deleteRegister.bind(this);
 		this.handleChangeRegister = this.handleChangeRegister.bind(this);
 		this.handleChangeCurrentRegister = this.handleChangeCurrentRegister.bind(this);
-		this.deepFreeze = this.deepFreeze.bind(this);
 		this.addRegister = this.addRegister.bind(this);
 		this.handleChangeAddedRegister = this.handleChangeAddedRegister.bind(this);
 
@@ -157,6 +156,15 @@ class DeviceComponent extends Component {
 				    </Select>
 	                <label>Тип</label>
 	                <input type="text" className="form-control" defaultValue={type} onChange={(event) => this.handleChangeCurrentRegister(event, "type")}  />
+					<button 
+					  onClick={() => {
+							confirmAlert({
+								closeOnClickOutside: true,
+								customUI: ({ onClose }) => {
+									return (<SpecialModbusTypesComponent targetType={this.state.currentLegend} />)
+								}
+							})	
+						}}>Задать параметры типа</button>
 					<label>Множитель</label>
 	                <input type="text" className="form-control" defaultValue={multiplier} onChange={(event) => this.handleChangeCurrentRegister(event, "multiplier")}  />
 					<label>Суффикс</label>
@@ -294,6 +302,10 @@ class DeviceComponent extends Component {
 	handleChangeAddedRegister = (event, key) => {
 		var addedRegister = this.state.addedRegister;
 		addedRegister[key] = event.target.value;
+		if (key == "type") {
+			this.setState({ currentLegend: event.target.value });
+			console.log("currentLegend", this.state.currentLegend)
+		}	
 		this.setState({ addedRegister: addedRegister });	
 	}
 
@@ -302,8 +314,8 @@ class DeviceComponent extends Component {
 		currentChange[key] = event.target.value;
 		if (key == "type") {
 			this.setState({ currentLegend: event.target.value });
-		}
-		console.log("currentLegend", this.state.currentLegend)
+			console.log("currentLegend", this.state.currentLegend)
+		}	
 		this.setState({ currentChange: currentChange });	
 	}
 	
