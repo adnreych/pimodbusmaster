@@ -7,7 +7,7 @@ class SpecialModbusTypesComponent extends Component {
 
 		this.state = {
 					targetType: this.props.targetType,
-					data: [],
+					data: JSON.parse(this.props.data),
 					loading: false,					
 		        }
 
@@ -16,8 +16,17 @@ class SpecialModbusTypesComponent extends Component {
 		this.renderByteElements = this.renderByteElements.bind(this);
 		this.renderVarElements = this.renderVarElements.bind(this);
 		this.renderPossibleValues = this.renderPossibleValues.bind(this);
+		this.handleChangeByte = this.handleChangeByte.bind(this);
 
     }
+
+	handleChangeByte(event, field, index) {
+		console.log("DATABEFORE", this.state.data)
+		var data = this.state.data
+		data[index][field] = event.target.value;
+		this.setState({ data: data });	
+		console.log("DATAAFTER", this.state.data)
+	}
 
 
 	renderTargetModbusTypeForm() {
@@ -61,14 +70,14 @@ class SpecialModbusTypesComponent extends Component {
 	}
 	
 	renderByteElements() {
-		if (this.state.data.length != 0) {
+		if (this.state.data != null) {
 			return this.state.data.map((current, index) => {
 	         const { startBit, bitQuantity, description, possibleValues } = current;
 	         return (
 	            <tr>
-					<td>{description}</td>
-					<td>{startBit}</td>
-					<td>{bitQuantity}</td>
+					<td><input type="text" className="form-control" defaultValue={description} onChange={(event) => this.handleChangeByte(event, "description", index)}/></td>
+					<td><input type="text" className="form-control" defaultValue={startBit} onChange={(event) => this.handleChangeByte(event, "startBit", index)}/></td>
+					<td><input type="text" className="form-control" defaultValue={bitQuantity} onChange={(event) => this.handleChangeByte(event, "bitQuantity", index)}/></td>
 					<td>{this.renderPossibleValues(possibleValues)}</td>
 				</tr>
 	         )
@@ -76,10 +85,10 @@ class SpecialModbusTypesComponent extends Component {
 		} else {
 			return(
 			<tr>
-				<td><input type="text" placeholder="Название" className="form-control" onChange={(event) => {}}/></td>
-				<td><input type="text" placeholder="Начальный бит" className="form-control" onChange={(event) => {}}/></td>
-				<td><input type="text" placeholder="Количество бит" className="form-control" onChange={(event) => {}}/></td>
-				<td><input type="text" placeholder="Возможные значения" className="form-control" onChange={(event) => {}}/></td>
+				<td><input type="text" placeholder="Название" className="form-control" onChange={(event) => this.handleChangeByte(event, "description", 0)}/></td>
+				<td><input type="text" placeholder="Начальный бит" className="form-control" onChange={(event) => this.handleChangeByte(event, "startBit", 0)}/></td>
+				<td><input type="text" placeholder="Количество бит" className="form-control" onChange={(event) => this.handleChangeByte(event, "bitQuantity", 0)}/></td>
+				<td><input type="text" placeholder="Возможные значения (через запятую)" className="form-control" onChange={(event) => this.handleChangeByte(event, "possibleValues", 0)}/></td>
 			</tr>
 			)
 		}
@@ -111,21 +120,21 @@ class SpecialModbusTypesComponent extends Component {
 	}
 	
 	renderVarElements() {
-		if (this.state.data.length != 0) {
+		if (this.state.data != null) {
 			return this.state.data.map((current, index) => {
 	         const {description, value } = current;
 	         return (
 	            <tr>
-					<td>{description}</td>
-					<td>{value}</td>
+					<td><input type="text" className="form-control" defaultValue={description} onChange={(event) => this.handleChangeByte(event, "description", index)}/></td>
+					<td><input type="text" className="form-control" defaultValue={value} onChange={(event) => this.handleChangeByte(event, "value", index)}/></td>
 				</tr>
 	         )
 	      })
 		} else {
 			return(
 				<tr>
-					<td><input type="text" placeholder="Описание" className="form-control" onChange={(event) => {}}/></td>
-					<td><input type="text" placeholder="Значение" className="form-control" onChange={(event) => {}}/></td>
+					<td><input type="text" placeholder="Описание" className="form-control" onChange={(event) => this.handleChangeByte(event, "description", 0)}/></td>
+					<td><input type="text" placeholder="Значение" className="form-control" onChange={(event) => this.handleChangeByte(event, "value", 0)}/></td>
 				</tr>
 			)
 		}

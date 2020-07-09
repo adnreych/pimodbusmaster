@@ -366,7 +366,6 @@ class DeviceComponent extends Component {
 					legendStrings.push(str)
 			})
 			}
-			console.log("lSTRINGS", legendStrings)
 			return legendStrings.map((e) => {
 				return (
 					<p>{e}</p>
@@ -487,7 +486,7 @@ class DeviceComponent extends Component {
 				<td>{this.renderDescriptionSpecialTypes(type, legends)}
 					{editedNow[index] &&
 							<div>
-							{(type=="Variable" || type=="Bit") && <SpecialModbusTypesComponent targetType={type} />}
+							{(type=="Variable" || type=="Bit") && <SpecialModbusTypesComponent targetType={type} data={legends} />}
 							</div>
                         }
 				</td>
