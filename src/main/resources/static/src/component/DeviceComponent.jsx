@@ -38,8 +38,8 @@ class DeviceComponent extends Component {
 		this.handleChangeCurrentRegister = this.handleChangeCurrentRegister.bind(this);
 		this.addRegister = this.addRegister.bind(this);
 		this.handleChangeAddedRegister = this.handleChangeAddedRegister.bind(this);
-		this.renderEditRegister = this.renderEditRegister.bind(this);
 		this.handleConfirmChangeRegister = this.handleConfirmChangeRegister.bind(this);
+		this.renderDescriptionSpecialTypes = this.renderDescriptionSpecialTypes.bind(this);
 
     }
 
@@ -133,94 +133,19 @@ class DeviceComponent extends Component {
 				  });
 	}
 	
-	handleConfirmChangeRegister(current, index) {
+	handleConfirmChangeRegister(index) {
 		var editedNow = this.state.editedNow;
 		 editedNow[index] = false;
 		 this.setState({ editedNow:  editedNow,
-						 currentChange: current });
+						 currentChange: "" });
 	}
 	
-	async handleChangeRegister(current, index) {  
-
+	handleChangeRegister(current, index) {  
 		 var editedNow = this.state.editedNow;
 		 editedNow[index] = true;
 		 this.setState({ editedNow:  editedNow,
 						 currentChange: current });
 	  }
-
-	renderEditRegister(current, index) {  
-		let { name, address, count, isRead, isWrite, type, multiplier, suffix, min, max, group, legends } = current;
-		console.log("TYPE", type)
-		const device = JSON.stringify(this.state.device);
-		return (
-		      <div className='custom-ui'>
-			        <label>Название</label>
-	                <input type="text" className="form-control" defaultValue={name} onChange={(event) => this.handleChangeCurrentRegister(event, "name")} />
-					<label>Адрес</label>
-	                <input type="text" className="form-control" defaultValue={address} onChange={(event) => this.handleChangeCurrentRegister(event, "address")}  />
-					<label>Количество</label>
-	                <input type="text" className="form-control" defaultValue={count} onChange={(event) => this.handleChangeCurrentRegister(event, "count")}  />
-					<label>Чтение</label>
-					<Select name="input" defaultValue={String(isRead)} onChange={(event) => this.handleChangeCurrentRegister(event, "isRead")}>
-				          <Option value="true" label="true" />
-						  <Option value="false" label="false" />
-				    </Select>
-	               	<label>Запись</label>
-					<Select name="input" defaultValue={String(isWrite)} onChange={(event) => this.handleChangeCurrentRegister(event, "isWrite")}>
-				          <Option value="true" label="true" />
-						  <Option value="false" label="false" />
-				    </Select>
-	                <label>Тип</label>
-	                <input type="text" className="form-control" defaultValue={type} onChange={(event) => this.handleChangeCurrentRegister(event, "type")}  />
-					<button 
-					  onClick={() => {
-								this.setState({ currentLegend: type });
-						}}>Задать параметры типа</button>
-					<br />
-					<label>Множитель</label>
-	                <input type="text" className="form-control" defaultValue={multiplier} onChange={(event) => this.handleChangeCurrentRegister(event, "multiplier")}  />
-					<label>Суффикс</label>
-	                <input type="text" className="form-control" defaultValue={suffix} onChange={(event) => this.handleChangeCurrentRegister(event, "suffix")}  />
-					<label>Мин</label>
-	                <input type="text" className="form-control" defaultValue={min} onChange={(event) => this.handleChangeCurrentRegister(event, "min")}  />
-					<label>Макс</label>
-	                <input type="text" className="form-control" defaultValue={max} onChange={(event) => this.handleChangeCurrentRegister(event, "max")}  />
-					<label>Группа</label>
-	                <input type="text" className="form-control" defaultValue={group} onChange={(event) => this.handleChangeCurrentRegister(event, "group")} />
-					<label>Описание</label>
-					<SpecialModbusTypesComponent targetType={this.state.currentLegend} data={legends} />
-			        <button 
-					  onClick={() => {
-							this.setState({device: JSON.parse(device),
-										   currentLegend: ""});
-						}}>Отмена</button>
-			        <button
-			          onClick={() => {
-							this.setState({ loading: true });
-							console.log("currentOnChange: ", current);
-								LoadRegistersService.changeRegister(current)
-									.then(() => {
-										var device = this.state.device;
-										device[index] = current;
-										this.setState({
-											device: device,
-											loading: false,
-											error: null,
-											success: "Данные обновлены успешно"});
-										
-									})
-									.catch((err) => {
-											  console.log("ERROR: ", err);
-											  this.setState({ 
-												loading: false, 
-												error: "Ошибка изменения карты регистров",
-												success: null })
-										  });	
-							}}>Сохранить</button>
-		      </div>
-		    ); 
-	  }
-
 
 	addRegister() {
 		this.setState({
@@ -246,38 +171,70 @@ class DeviceComponent extends Component {
 		  customUI: ({ onClose }) => {
 		    return (
 		      <div className='custom-ui'>
+					<tr>
+					<td>
 			        <label>Название</label>
 	                <input type="text" className="form-control" defaultValue={name} onChange={(event) => this.handleChangeAddedRegister(event, "name")}/>
+					</td>
+					<td>
 					<label>Адрес</label>
 	                <input type="text" className="form-control" defaultValue={address} onChange={(event) => this.handleChangeAddedRegister(event, "address")} />
+					</td>
+					<td>
 					<label>Количество</label>
 	                <input type="text" className="form-control" defaultValue={count} onChange={(event) => this.handleChangeAddedRegister(event, "count")} />
+					</td>
+					<td>
 					<label>Чтение</label>
 					<Select name="input" defaultValue={String(isRead)} onChange={(event) => this.handleChangeAddedRegister(event, "isRead")} >
 				          <Option value="true" label="true" />
 						  <Option value="false" label="false" />
 				    </Select>
+					</td>
+					<td>
 	               	<label>Запись</label>
 					<Select name="input" defaultValue={String(isWrite)} onChange={(event) => this.handleChangeAddedRegister(event, "isWrite")} >
 				          <Option value="true" label="true" />
 						  <Option value="false" label="false" />
 				    </Select>
+					</td>
+					<td>
 	                <label>Тип</label>
-	                <input type="text" className="form-control" defaultValue={type} onChange={(event) => this.handleChangeAddedRegister(event, "type")} />
+					<Select name="input" defaultValue={type} onChange={(event) => this.handleChangeAddedRegister(event, "type")} >
+				          <Option value="SignedInt" label="SignedInt" />
+						  <Option value="UnsignedInt" label="UnsignedInt" />
+						  <Option value="Float" label="Float" />
+						  <Option value="Variable" label="Variable" />
+						  <Option value="Bit" label="Bit" />
+				    </Select>
+					</td>
+					<td>
 					<label>Множитель</label>
 	                <input type="text" className="form-control" defaultValue={multiplier} onChange={(event) => this.handleChangeAddedRegister(event, "multiplier")} />
+					</td>
+					<td>
 					<label>Суффикс</label>
 	                <input type="text" className="form-control" defaultValue={suffix} onChange={(event) => this.handleChangeAddedRegister(event, "suffix")} />
+					</td>
+					<td>
 					<label>Мин</label>
 	                <input type="text" className="form-control" defaultValue={min} onChange={(event) => this.handleChangeAddedRegister(event, "min")} />
+					</td>
+					<td>
 					<label>Макс</label>
 	                <input type="text" className="form-control" defaultValue={max} onChange={(event) => this.handleChangeAddedRegister(event, "max")} />
+					</td>
+					<td>
 					<label>Группа</label>
 	                <input type="text" className="form-control" defaultValue={group} onChange={(event) => this.handleChangeAddedRegister(event, "group")} />
+					</td>
+					<td>
 			        <button 
 					  onClick={() => {
 							onClose();	
 						}}>Отмена</button>
+					</td>
+					<td>
 			        <button
 			          onClick={() => {
 							this.setState({ loading: true });
@@ -301,6 +258,8 @@ class DeviceComponent extends Component {
 										  });
 								onClose();		
 							}}>Сохранить</button>
+						</td>
+					</tr>
 		      </div>
 		    );
 		  }
@@ -388,48 +347,203 @@ class DeviceComponent extends Component {
 	      ]
 	    });		
 	}
+	
+	renderDescriptionSpecialTypes(type, legends) {
+		var legendStrings = []
+		if (legends == "null") {
+			return(<p>Нет описания</p>)
+		} else {
+			var l = JSON.parse(legends);
+			if (type == "Variable") {
+			l.forEach(e => {
+				var str = `${e.description} : ${e.value}`
+				legendStrings.push(str)
+			})
+			} else if (type == "Bit") {
+				l.forEach(e => {
+					var end = Number(e.startBit) + Number(e.bitQuantity) - 1;
+					var str = `${e.description} (биты ${e.startBit} - ${end}) : ${e.possibleValues}`
+					legendStrings.push(str)
+			})
+			}
+			console.log("lSTRINGS", legendStrings)
+			return legendStrings.map((e) => {
+				return (
+					<p>{e}</p>
+				)
+			})
+		}
+		
+	}
 
 	
 	
 	renderTableData() {
       return this.state.device.map((current, index) => {
 		 const {loading, editedNow} = this.state;
-         const { id, name, address, count, isRead, isWrite, type, multiplier, suffix, min, max} = current;
+         const { id, name, address, count, isRead, isWrite, type, multiplier, suffix, min, max, group, legends} = current;
          return (
             <tr key={index}>
-               <td>{name}</td>
-               <td>{address}</td>
-               <td>{count}</td>
-               <td>{String(isRead)}</td>
-			   <td>{String(isWrite)}</td>
-               <td>{type}</td>
-               <td>{multiplier}</td>
-			   <td>{suffix}</td>
-			   <td>{min}</td>
-               <td>{max}</td>
+               <td>{name}
+					{editedNow[index] &&
+							<div>
+							<br />
+                            <input type="text" className="form-control" defaultValue={name} onChange={(event) => this.handleChangeCurrentRegister(event, "name")}/>
+							</div>
+                        }
+				</td>
+               <td>{address}
+					{editedNow[index] &&
+							<div>
+							<br />
+                            <input type="text" className="form-control" defaultValue={address} onChange={(event) => this.handleChangeCurrentRegister(event, "address")}/>
+							</div>
+                        }
+				</td>
+               <td>{count}
+					{editedNow[index] &&
+							<div>
+							<br />
+                            <input type="text" className="form-control" defaultValue={count} onChange={(event) => this.handleChangeCurrentRegister(event, "count")}/>
+							</div>
+                        }
+				</td>
+               <td>{String(isRead)}
+					{editedNow[index] &&
+							<div>
+							<br />
+                            <Select name="input" defaultValue={String(isRead)} onChange={(event) => this.handleChangeCurrentRegister(event, "isRead")} >
+						          <Option value="true" label="true" />
+								  <Option value="false" label="false" />
+						    </Select>
+							</div>
+                        }
+				</td>
+			   <td>{String(isWrite)}
+					{editedNow[index] &&
+							<div>
+							<br />
+                            <Select name="input" defaultValue={String(isWrite)} onChange={(event) => this.handleChangeCurrentRegister(event, "isWrite")} >
+						          <Option value="true" label="true" />
+								  <Option value="false" label="false" />
+						    </Select>
+							</div>
+                        }
+				</td>
+               <td>{type}
+					{editedNow[index] &&
+							<div>
+							<br />
+							<Select name="input" defaultValue={type} onChange={(event) => this.handleChangeCurrentRegister(event, "type")} >
+						          <Option value="SignedInt" label="SignedInt" />
+								  <Option value="UnsignedInt" label="UnsignedInt" />
+								  <Option value="Float" label="Float" />
+								  <Option value="Variable" label="Variable" />
+								  <Option value="Bit" label="Bit" />
+						    </Select>
+							</div>
+                        }
+				</td>
+               <td>{multiplier}
+					{editedNow[index] &&
+							<div>
+							<br />
+                            <input type="text" className="form-control" defaultValue={multiplier} onChange={(event) => this.handleChangeCurrentRegister(event, "multiplier")}/>
+							</div>
+                        }
+				</td>
+			   <td>{suffix}
+					{editedNow[index] &&
+							<div>
+							<br />
+                            <input type="text" className="form-control" defaultValue={suffix} onChange={(event) => this.handleChangeCurrentRegister(event, "suffix")}/>
+							</div>
+                        }
+				</td>
+			   <td>{min}
+					{editedNow[index] &&
+							<div>
+							<br />
+                            <input type="text" className="form-control" defaultValue={min} onChange={(event) => this.handleChangeCurrentRegister(event, "min")}/>
+							</div>
+                        }
+				</td>
+               <td>{max}
+					{editedNow[index] &&
+							<div>
+							<br />
+                            <input type="text" className="form-control" defaultValue={max} onChange={(event) => this.handleChangeCurrentRegister(event, "max")}/>
+							</div>
+                        }
+				</td>
+				<td>{group}
+					{editedNow[index] &&
+							<div>
+							<br />
+                            <input type="text" className="form-control" defaultValue={group} onChange={(event) => this.handleChangeCurrentRegister(event, "group")}/>
+							</div>
+                        }
+				</td>
+				<td>{this.renderDescriptionSpecialTypes(type, legends)}
+					{editedNow[index] &&
+							<div>
+							{(type=="Variable" || type=="Bit") && <SpecialModbusTypesComponent targetType={type} />}
+							</div>
+                        }
+				</td>
 							
 						<td><input type="text" placeholder="Значение" 
 								value={this.state.inputValues[index]} 
 								ref={index}
 								onChange={(event) => this.handleChange(event, index)} /></td>
+								
                         <td><button className="btn btn-primary" onClick={() => this.handleClickRead(address, count, index)} disabled={!isRead}>Чтение</button></td>
                         {loading &&
                             <img src={Strings.LOADING} />
                         }
+
                         <td><button className="btn btn-primary" onClick={() => this.handleClickWrite(address, this.state.inputValues[index])} disabled={!isWrite}>Запись</button></td>
                         {loading &&
                             <img src={Strings.LOADING} />
                         }
+
                         <td><button className="btn btn-primary" onClick={() => this.handleChangeRegister(current, index)} disabled={editedNow[index]}>Изменить</button></td>
-						<td><button className="btn btn-primary" onClick={() => this.handleConfirmChangeRegister(current, index)} disabled={!editedNow[index]}>Сохранить</button></td>
-                        <td><button className="btn btn-primary" onClick={() => this.deleteRegister(id, index)}>Удалить</button></td>
-						{editedNow[index] &&
-                            <img src={this.renderEditRegister(current, index)} />
-                        }
+						
+						<td><button className="btn btn-primary" onClick={() => {
+								this.handleConfirmChangeRegister(index)
+								this.setState({ loading: true });
+								console.log("currentOnChange: ", current);
+								LoadRegistersService.changeRegister(current)
+									.then(() => {
+										var device = this.state.device;
+										device[index] = current;
+										this.setState({
+											device: device,
+											loading: false,
+											error: null,
+											success: "Данные обновлены успешно"});
+										
+									})
+									.catch((err) => {
+											  console.log("ERROR: ", err);
+											  this.setState({ 
+												loading: false, 
+												error: "Ошибка изменения карты регистров",
+												success: null })
+										  });
+							}} disabled={!editedNow[index]}>Сохранить</button></td>
+							
+							<td><button className="btn btn-primary" onClick={() => {
+								this.handleConfirmChangeRegister(index);
+							}} disabled={!editedNow[index]}>Отменить</button></td>
+							
+                        <td><button className="btn btn-primary" onClick={() => this.deleteRegister(id, index)}>Удалить</button></td>								
             </tr>
+					
          )
       })
    }
+
 
 
 	
@@ -439,45 +553,47 @@ class DeviceComponent extends Component {
 		const {name, address, loading, error, success} = this.state;
 		
 	    return (
-		<div>
-			{error &&
-                        <div className={'alert alert-danger'}>{this.state.error}</div>
-                    }
-			
-			{success &&
-                        <div className={'alert alert-success'}>{this.state.success}</div>
-                    }
-
-			<table border="1">
-			   <caption>Устройство {name}. Адрес {address}.</caption>
-			   <tr>
-				<th>Название</th>
-			    <th>Адрес</th>
-			    <th>Количество</th>
-			    <th>Чтение</th>
-			    <th>Запись</th>
-				<th>Тип</th>
-			    <th>Множитель</th>
-			    <th>Суффикс</th>
-				<th>Мин.</th>
-				<th>Макс.</th>
-			   </tr>
-
-				<tbody>
-				{this.renderTableData()}
-				</tbody>
-
-			</table>
-			
-			<div className="form-group">
-                        <button className="btn btn-primary" onClick={() => this.deleteDevice(this.props.match.params.id)} >Удалить устройство</button>
-						<button className="btn btn-primary" onClick={() => this.addRegister()} >Добавить регистр</button>
-                        {loading &&
-                            <img src={Strings.LOADING} />
-                        }
-                    </div>
-
-		</div>
+			<div>
+				{error &&
+	                        <div className={'alert alert-danger'}>{this.state.error}</div>
+	                    }
+				
+				{success &&
+	                        <div className={'alert alert-success'}>{this.state.success}</div>
+	                    }
+	
+				<table border="1">
+				   <caption>Устройство {name}. Адрес {address}.</caption>
+				   <tr>
+					<th>Название</th>
+				    <th>Адрес</th>
+				    <th>Количество</th>
+				    <th>Чтение</th>
+				    <th>Запись</th>
+					<th>Тип</th>
+				    <th>Множитель</th>
+				    <th>Суффикс</th>
+					<th>Мин.</th>
+					<th>Макс.</th>
+					<th>Группа</th>
+					<th>Описание</th>
+				   </tr>
+	
+					<tbody>
+					{this.renderTableData()}
+					</tbody>
+	
+				</table>
+				
+				<div className="form-group">
+	                        <button className="btn btn-primary" onClick={() => this.deleteDevice(this.props.match.params.id)} >Удалить устройство</button>
+							<button className="btn btn-primary" onClick={() => this.addRegister()} >Добавить регистр</button>
+	                        {loading &&
+	                            <img src={Strings.LOADING} />
+	                        }
+	                    </div>
+	
+			</div>
 	    )
 	  }
 	
