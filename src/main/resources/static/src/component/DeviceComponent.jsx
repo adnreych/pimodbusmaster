@@ -21,6 +21,7 @@ class DeviceComponent extends Component {
 					name: "",
 					address: "",
 					inputValues: [],
+					editedNow: [],
 					error: null,
 					success: null,
 					currentChange: null,
@@ -37,6 +38,8 @@ class DeviceComponent extends Component {
 		this.handleChangeCurrentRegister = this.handleChangeCurrentRegister.bind(this);
 		this.addRegister = this.addRegister.bind(this);
 		this.handleChangeAddedRegister = this.handleChangeAddedRegister.bind(this);
+		this.renderEditRegister = this.renderEditRegister.bind(this);
+		this.handleConfirmChangeRegister = this.handleConfirmChangeRegister.bind(this);
 
     }
 
@@ -51,10 +54,13 @@ class DeviceComponent extends Component {
 						name: this.state.device[0].device.name, 
 						address: this.state.device[0].device.address, 
 						loading: false,
-						inputValues: new Array(this.state.device.length)});
+						inputValues: new Array(this.state.device.length),
+						editedNow: Array.apply(false, Array(this.state.device.length))});
 				}
 				var dv = this.state.device;
-				dv.forEach(element => element.device = element.device.id);
+				dv.forEach(element => {
+					element.device = element.device.id;
+				});
 			})
 			.catch((err) => {
 					  console.log("ERROR: ", err);
@@ -127,16 +133,26 @@ class DeviceComponent extends Component {
 				  });
 	}
 	
+	handleConfirmChangeRegister(current, index) {
+		var editedNow = this.state.editedNow;
+		 editedNow[index] = false;
+		 this.setState({ editedNow:  editedNow,
+						 currentChange: current });
+	}
+	
 	async handleChangeRegister(current, index) {  
-		await this.setState({ currentChange: current });
-		let { name, address, count, isRead, isWrite, type, multiplier, suffix, min, max, group, legends } = current;
-		this.setState({ currentChange: current, currentLegend: type });
-		const device = JSON.stringify(this.state.device);
 
-		confirmAlert({
-		  closeOnClickOutside: true,
-		  customUI: ({ onClose }) => {
-		    return (
+		 var editedNow = this.state.editedNow;
+		 editedNow[index] = true;
+		 this.setState({ editedNow:  editedNow,
+						 currentChange: current });
+	  }
+
+	renderEditRegister(current, index) {  
+		let { name, address, count, isRead, isWrite, type, multiplier, suffix, min, max, group, legends } = current;
+		console.log("TYPE", type)
+		const device = JSON.stringify(this.state.device);
+		return (
 		      <div className='custom-ui'>
 			        <label>Название</label>
 	                <input type="text" className="form-control" defaultValue={name} onChange={(event) => this.handleChangeCurrentRegister(event, "name")} />
@@ -158,13 +174,9 @@ class DeviceComponent extends Component {
 	                <input type="text" className="form-control" defaultValue={type} onChange={(event) => this.handleChangeCurrentRegister(event, "type")}  />
 					<button 
 					  onClick={() => {
-							confirmAlert({
-								closeOnClickOutside: true,
-								customUI: ({ onClose }) => {
-									return (<SpecialModbusTypesComponent targetType={this.state.currentLegend} />)
-								}
-							})	
+								this.setState({ currentLegend: type });
 						}}>Задать параметры типа</button>
+					<br />
 					<label>Множитель</label>
 	                <input type="text" className="form-control" defaultValue={multiplier} onChange={(event) => this.handleChangeCurrentRegister(event, "multiplier")}  />
 					<label>Суффикс</label>
@@ -176,12 +188,11 @@ class DeviceComponent extends Component {
 					<label>Группа</label>
 	                <input type="text" className="form-control" defaultValue={group} onChange={(event) => this.handleChangeCurrentRegister(event, "group")} />
 					<label>Описание</label>
-					<SpecialModbusTypesComponent targetType={this.state.currentLegend} />
+					<SpecialModbusTypesComponent targetType={this.state.currentLegend} data={legends} />
 			        <button 
 					  onClick={() => {
 							this.setState({device: JSON.parse(device),
 										   currentLegend: ""});
-							onClose();	
 						}}>Отмена</button>
 			        <button
 			          onClick={() => {
@@ -204,13 +215,10 @@ class DeviceComponent extends Component {
 												loading: false, 
 												error: "Ошибка изменения карты регистров",
 												success: null })
-										  });
-								onClose();		
+										  });	
 							}}>Сохранить</button>
 		      </div>
-		    );
-		  }
-		}); 
+		    ); 
 	  }
 
 
@@ -385,8 +393,8 @@ class DeviceComponent extends Component {
 	
 	renderTableData() {
       return this.state.device.map((current, index) => {
-		 const {loading} = this.state;
-         const { id, name, address, count, isRead, isWrite, type, multiplier, suffix, min, max } = current;
+		 const {loading, editedNow} = this.state;
+         const { id, name, address, count, isRead, isWrite, type, multiplier, suffix, min, max} = current;
          return (
             <tr key={index}>
                <td>{name}</td>
@@ -412,8 +420,12 @@ class DeviceComponent extends Component {
                         {loading &&
                             <img src={Strings.LOADING} />
                         }
-                        <td><button className="btn btn-primary" onClick={() => this.handleChangeRegister(current, index)}>Изменить</button></td>
+                        <td><button className="btn btn-primary" onClick={() => this.handleChangeRegister(current, index)} disabled={editedNow[index]}>Изменить</button></td>
+						<td><button className="btn btn-primary" onClick={() => this.handleConfirmChangeRegister(current, index)} disabled={!editedNow[index]}>Сохранить</button></td>
                         <td><button className="btn btn-primary" onClick={() => this.deleteRegister(id, index)}>Удалить</button></td>
+						{editedNow[index] &&
+                            <img src={this.renderEditRegister(current, index)} />
+                        }
             </tr>
          )
       })

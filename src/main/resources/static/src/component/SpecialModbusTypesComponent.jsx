@@ -7,7 +7,7 @@ class SpecialModbusTypesComponent extends Component {
 
 		this.state = {
 					targetType: this.props.targetType,
-					data: [],
+					data: this.props.data,
 					loading: false,					
 		        }
 
