@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import AddIcon from '@material-ui/icons/Add';
 import ClearIcon from '@material-ui/icons/Clear';
 import { green, red } from '@material-ui/core/colors';
-import times from 'lodash/times';
+import _times from 'lodash/times';
+import _isEmpty from 'lodash/isEmpty';
 
 
 class SpecialModbusTypesComponent extends Component {
@@ -12,7 +13,7 @@ class SpecialModbusTypesComponent extends Component {
 
 		this.state = {
 					targetType: this.props.targetType,
-					data: JSON.parse(this.props.data),
+					data: [{}],
 					loading: false,	
 					emptyCellsCount: 1,			
 		        }
@@ -27,13 +28,26 @@ class SpecialModbusTypesComponent extends Component {
 
     }
 
+	componentDidMount() {
+		var data = JSON.parse(this.props.data)
+		if (data != null) this.setState({data : data})
+    }
+
 	handleAddDelete(add) {
-		add ? this.setState({emptyCellsCount : this.state.emptyCellsCount + 1}) : this.setState({emptyCellsCount : this.state.emptyCellsCount - 1})
+		if (add) {
+			var data = this.state.data
+			data.push({})
+			this.setState({data: data}) 
+		} else if (!add && (this.state.data.length > 1)) {
+			var data = this.state.data
+			data.pop()
+			this.setState({data: data}) 
+		}
 	}
 
 	handleChangeByte(event, field, index) {
 		console.log("DATABEFORE", this.state.data)
-		var data = this.state.data
+		var data = this.state.data	
 		data[index][field] = event.target.value;
 		this.setState({ data: data });	
 		console.log("DATAAFTER", this.state.data)
@@ -73,7 +87,7 @@ class SpecialModbusTypesComponent extends Component {
 			   </tr>
 
 				<tbody>
-				{this.renderByteElements()}
+				{this.renderByteElements()}		
 				<button className="btn btn-primary" onClick={() => {this.handleAddDelete(true)}} ><AddIcon style={{ color: green[500] }} /></button>
 				<button className="btn btn-primary" onClick={() => {this.handleAddDelete(false)}} ><ClearIcon style={{ color: red[500] }} /></button>
 				</tbody>
@@ -82,47 +96,49 @@ class SpecialModbusTypesComponent extends Component {
 		)
 	}
 	
-	renderByteElements() {
-		if (this.state.data != null) {
+	renderByteElements() {		
+		if (this.state.data.length != 0) {
 			return this.state.data.map((current, index) => {
-	         const { startBit, bitQuantity, description, possibleValues } = current;
-	         return (
-	            <tr>
-					<td><input type="text" className="form-control" defaultValue={description} onChange={(event) => this.handleChangeByte(event, "description", index)}/></td>
-					<td><input type="text" className="form-control" defaultValue={startBit} onChange={(event) => this.handleChangeByte(event, "startBit", index)}/></td>
-					<td><input type="text" className="form-control" defaultValue={bitQuantity} onChange={(event) => this.handleChangeByte(event, "bitQuantity", index)}/></td>
-					<td>{this.renderPossibleValues(possibleValues)}</td>
-				</tr>
-	         )
+				if (!_isEmpty(current)) {
+					const { startBit, bitQuantity, description, possibleValues } = current;
+			         return (
+			            <tr>
+							<td><input type="text" className="form-control" defaultValue={description} onChange={(event) => this.handleChangeByte(event, "description", index)}/></td>
+							<td><input type="text" className="form-control" defaultValue={startBit} onChange={(event) => this.handleChangeByte(event, "startBit", index)}/></td>
+							<td><input type="text" className="form-control" defaultValue={bitQuantity} onChange={(event) => this.handleChangeByte(event, "bitQuantity", index)}/></td>
+							<td>{this.renderPossibleValues(possibleValues)}</td>
+						</tr>
+			         )
+				} else {
+					return(
+						<tr>
+							<td><input type="text" placeholder="Название" className="form-control" onChange={(event) => this.handleChangeByte(event, "description", index)}/></td>
+							<td><input type="text" placeholder="Начальный бит" className="form-control" onChange={(event) => this.handleChangeByte(event, "startBit", index)}/></td>
+							<td><input type="text" placeholder="Количество бит" className="form-control" onChange={(event) => this.handleChangeByte(event, "bitQuantity", index)}/></td>
+							<td><input type="text" placeholder="Возможные значения (через запятую)" className="form-control" onChange={(event) => this.handleChangeByte(event, "possibleValues", index)}/></td>
+						</tr>
+					)
+				}
+	         
 	      })
-		} else {
-			let emptyCells = [];
-			times(this.state.emptyCellsCount, () => {
-			  emptyCells.push(
-					<tr>
-						<td><input type="text" placeholder="Название" className="form-control" onChange={(event) => this.handleChangeByte(event, "description", 0)}/></td>
-						<td><input type="text" placeholder="Начальный бит" className="form-control" onChange={(event) => this.handleChangeByte(event, "startBit", 0)}/></td>
-						<td><input type="text" placeholder="Количество бит" className="form-control" onChange={(event) => this.handleChangeByte(event, "bitQuantity", 0)}/></td>
-						<td><input type="text" placeholder="Возможные значения (через запятую)" className="form-control" onChange={(event) => this.handleChangeByte(event, "possibleValues", 0)}/></td>
-					</tr>);
-			});
-			console.log("emptyCells", emptyCells)
-			return emptyCells.map((e) => {
-				return(
-					e
-			)
-			})
-			
-		}
+		} 
 		
 	}
 	
+	
 	renderPossibleValues(possibleValues) {
-		return possibleValues.map((current, index) => {
-         return (
-            <input type="text" className="form-control" defaultValue={current} onChange={(event) => {}}/>
-         )
-      })
+		if (possibleValues != null && possibleValues.length != 0) {
+			return possibleValues.map((current) => {
+	         return (
+	            <input type="text" className="form-control" defaultValue={current} onChange={(event) => {}}/>
+	         )
+	      })
+		} else {
+			return (
+	            <input type="text" className="form-control" onChange={(event) => {}}/>
+	         )
+		}
+		
 	}
 	
 	renderVariable() {
@@ -144,26 +160,27 @@ class SpecialModbusTypesComponent extends Component {
 	}
 	
 	renderVarElements() {
-		if (this.state.data != null) {
+		if (this.state.data.length != 0) {
 			return this.state.data.map((current, index) => {
-	         const {description, value } = current;
-	         return (
-		            <tr>
-						<td><input type="text" className="form-control" defaultValue={description} onChange={(event) => this.handleChangeByte(event, "description", index)}/></td>
-						<td><input type="text" className="form-control" defaultValue={value} onChange={(event) => this.handleChangeByte(event, "value", index)}/></td>				        				      
+				if (!_isEmpty(current)) {
+					const { description, value } = current;
+			         return (
+			            <tr>
+							<td><input type="text" className="form-control" defaultValue={description} onChange={(event) => this.handleChangeByte(event, "description", index)}/></td>
+							<td><input type="text" className="form-control" defaultValue={value} onChange={(event) => this.handleChangeByte(event, "value", index)}/></td>	
+						</tr>
+			         )
+				} else {
+					return(
+						<tr>
+							<td><input type="text" placeholder="Описание" className="form-control" onChange={(event) => this.handleChangeByte(event, "description", this.state.data.length)}/></td>
+							<td><input type="text" placeholder="Значение" className="form-control" onChange={(event) => this.handleChangeByte(event, "value", this.state.data.length)}/></td>
 					</tr>
-	         )
+					)
+				}
+	         
 	      })
-		} else {
-			return this.state.emptyCellsCount.map(() => {
-				return(
-					<tr>
-						<td><input type="text" placeholder="Описание" className="form-control" onChange={(event) => this.handleChangeByte(event, "description", 0)}/></td>
-						<td><input type="text" placeholder="Значение" className="form-control" onChange={(event) => this.handleChangeByte(event, "value", 0)}/></td>
-					</tr>
-				)
-			})
-		}
+		} 
 		
 	}
 
