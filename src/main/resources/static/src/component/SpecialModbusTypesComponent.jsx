@@ -1,4 +1,9 @@
 import React, { Component } from 'react';
+import AddIcon from '@material-ui/icons/Add';
+import ClearIcon from '@material-ui/icons/Clear';
+import { green, red } from '@material-ui/core/colors';
+import times from 'lodash/times';
+
 
 class SpecialModbusTypesComponent extends Component {
 	
@@ -8,7 +13,8 @@ class SpecialModbusTypesComponent extends Component {
 		this.state = {
 					targetType: this.props.targetType,
 					data: JSON.parse(this.props.data),
-					loading: false,					
+					loading: false,	
+					emptyCellsCount: 1,			
 		        }
 
 		this.renderVariable = this.renderVariable.bind(this);
@@ -17,8 +23,13 @@ class SpecialModbusTypesComponent extends Component {
 		this.renderVarElements = this.renderVarElements.bind(this);
 		this.renderPossibleValues = this.renderPossibleValues.bind(this);
 		this.handleChangeByte = this.handleChangeByte.bind(this);
+		this.handleAddDelete = this.handleAddDelete.bind(this);
 
     }
+
+	handleAddDelete(add) {
+		add ? this.setState({emptyCellsCount : this.state.emptyCellsCount + 1}) : this.setState({emptyCellsCount : this.state.emptyCellsCount - 1})
+	}
 
 	handleChangeByte(event, field, index) {
 		console.log("DATABEFORE", this.state.data)
@@ -63,6 +74,8 @@ class SpecialModbusTypesComponent extends Component {
 
 				<tbody>
 				{this.renderByteElements()}
+				<button className="btn btn-primary" onClick={() => {this.handleAddDelete(true)}} ><AddIcon style={{ color: green[500] }} /></button>
+				<button className="btn btn-primary" onClick={() => {this.handleAddDelete(false)}} ><ClearIcon style={{ color: red[500] }} /></button>
 				</tbody>
 
 			</table>
@@ -83,14 +96,23 @@ class SpecialModbusTypesComponent extends Component {
 	         )
 	      })
 		} else {
-			return(
-			<tr>
-				<td><input type="text" placeholder="Название" className="form-control" onChange={(event) => this.handleChangeByte(event, "description", 0)}/></td>
-				<td><input type="text" placeholder="Начальный бит" className="form-control" onChange={(event) => this.handleChangeByte(event, "startBit", 0)}/></td>
-				<td><input type="text" placeholder="Количество бит" className="form-control" onChange={(event) => this.handleChangeByte(event, "bitQuantity", 0)}/></td>
-				<td><input type="text" placeholder="Возможные значения (через запятую)" className="form-control" onChange={(event) => this.handleChangeByte(event, "possibleValues", 0)}/></td>
-			</tr>
+			let emptyCells = [];
+			times(this.state.emptyCellsCount, () => {
+			  emptyCells.push(
+					<tr>
+						<td><input type="text" placeholder="Название" className="form-control" onChange={(event) => this.handleChangeByte(event, "description", 0)}/></td>
+						<td><input type="text" placeholder="Начальный бит" className="form-control" onChange={(event) => this.handleChangeByte(event, "startBit", 0)}/></td>
+						<td><input type="text" placeholder="Количество бит" className="form-control" onChange={(event) => this.handleChangeByte(event, "bitQuantity", 0)}/></td>
+						<td><input type="text" placeholder="Возможные значения (через запятую)" className="form-control" onChange={(event) => this.handleChangeByte(event, "possibleValues", 0)}/></td>
+					</tr>);
+			});
+			console.log("emptyCells", emptyCells)
+			return emptyCells.map((e) => {
+				return(
+					e
 			)
+			})
+			
 		}
 		
 	}
@@ -113,6 +135,8 @@ class SpecialModbusTypesComponent extends Component {
 
 				<tbody>
 				{this.renderVarElements()}
+				<button className="btn btn-primary" onClick={() => {this.handleAddDelete(true)}} ><AddIcon style={{ color: green[500] }} /></button>
+				<button className="btn btn-primary" onClick={() => {this.handleAddDelete(false)}} ><ClearIcon style={{ color: red[500] }} /></button>
 				</tbody>
 
 			</table>
@@ -124,19 +148,21 @@ class SpecialModbusTypesComponent extends Component {
 			return this.state.data.map((current, index) => {
 	         const {description, value } = current;
 	         return (
-	            <tr>
-					<td><input type="text" className="form-control" defaultValue={description} onChange={(event) => this.handleChangeByte(event, "description", index)}/></td>
-					<td><input type="text" className="form-control" defaultValue={value} onChange={(event) => this.handleChangeByte(event, "value", index)}/></td>
-				</tr>
+		            <tr>
+						<td><input type="text" className="form-control" defaultValue={description} onChange={(event) => this.handleChangeByte(event, "description", index)}/></td>
+						<td><input type="text" className="form-control" defaultValue={value} onChange={(event) => this.handleChangeByte(event, "value", index)}/></td>				        				      
+					</tr>
 	         )
 	      })
 		} else {
-			return(
-				<tr>
-					<td><input type="text" placeholder="Описание" className="form-control" onChange={(event) => this.handleChangeByte(event, "description", 0)}/></td>
-					<td><input type="text" placeholder="Значение" className="form-control" onChange={(event) => this.handleChangeByte(event, "value", 0)}/></td>
-				</tr>
-			)
+			return this.state.emptyCellsCount.map(() => {
+				return(
+					<tr>
+						<td><input type="text" placeholder="Описание" className="form-control" onChange={(event) => this.handleChangeByte(event, "description", 0)}/></td>
+						<td><input type="text" placeholder="Значение" className="form-control" onChange={(event) => this.handleChangeByte(event, "value", 0)}/></td>
+					</tr>
+				)
+			})
 		}
 		
 	}
