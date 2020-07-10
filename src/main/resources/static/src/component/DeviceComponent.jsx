@@ -351,7 +351,7 @@ class DeviceComponent extends Component {
 	renderDescriptionSpecialTypes(type, legends) {
 		var legendStrings = []
 		if (legends == "null") {
-			return(<p>Нет описания</p>)
+			return(<p class="small-text">Нет описания</p>)
 		} else {
 			var l = JSON.parse(legends);
 			if (type == "Variable") {
@@ -368,7 +368,7 @@ class DeviceComponent extends Component {
 			}
 			return legendStrings.map((e) => {
 				return (
-					<p>{e}</p>
+					<p class="small-text">{e}</p>
 				)
 			})
 		}
