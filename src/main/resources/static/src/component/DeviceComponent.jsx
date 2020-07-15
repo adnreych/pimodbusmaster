@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import ReactTextCollapse from 'react-text-collapse'
 import * as Strings from '../helpers/strings';
 import LoadRegistersService from '../service/LoadRegistersService';
 import ModbusService from '../service/ModbusService';
@@ -404,6 +405,13 @@ class DeviceComponent extends Component {
 	
 	renderTableData() {
       return this.state.device.map((current, index) => {
+		const TEXT_COLLAPSE_OPTIONS = {
+			  collapse: false, // default state when component rendered
+			  collapseText: '... Развернуть', // text to show when collapsed
+			  expandText: 'Свернуть', // text to show when expanded
+			  minHeight: 30, // component height when closed
+			  maxHeight: 250, // expanded to
+			}
 		 const {loading, editedNow} = this.state;
          const { id, name, address, count, isRead, isWrite, type, multiplier, suffix, min, max, group, legends} = current;
          return (
@@ -508,7 +516,10 @@ class DeviceComponent extends Component {
 							</div>
                         }
 				</td>
-				<td>{this.renderDescriptionSpecialTypes(type, legends, index)}
+				<td>{(type=="Variable" || type=="Bit") && <ReactTextCollapse options={TEXT_COLLAPSE_OPTIONS}>
+						{this.renderDescriptionSpecialTypes(type, legends, index)}
+					</ReactTextCollapse>}
+					
 					{editedNow[index] &&
 							<div>
 							{(type=="Variable" || type=="Bit") && <SpecialModbusTypesComponent targetType={type} index={index} data={legends} callbackFromParent={this.callbackFromSpecialType } />}
@@ -521,19 +532,15 @@ class DeviceComponent extends Component {
 								ref={index}
 								onChange={(event) => this.handleChange(event, index)} /></td>
 								
-                        <td><button className="btn btn-primary" onClick={() => this.handleClickRead(address, count, index)} disabled={!isRead}>Чтение</button></td>
+                        <td><button className="btn btn-primary" onClick={() => this.handleClickRead(address, count, index)} disabled={!isRead}>Чтение</button>
+							<button className="btn btn-primary" onClick={() => this.handleClickWrite(address, this.state.inputValues[index])} disabled={!isWrite}>Запись</button>
+							</td>
                         {loading &&
                             <img src={Strings.LOADING} />
                         }
 
-                        <td><button className="btn btn-primary" onClick={() => this.handleClickWrite(address, this.state.inputValues[index])} disabled={!isWrite}>Запись</button></td>
-                        {loading &&
-                            <img src={Strings.LOADING} />
-                        }
-
-                        <td><button className="btn btn-primary" onClick={() => this.handleChangeRegister(current, index)} disabled={editedNow[index]}>Изменить</button></td>
-						
-						<td><button className="btn btn-primary" onClick={() => {
+                        <td><button className="btn btn-primary" onClick={() => this.handleChangeRegister(current, index)} disabled={editedNow[index]}>Изменить</button>
+							<button className="btn btn-primary" onClick={() => {
 								this.handleConfirmChangeRegister(index)
 								this.setState({ loading: true });			
 								console.log("currentOnChange2: ", current);
@@ -559,13 +566,16 @@ class DeviceComponent extends Component {
 												error: "Ошибка изменения карты регистров",
 												success: null })
 										  });
-							}} disabled={!editedNow[index] || (this.state.editedNowSpecialTypeIndexes.includes(index) && (type=="Variable" || type=="Bit"))}>Сохранить</button></td>
-							
-							<td><button className="btn btn-primary" onClick={() => {
+							}} disabled={!editedNow[index] || (this.state.editedNowSpecialTypeIndexes.includes(index) && (type=="Variable" || type=="Bit"))}>Сохранить</button>
+							<button className="btn btn-primary" onClick={() => {
 								this.handleConfirmChangeRegister(index);
-							}} disabled={!editedNow[index]}>Отменить</button></td>
-							
-                        <td><button className="btn btn-primary" onClick={() => this.deleteRegister(id, index)}>Удалить</button></td>								
+							}} disabled={!editedNow[index]}>Отменить</button>
+						</td>
+													
+							<td>
+							<button className="btn btn-primary" onClick={() => this.deleteRegister(id, index)}>Удалить</button>
+							</td>
+							          								
             </tr>
 					
          )
@@ -589,7 +599,6 @@ class DeviceComponent extends Component {
 				{success &&
 	                        <div className={'alert alert-success'}>{this.state.success}</div>
 	                    }
-	
 				<table border="1">
 				   <caption>Устройство {name}. Адрес {address}.</caption>
 				   <tr>
