@@ -8,6 +8,7 @@ import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css'; 
 import Option from 'muicss/lib/react/option';
 import Select from 'muicss/lib/react/select';
+import _pull from 'lodash/pull';
 
 
 class DeviceComponent extends Component {
@@ -26,7 +27,9 @@ class DeviceComponent extends Component {
 					success: null,
 					currentChange: null,
 					addedRegister: {},
-					currentLegend: ""
+					currentLegend: "",
+					dataFromSpecialType: [],
+					editedNowSpecialTypeIndexes: []
 		        }
 
 
@@ -40,6 +43,7 @@ class DeviceComponent extends Component {
 		this.handleChangeAddedRegister = this.handleChangeAddedRegister.bind(this);
 		this.handleConfirmChangeRegister = this.handleConfirmChangeRegister.bind(this);
 		this.renderDescriptionSpecialTypes = this.renderDescriptionSpecialTypes.bind(this);
+		this.callbackFromSpecialType = this.callbackFromSpecialType.bind(this);
 
     }
 
@@ -55,6 +59,7 @@ class DeviceComponent extends Component {
 						address: this.state.device[0].device.address, 
 						loading: false,
 						inputValues: new Array(this.state.device.length),
+						dataFromSpecialType: [],
 						editedNow: Array.apply(false, Array(this.state.device.length))});
 				}
 				var dv = this.state.device;
@@ -66,6 +71,18 @@ class DeviceComponent extends Component {
 					  console.log("ERROR: ", err);
 					  this.setState({ loading: false })
 				  });
+    }
+
+	callbackFromSpecialType = (dataFromSpecialType) => {
+        this.setState({ dataFromSpecialType: dataFromSpecialType });
+		var device = this.state.device
+		console.log("device: ", device)
+		console.log("dataFromSpecialType.index: ", dataFromSpecialType.index)
+		var editedNowSpecialTypeIndexes = this.state.editedNowSpecialTypeIndexes;
+		_pull(editedNowSpecialTypeIndexes, dataFromSpecialType.index);
+		device[dataFromSpecialType.index].legends = dataFromSpecialType
+		this.setState({device : device,
+					   editedNowSpecialTypeIndexes: editedNowSpecialTypeIndexes})
     }
 
 	handleClickRead = (address, count, index) => {    
@@ -135,16 +152,22 @@ class DeviceComponent extends Component {
 	
 	handleConfirmChangeRegister(index) {
 		var editedNow = this.state.editedNow;
+		var editedNowSpecialTypeIndexes = this.state.editedNowSpecialTypeIndexes;
+		_pull(editedNowSpecialTypeIndexes, index);
 		 editedNow[index] = false;
 		 this.setState({ editedNow:  editedNow,
-						 currentChange: "" });
+						 currentChange: "",
+						 editedNowSpecialTypeIndexes: editedNowSpecialTypeIndexes  });
 	}
 	
 	handleChangeRegister(current, index) {  
+		 var editedNowSpecialTypeIndexes = this.state.editedNowSpecialTypeIndexes;
+		 editedNowSpecialTypeIndexes.push(index);
 		 var editedNow = this.state.editedNow;
 		 editedNow[index] = true;
 		 this.setState({ editedNow:  editedNow,
-						 currentChange: current });
+						 currentChange: current,
+						 editedNowSpecialTypeIndexes: editedNowSpecialTypeIndexes });
 	  }
 
 	addRegister() {
@@ -350,6 +373,8 @@ class DeviceComponent extends Component {
 	
 	renderDescriptionSpecialTypes(type, legends) {
 		var legendStrings = []
+		if (this.state.dataFromSpecialType.length != 0) legends = JSON.stringify(this.state.dataFromSpecialType)
+		
 		if (legends == "null") {
 			return(<p class="small-text">Нет описания</p>)
 		} else {
@@ -483,10 +508,10 @@ class DeviceComponent extends Component {
 							</div>
                         }
 				</td>
-				<td>{this.renderDescriptionSpecialTypes(type, legends)}
+				<td>{this.renderDescriptionSpecialTypes(type, legends, index)}
 					{editedNow[index] &&
 							<div>
-							{(type=="Variable" || type=="Bit") && <SpecialModbusTypesComponent targetType={type} data={legends} />}
+							{(type=="Variable" || type=="Bit") && <SpecialModbusTypesComponent targetType={type} index={index} data={legends} callbackFromParent={this.callbackFromSpecialType } />}
 							</div>
                         }
 				</td>
@@ -510,8 +535,9 @@ class DeviceComponent extends Component {
 						
 						<td><button className="btn btn-primary" onClick={() => {
 								this.handleConfirmChangeRegister(index)
-								this.setState({ loading: true });
-								console.log("currentOnChange: ", current);
+								this.setState({ loading: true });			
+								console.log("currentOnChange2: ", current);
+								current.legends = JSON.stringify(current.legends)
 								LoadRegistersService.changeRegister(current)
 									.then(() => {
 										var device = this.state.device;
@@ -530,7 +556,7 @@ class DeviceComponent extends Component {
 												error: "Ошибка изменения карты регистров",
 												success: null })
 										  });
-							}} disabled={!editedNow[index]}>Сохранить</button></td>
+							}} disabled={!editedNow[index] || (this.state.editedNowSpecialTypeIndexes.includes(index) && (type=="Variable" || type=="Bit"))}>Сохранить</button></td>
 							
 							<td><button className="btn btn-primary" onClick={() => {
 								this.handleConfirmChangeRegister(index);

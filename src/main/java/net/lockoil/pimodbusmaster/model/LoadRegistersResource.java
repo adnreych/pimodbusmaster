@@ -28,6 +28,6 @@ public class LoadRegistersResource {
 	private Long minValue;
 	private Long maxValue;
 	private String group;
-	private List<TypeSupportable> legends;
+	private String legends;
 
 }

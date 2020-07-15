@@ -75,9 +75,7 @@ public class RegistersService {
 		Long max = loadRegistersResource.getMaxValue() != null ? loadRegistersResource.getMaxValue() : null;
 		Long multiplier = loadRegistersResource.getMultiplier() != null ? loadRegistersResource.getMultiplier() : null;
 		String group = loadRegistersResource.getGroup() != null ? loadRegistersResource.getGroup() : "Без группы";
-		List<TypeSupportable> legends = loadRegistersResource.getLegends() != null ? loadRegistersResource.getLegends() : null;
-		
-		ObjectMapper mapper = new ObjectMapper();
+		String legends = loadRegistersResource.getLegends() != null ? loadRegistersResource.getLegends() : null;
 		
 		CardRegisterElement cardRegisterElement = new CardRegisterElement();
 		Device device;
@@ -97,12 +95,10 @@ public class RegistersService {
 			cardRegisterElement.setMaxValue(max);
 			cardRegisterElement.setMultiplier(multiplier);
 			cardRegisterElement.setGroup(group);
-			cardRegisterElement.setLegends(mapper.writeValueAsString(legends));
+			cardRegisterElement.setLegends(legends);
 		} catch (DeviceNotFoundException e) {
 			e.printStackTrace();
-		} catch (JsonProcessingException e) {
-			e.printStackTrace();
-		}
+		} 
 		
 		
 		return cardRegisterElement;
