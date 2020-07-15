@@ -538,6 +538,9 @@ class DeviceComponent extends Component {
 								this.setState({ loading: true });			
 								console.log("currentOnChange2: ", current);
 								current.legends = JSON.stringify(current.legends)
+								if (!(type=="Variable" || type=="Bit")) {
+									current.legends = null
+								}
 								LoadRegistersService.changeRegister(current)
 									.then(() => {
 										var device = this.state.device;
