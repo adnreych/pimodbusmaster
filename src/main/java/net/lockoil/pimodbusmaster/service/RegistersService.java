@@ -56,8 +56,9 @@ public class RegistersService {
 		registerRepository.deleteById(id);
 	}
 	
-	public void addRegister(CardRegisterElement cardRegisterElement) {
-		registerRepository.save(cardRegisterElement);
+	public Long addRegister(CardRegisterElement cardRegisterElement) {
+		CardRegisterElement element = registerRepository.save(cardRegisterElement);
+		return element.getId();
 	}
 	
 	

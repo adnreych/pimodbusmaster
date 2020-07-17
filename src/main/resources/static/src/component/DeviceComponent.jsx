@@ -78,7 +78,6 @@ class DeviceComponent extends Component {
         this.setState({ dataFromSpecialType: dataFromSpecialType });
 		var device = this.state.device
 		console.log("device: ", device)
-		console.log("dataFromSpecialType.index: ", dataFromSpecialType.index)
 		var editedNowSpecialTypeIndexes = this.state.editedNowSpecialTypeIndexes;
 		_pull(editedNowSpecialTypeIndexes, dataFromSpecialType.index);
 		device[dataFromSpecialType.index].legends = dataFromSpecialType
@@ -98,7 +97,6 @@ class DeviceComponent extends Component {
 		
 		ModbusService.modbusRead(readRequest)
 			.then((response) => {
-				console.log("response: ", response);
 				var inputValues = this.state.inputValues;
 				inputValues[index] = response.data[0];
 				if (response.data[0] == null) {
@@ -111,8 +109,6 @@ class DeviceComponent extends Component {
 						loading: false,
 						inputValues: inputValues});
 				}
-				console.log("inputValues index: ", index);
-				console.log("inputValues: ", inputValues);
 		
 			})
 			.catch((err) => {
@@ -263,9 +259,11 @@ class DeviceComponent extends Component {
 			          onClick={() => {
 							this.setState({ loading: true });
 								LoadRegistersService.addRegister(this.state.addedRegister)
-									.then(() => {		
+									.then((response) => {	
 										var device = this.state.device;
-											device.push(this.state.addedRegister);
+										var addedRegister = this.state.addedRegister;
+										addedRegister.id = response.data;
+											device.push(addedRegister);
 											this.setState({
 												device: device,
 												loading: false,
@@ -295,7 +293,6 @@ class DeviceComponent extends Component {
 		addedRegister[key] = event.target.value;
 		if (key == "type") {
 			this.setState({ currentLegend: event.target.value });
-			console.log("currentLegend", this.state.currentLegend)
 		}	
 		this.setState({ addedRegister: addedRegister });	
 	}
@@ -305,7 +302,6 @@ class DeviceComponent extends Component {
 		currentChange[key] = event.target.value;
 		if (key == "type") {
 			this.setState({ currentLegend: event.target.value });
-			console.log("currentLegend", this.state.currentLegend)
 		}	
 		this.setState({ currentChange: currentChange });	
 	}
@@ -376,7 +372,7 @@ class DeviceComponent extends Component {
 		var legendStrings = []
 		if (this.state.dataFromSpecialType.length != 0) legends = JSON.stringify(this.state.dataFromSpecialType)
 		
-		if (legends == "null") {
+		if (legends == "null" || legends == null) {
 			return(<p class="small-text">Нет описания</p>)
 		} else {
 			var l = JSON.parse(legends);

@@ -64,9 +64,9 @@ public class LoadRegistersController {
 	  }
 	
 	@PostMapping("/api/registers/add")
-	  public void addRegister(@RequestBody LoadRegistersResource loadRegistersResource) {		
+	  public Long addRegister(@RequestBody LoadRegistersResource loadRegistersResource) {		
 			CardRegisterElement cardRegisterElement = registersService.parseRegisterElement(loadRegistersResource);
-			registersService.addRegister(cardRegisterElement);
+			return registersService.addRegister(cardRegisterElement);
 	  }
 	
 }
