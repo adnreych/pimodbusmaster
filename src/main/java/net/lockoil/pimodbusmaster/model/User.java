@@ -1,68 +1,72 @@
 package net.lockoil.pimodbusmaster.model;
 
+import java.util.Collection;
+import java.util.Set;
+
 import javax.persistence.*;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import lombok.Data;
 
+@Data
 @Entity
 @Table(name = "users")
-public class User {
-    @Id
+public class User implements UserDetails  {
+
+	private static final long serialVersionUID = 1L;
+
+	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, updatable = false)
     private Long id;
 
-    // Username with unique constraint
     @Column(name = "username", nullable = false, unique = true)
     private String username;
 
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "role", nullable = false)
-    private String role;
+    @ManyToMany(fetch = FetchType.EAGER)
+    private Set<Role> roles;
     
     public User() {
     }
 
-	public User(String username, String passwordHash, String role) {
+	public User(String username, String password, Set<Role> roles) {
 		super();
 		this.username = username;
-		this.password = passwordHash;
-		this.role = role;
+		this.password = password;
+		this.roles = roles;
 	}
 
-	public Long getId() {
-		return id;
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		return getRoles();
 	}
 
-	public void setId(Long id) {
-		this.id = id;
+	@Override
+	public boolean isAccountNonExpired() {
+		return true;
 	}
 
-	public String getUsername() {
-		return username;
+	@Override
+	public boolean isAccountNonLocked() {
+		// TODO Auto-generated method stub
+		return true;
 	}
 
-	public void setUsername(String username) {
-		this.username = username;
+	@Override
+	public boolean isCredentialsNonExpired() {
+		return true;
 	}
 
-	public String getPasswordHash() {
-		return password;
-	}
-
-	public void setPasswordHash(String passwordHash) {
-		this.password = passwordHash;
-	}
-
-	public String getRole() {
-		return role;
-	}
-
-	public void setRole(String role) {
-		this.role = role;
+	@Override
+	public boolean isEnabled() {
+		return true;
 	}
 
 }

@@ -1,52 +1,49 @@
-import axios from "axios";
+import axios from 'axios'
 import qs from "querystring";
 
-export const userService = {
-    login,
-    logout,
-   // getAll
-};
 
-async function login(username, password) {
+class userService {
+	
+	login(username, password) {
 
-	const requestBody = {
-	  username: username,
-	  password: password
+		const requestBody = {
+		  username: username,
+		  password: password
+		}
+
+		const config = {
+		  headers: {
+		    'Content-Type': 'application/x-www-form-urlencoded'
+		  }
+		}
+
+		return axios.post(`/auth/login`, qs.stringify(requestBody), config)
+		  .then((result) => {
+			  console.log("result: ", result);
+			  localStorage.setItem('user', JSON.stringify(requestBody));
+		  })
+	}
+	
+	logout() {
+		
+		var user = localStorage.getItem('user');
+		
+		return axios.post(`/auth/logout`, user)
+		  .then((result) => {
+			  console.log("result: ", result);
+			  localStorage.removeItem('user');
+		  })
+		  .catch((err) => {
+					  console.log("ERROR: ", err);
+				  });
 	}
 
-	const config = {
-	  headers: {
-	    'Content-Type': 'application/x-www-form-urlencoded'
-	  }
-	}
+	
+	getAll() {
+	    return axios.get(`/api/allusers`);
+	} 
+   
 
-	await axios.post('/auth/login', qs.stringify(requestBody), config)
-	  .then((result) => {
-		  console.log("result: ", result);
-		  localStorage.setItem('user', JSON.stringify(requestBody));
-	  })
 }
 
-
-async function logout() {
-	
-	var user = localStorage.getItem('user');
-	
-	await axios.post('/auth/logout', user)
-	  .then((result) => {
-		  console.log("result: ", result);
-		  localStorage.removeItem('user');
-	  })
-	  .catch((err) => {
-				  console.log("ERROR: ", err);
-			  });
-}
-
-/*function getAll() {
-    const requestOptions = {
-        method: 'GET',
-        headers: authHeader()
-    };
-
-    return fetch(`${config.apiUrl}/users`, requestOptions).then(handleResponse);
-} */
+export default new userService()

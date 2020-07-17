@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { userService } from '../service/UserService';
+import  userService  from '../service/UserService';
 
 class LoginPage extends React.Component {
     constructor(props) {

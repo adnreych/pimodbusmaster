@@ -7,6 +7,7 @@ import { LoginPage } from '../component/LoginPage';
 import ModbusReadComponent from '../component/ModbusReadComponent';
 import LoadRegistersComponent from '../component/LoadRegistersComponent';
 import DeviceComponent from '../component/DeviceComponent';
+import UserListComponent from '../component/UserListComponent';
 
 
 class App extends React.Component {
@@ -21,7 +22,8 @@ class App extends React.Component {
                                 <PrivateRoute exact path="/" component={HomePage} />     
 								<PrivateRoute exact path="/read" component={ModbusReadComponent} />  
 								<PrivateRoute exact path="/loadregisters" component={LoadRegistersComponent} />    
-								<PrivateRoute exact path="/device/:id/" component={DeviceComponent} />                           
+								<PrivateRoute exact path="/device/:id/" component={DeviceComponent} />  
+								<PrivateRoute exact path="/userlist" component={UserListComponent} />                             
                             </div>
                         </Router>
                     </div>
