@@ -17,6 +17,10 @@ class UserListComponent extends Component {
 					success: null,		
 		        }
 
+		this.changeUser = this.changeUser.bind(this);
+		this.deleteUser = this.deleteUser.bind(this);
+		this.addUser = this.addUser.bind(this);
+
     }
 
 
@@ -37,13 +41,33 @@ class UserListComponent extends Component {
 		console.log("USERS", this.state.users);
     }
 
+	addUser() {
+		
+	}
+	
+	deleteUser() {
+		
+	}
+	
+
+	changeUser() {
+		
+	}
+
+
 	renderTableData() {
       return this.state.users.map((current, index) => {
-         const { username, role} = current;
+         const { username, roles} = current;
          return (
             <tr key={index}>
                <td>{username}</td>
-               <td>{role}</td>					          								
+               <td>{roles.map((current) => {return (<p class="simple-text">{current.name}</p>)})}</td>	
+				<td>
+					<button className="btn btn-primary" onClick={() => this.changeUser()}>Изменить</button>
+				</td>	
+				<td>
+					<button className="btn btn-primary" onClick={() => this.deleteUser()}>Удалить</button>
+				</td>				          								
             </tr>
 					
          )
@@ -75,6 +99,8 @@ class UserListComponent extends Component {
 					</tbody>
 	
 				</table>
+				
+				<button className="btn btn-primary" onClick={() => this.addUser()}>Добавить нового</button>
 				
 				<div className="form-group">
 	                        {loading &&
