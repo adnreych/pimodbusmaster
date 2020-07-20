@@ -42,6 +42,14 @@ class userService {
 	getAll() {
 	    return axios.get(`/api/allusers`);
 	} 
+	
+	addUser(user) {
+	    return axios.post(`/api/adduser`, user);
+	} 
+	
+	getRoles() {
+	    return axios.get(`/api/allroles`);
+	} 
    
 
 }

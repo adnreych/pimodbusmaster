@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import net.lockoil.pimodbusmaster.model.Role;
 import net.lockoil.pimodbusmaster.model.User;
+import net.lockoil.pimodbusmaster.repository.RoleRepository;
 import net.lockoil.pimodbusmaster.repository.UserRepository;
 
 
@@ -26,12 +27,14 @@ import net.lockoil.pimodbusmaster.repository.UserRepository;
 public class UserDetailServiceImpl implements UserDetailsService  {
 	private final Logger log = Logger.getLogger(this.getClass().getSimpleName());
 	private final UserRepository userRepository;
+	private final RoleRepository roleRepository;
 
 	@Autowired
-	public UserDetailServiceImpl(UserRepository userRepository) {
+	public UserDetailServiceImpl(UserRepository userRepository, RoleRepository roleRepository) {
 		this.userRepository = userRepository;
+		this.roleRepository = roleRepository;
 	}
-
+	
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {   
     	User user = userRepository.findByUsername(username);	
@@ -53,17 +56,8 @@ public class UserDetailServiceImpl implements UserDetailsService  {
         return userRepository.findAll();
     }
 
-    public boolean saveUser(User user) {
-        User userFromDB = userRepository.findByUsername(user.getUsername());
-
-        if (userFromDB != null) {
-            return false;
-        }
-
-        user.setRoles(Collections.singleton(new Role(1L, "ROLE_USER")));
-        user.setPassword(new BCryptPasswordEncoder(10).encode(user.getPassword()));
-        userRepository.save(user);
-        return true;
+    public Long saveUser(User user) {
+        return userRepository.save(user).getId();
     }
 
     public boolean deleteUser(Long userId) {

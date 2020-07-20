@@ -1,10 +1,10 @@
 package net.lockoil.pimodbusmaster.exceptions;
 
-public class DeviceNotFoundException extends Exception {
+public class RoleNotFoundException extends Exception {
 
 	private static final long serialVersionUID = 1L;
 
-	public DeviceNotFoundException() {
+	public RoleNotFoundException() {
         super("");
     }
 }
