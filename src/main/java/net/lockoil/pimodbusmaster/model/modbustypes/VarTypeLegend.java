@@ -14,8 +14,8 @@ import lombok.Data;
 @JsonTypeName("varType")
 @Data
 public class VarTypeLegend implements TypeSupportable {
-	Integer value;
-	String description;
+	private Integer value;
+	private String description;
 	
 	public VarTypeLegend() {};
 }

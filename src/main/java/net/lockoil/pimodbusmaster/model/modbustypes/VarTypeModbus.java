@@ -1,27 +1,27 @@
 package net.lockoil.pimodbusmaster.model.modbustypes;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 public class VarTypeModbus implements AbstractModbusType<Integer, String> {
 
 	private Integer value;
-	private Map<String, Integer> legend;
+	private List<VarTypeLegend> legends;
 	
-	public VarTypeModbus(Map<String, Integer> legend, Integer value) {
-		this.legend = legend;
+	public VarTypeModbus(List<VarTypeLegend> legends, Integer value) {
+		this.legends = legends;
 		this.value = value;
 	}
 	
 	@Override
 	public String readValue() {
-		return legend
-				.entrySet()
+		return legends
 				.stream()
 				.filter(entry -> Objects.equals(entry.getValue(), value))
 				.findFirst()
 				.get()
-				.getKey();
+				.getDescription();
 	}
 
 	@Override

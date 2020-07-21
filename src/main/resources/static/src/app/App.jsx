@@ -4,7 +4,6 @@ import { BrowserRouter as Router, Route } from 'react-router-dom';
 import { PrivateRoute } from '../component/PrivateRoute';
 import { HomePage } from '../component/HomePage';
 import { LoginPage } from '../component/LoginPage';
-import ModbusReadComponent from '../component/ModbusReadComponent';
 import LoadRegistersComponent from '../component/LoadRegistersComponent';
 import DeviceComponent from '../component/DeviceComponent';
 import UserListComponent from '../component/UserListComponent';
@@ -20,7 +19,6 @@ class App extends React.Component {
                             <div>
 								<Route path="/login" component={LoginPage} />
                                 <PrivateRoute exact path="/" component={HomePage} />     
-								<PrivateRoute exact path="/read" component={ModbusReadComponent} />  
 								<PrivateRoute exact path="/loadregisters" component={LoadRegistersComponent} />    
 								<PrivateRoute exact path="/device/:id/" component={DeviceComponent} />  
 								<PrivateRoute exact path="/userlist" component={UserListComponent} />                             

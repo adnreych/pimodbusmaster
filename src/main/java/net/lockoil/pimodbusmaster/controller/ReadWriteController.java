@@ -28,11 +28,6 @@ public class ReadWriteController {
   @Autowired
   private ModbusRequestService modbusRequestService;
   
-  @GetMapping("/api/modbusread")
-  public List<String> getAll() {
-	return modbusRequestService.courses;
-  }
-
   @PostMapping("/api/modbusread")
   public List<ReadResponse> modbusRead(@RequestBody ReadRequest modbusReadRequest) {
 	return modbusRequestService.read(modbusReadRequest);

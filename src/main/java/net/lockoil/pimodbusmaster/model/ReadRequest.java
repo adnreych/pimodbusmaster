@@ -9,5 +9,6 @@ public class ReadRequest {
 	private int slave;
 	private int address;
 	private int count;
+	private String type;
 	
 }

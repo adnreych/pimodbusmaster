@@ -2,10 +2,12 @@ package net.lockoil.pimodbusmaster.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -61,6 +63,12 @@ public class RegistersService {
 		return element.getId();
 	}
 	
+	@Transactional
+	public CardRegisterElement getRegister(Integer deviceAddress, Integer registerAddress) {
+		Device device = deviceService.findByAddress(deviceAddress);
+		Long deviceId = device.getId();
+		return Optional.of(registerRepository.findByAddressAndDeviceId(registerAddress, deviceId).get(0)).get();
+	}
 	
 	public CardRegisterElement parseRegisterElement(LoadRegistersResource loadRegistersResource) {
 		

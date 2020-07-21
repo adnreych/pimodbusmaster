@@ -4,10 +4,6 @@ const READ = `/api/modbusread`
 const WRITE = `/api/modbuswrite`
 
 class ModbusService {
-
-    getModbusResponse() {
-        return axios.get(`${READ}`);
-    }
     
     modbusRead(readRequest) {
         return axios.post(`${READ}`, readRequest);

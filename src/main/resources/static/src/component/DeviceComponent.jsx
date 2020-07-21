@@ -92,8 +92,11 @@ class DeviceComponent extends Component {
 		let readRequest = {
             slave: this.state.address,
            	address: address,
-			count: count
+			count: count,
+			type: this.state.device[index].type
         }
+
+console.log("readRequest: ", readRequest);
 		
 		ModbusService.modbusRead(readRequest)
 			.then((response) => {
@@ -125,8 +128,11 @@ class DeviceComponent extends Component {
 		let writeRequest = {
             slave: this.state.address,
            	address: address,
-			values: [value]
+			values: [value],
+			type: this.state.device[index].type
         }
+
+		console.log("writeRequest: ", writeRequest);
 		
 		ModbusService.modbusWrite(writeRequest)
 			.then((response) => {
@@ -529,7 +535,7 @@ class DeviceComponent extends Component {
 								onChange={(event) => this.handleChange(event, index)} /></td>
 								
                         <td><button className="btn btn-primary" onClick={() => this.handleClickRead(address, count, index)} disabled={!isRead}>Чтение</button>
-							<button className="btn btn-primary" onClick={() => this.handleClickWrite(address, this.state.inputValues[index])} disabled={!isWrite}>Запись</button>
+							<button className="btn btn-primary" onClick={() => this.handleClickWrite(address, this.state.inputValues[index], index)} disabled={!isWrite}>Запись</button>
 							</td>
                         {loading &&
                             <img src={Strings.LOADING} />

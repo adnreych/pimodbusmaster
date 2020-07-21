@@ -9,4 +9,5 @@ public class WriteRequest {
 	private int slave;
 	private int address;
 	private int[] values;
+	private String type;
 }

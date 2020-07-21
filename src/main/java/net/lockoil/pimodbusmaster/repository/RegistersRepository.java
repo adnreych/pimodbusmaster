@@ -13,5 +13,7 @@ import net.lockoil.pimodbusmaster.model.CardRegisterElement;
 public interface RegistersRepository extends CrudRepository<CardRegisterElement, Long> {
 	
 	List<CardRegisterElement> findByDeviceId(Long id);
+	List<CardRegisterElement> findByAddressAndDeviceId(Integer address, Long deviceId);
+	
 
 }
