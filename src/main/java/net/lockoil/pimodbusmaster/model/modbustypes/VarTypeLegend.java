@@ -17,5 +17,11 @@ public class VarTypeLegend implements TypeSupportable {
 	private Integer value;
 	private String description;
 	
-	public VarTypeLegend() {};
+
+	public VarTypeLegend(Integer value, String description) {
+		this.value = value;
+		this.description = description;
+	};
+	
+	
 }

@@ -156,18 +156,26 @@ class LoadRegistersComponent extends Component {
 		DeviceService.save(device)
 			.then(
 	                (request) => {
-						data.forEach(element => element.device = request.data)
+						console.log("data before load: ", data);
+						data.forEach(element => {
+							element.device = request.data;
+							if (element.legends != null) element.legends = JSON.stringify(element.legends);
+						})
 	                    LoadRegistersService.load(data)
-				.then(
-	                () => {
-	                    this.setState( prevState => ({ success: ["Данные успешно загружены"], loading: false}));
-	                }
-	            )
-				.catch((err) => {
-					  console.log("ERROR: ", err);
-						this.setState( prevState => ({ error: ["Ошибка загрузки данных"], loading: false}));
-				  });
-	                }
+									.then(
+						                () => {
+											data.forEach(element => {
+												element.device = request.data;
+												if (element.legends != null) element.legends = JSON.parse(element.legends);
+											})
+						                    this.setState( prevState => ({ success: ["Данные успешно загружены"], loading: false}));
+						                }
+						            )
+									.catch((err) => {
+										  console.log("ERROR: ", err);
+											this.setState( prevState => ({ error: ["Ошибка загрузки данных"], loading: false}));
+									  });
+						                }
             )
 			.catch((err) => {
 				  console.log("ERROR: ", err);

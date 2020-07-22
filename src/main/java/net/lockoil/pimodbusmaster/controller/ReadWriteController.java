@@ -1,20 +1,11 @@
 package net.lockoil.pimodbusmaster.controller;
 
-import java.net.URI;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
-import lombok.extern.log4j.Log4j2;
 import net.lockoil.pimodbusmaster.model.ReadRequest;
-import net.lockoil.pimodbusmaster.model.ReadResponse;
 import net.lockoil.pimodbusmaster.model.WriteRequest;
 import net.lockoil.pimodbusmaster.service.ModbusRequestService;
 
@@ -29,7 +20,7 @@ public class ReadWriteController {
   private ModbusRequestService modbusRequestService;
   
   @PostMapping("/api/modbusread")
-  public List<ReadResponse> modbusRead(@RequestBody ReadRequest modbusReadRequest) {
+  public Object modbusRead(@RequestBody ReadRequest modbusReadRequest) {
 	return modbusRequestService.read(modbusReadRequest);
   }
   

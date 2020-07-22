@@ -28,10 +28,11 @@ public class ModbusTypesTest {
 		unsignedInt = new UnsignedInt(-5000);
 		floatModbus = new FloatModbus(Pair.of(4, 5));
 		
-		Map<String, Integer> legend= new HashMap<>();
-		legend.put("Нормальная работа", 100);
-		legend.put("Ошибка", 200);
-		legend.put("Принудительно включен", 300);
+		List<VarTypeLegend> legend= new ArrayList<>();
+		
+		legend.add(new VarTypeLegend(100, "Нормальная работа"));
+		legend.add(new VarTypeLegend(200, "Ошибка"));
+		legend.add(new VarTypeLegend(300, "Принудительно включен"));
 		varTypeModbus = new VarTypeModbus(legend, 200);
 		
 		List<BitTypeLegend> bitTypeLegends = new ArrayList<>();

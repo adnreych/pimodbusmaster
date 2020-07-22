@@ -22,6 +22,8 @@ import net.lockoil.pimodbusmaster.deviceconfig.DeviceConfig;
 import net.lockoil.pimodbusmaster.model.ReadRequest;
 import net.lockoil.pimodbusmaster.model.ReadResponse;
 import net.lockoil.pimodbusmaster.model.WriteRequest;
+import net.lockoil.pimodbusmaster.model.modbustypes.AbstractModbusType;
+import net.lockoil.pimodbusmaster.util.ModbusTypeParser;
 
 
 @Service
@@ -31,8 +33,10 @@ public class ModbusRequestService {
 	private final Logger log = Logger.getLogger(this.getClass().getSimpleName());
 	
 	
-	public List<ReadResponse> read(ReadRequest modbusReadRequest) {
+	public Object read(ReadRequest modbusReadRequest) {
+		AbstractModbusType abstractModbusType;
 		List<ReadResponse> responses = new ArrayList<>();
+		ModbusTypeParser modbusTypeParser = new ModbusTypeParser();
 		
 		int slave = modbusReadRequest.getSlave(); 
 		int address = modbusReadRequest.getAddress(); 
@@ -45,13 +49,19 @@ public class ModbusRequestService {
 		try {
 			modbusMaster = ModbusMasterFactory.createModbusMasterRTU(DeviceConfig.getStandartDevice());
 			modbusMaster.connect();
+			
 			int[] registerValues = modbusMaster.readHoldingRegisters(slave, address, count);
-               // print values
+			
             for (int value : registerValues) {
             	address++;
             	log.info("addr: " + address + " val: " + value);
             	responses.add(new ReadResponse(address, value));
              }
+            
+            abstractModbusType = modbusTypeParser.parseRead(responses, modbusReadRequest);
+    		return abstractModbusType.readValue();
+            
+            
 		} catch (SerialPortException | ModbusIOException e) {
 			courses.add("Ошибка " + e.getClass().getSimpleName());
 			log.info(e.getClass().getSimpleName());
@@ -70,7 +80,7 @@ public class ModbusRequestService {
                 }
             }
 		
-		return responses;
+		return null;
 	}
 	
 	public String write(WriteRequest modbusWriteRequestRequest) {

@@ -100,6 +100,7 @@ console.log("readRequest: ", readRequest);
 		
 		ModbusService.modbusRead(readRequest)
 			.then((response) => {
+				console.log("readResponse: ", response);
 				var inputValues = this.state.inputValues;
 				inputValues[index] = response.data[0];
 				if (response.data[0] == null) {

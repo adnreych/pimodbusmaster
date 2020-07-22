@@ -27,9 +27,9 @@ public class ModbusTypeParser {
 	@Autowired
 	RegistersService registersService;
 	
-	public AbstractModbusType parseRead(String type, List<ReadResponse> response, ReadRequest request) throws IllegalModbusTypeException {
+	public AbstractModbusType parseRead(List<ReadResponse> response, ReadRequest request) throws IllegalModbusTypeException {
 		
-		switch (type) {
+		switch (request.getType()) {
 		case "UnsignedInt":
 			return new UnsignedInt(response.get(0).getValue());
 			
