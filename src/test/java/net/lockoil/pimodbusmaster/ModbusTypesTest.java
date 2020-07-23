@@ -74,7 +74,7 @@ public class ModbusTypesTest {
 		List<String> possibleValuesZero2 = new ArrayList<String>();
 		possibleValuesZero2.add("Выкл");
 		possibleValuesZero2.add("Вкл");	
-		bitTypeLegendZero1.setPossibleValues(possibleValuesZero2);
+		bitTypeLegendZero2.setPossibleValues(possibleValuesZero2);
 		
 		bitTypeLegendsZero.add(bitTypeLegendZero1);
 		bitTypeLegendsZero.add(bitTypeLegendZero2);
@@ -128,6 +128,15 @@ public class ModbusTypesTest {
 	@Test 
 	public void testBitTypeZeroRead() {
 		Map<String, String> valuesMap = new HashMap<>();
+		valuesMap.put("Состояние входа 1", "Выкл");
+		valuesMap.put("Состояние входа 2", "Выкл");
+		assertEquals(valuesMap, bitTypeModbusZero.readValue());
+	}
+	
+	@Test 
+	public void testBitTypeReadZerAfterWrite() {
+		Map<String, String> valuesMap = new HashMap<>();
+		bitTypeModbus.writeValue(0);
 		valuesMap.put("Состояние входа 1", "Выкл");
 		valuesMap.put("Состояние входа 2", "Выкл");
 		assertEquals(valuesMap, bitTypeModbusZero.readValue());
