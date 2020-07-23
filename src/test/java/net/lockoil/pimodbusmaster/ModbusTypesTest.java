@@ -19,6 +19,7 @@ public class ModbusTypesTest {
 	UnsignedInt unsignedInt;
 	FloatModbus floatModbus;
 	BitTypeModbus bitTypeModbus;
+	BitTypeModbus bitTypeModbusZero;
 	VarTypeModbus varTypeModbus;
 	BitTypeLegend bitTypeLegend;
 	
@@ -36,6 +37,7 @@ public class ModbusTypesTest {
 		varTypeModbus = new VarTypeModbus(legend, 200);
 		
 		List<BitTypeLegend> bitTypeLegends = new ArrayList<>();
+		List<BitTypeLegend> bitTypeLegendsZero = new ArrayList<>();
 		
 		BitTypeLegend bitTypeLegend = new BitTypeLegend();
 		bitTypeLegend.setStartBit(0);
@@ -55,6 +57,28 @@ public class ModbusTypesTest {
 		possibleValues2.add("Нет");
 		possibleValues2.add("Да");	
 		bitTypeLegend2.setPossibleValues(possibleValues2);
+		
+		BitTypeLegend bitTypeLegendZero1 = new BitTypeLegend();
+		bitTypeLegendZero1.setStartBit(0);
+		bitTypeLegendZero1.setBitQuantity(1);
+		bitTypeLegendZero1.setDescription("Состояние входа 1");
+		List<String> possibleValuesZero1 = new ArrayList<String>();
+		possibleValuesZero1.add("Выкл");
+		possibleValuesZero1.add("Вкл");	
+		bitTypeLegendZero1.setPossibleValues(possibleValuesZero1);
+		
+		BitTypeLegend bitTypeLegendZero2 = new BitTypeLegend();
+		bitTypeLegendZero2.setStartBit(1);
+		bitTypeLegendZero2.setBitQuantity(1);
+		bitTypeLegendZero2.setDescription("Состояние входа 2");
+		List<String> possibleValuesZero2 = new ArrayList<String>();
+		possibleValuesZero2.add("Выкл");
+		possibleValuesZero2.add("Вкл");	
+		bitTypeLegendZero1.setPossibleValues(possibleValuesZero2);
+		
+		bitTypeLegendsZero.add(bitTypeLegendZero1);
+		bitTypeLegendsZero.add(bitTypeLegendZero2);
+		bitTypeModbusZero = new BitTypeModbus(bitTypeLegendsZero, 0);
 		
 		bitTypeLegends.add(bitTypeLegend);
 		bitTypeLegends.add(bitTypeLegend2);
@@ -99,6 +123,14 @@ public class ModbusTypesTest {
 		valuesMap.put("Питание", "Ошибка");
 		valuesMap.put("Был перезагружен", "Да");
 		assertEquals(valuesMap, bitTypeModbus.readValue());
+	}
+	
+	@Test 
+	public void testBitTypeZeroRead() {
+		Map<String, String> valuesMap = new HashMap<>();
+		valuesMap.put("Состояние входа 1", "Выкл");
+		valuesMap.put("Состояние входа 2", "Выкл");
+		assertEquals(valuesMap, bitTypeModbusZero.readValue());
 	}
 	
 	@Test 

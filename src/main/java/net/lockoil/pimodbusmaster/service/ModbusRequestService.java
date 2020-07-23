@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.intelligt.modbus.jlibmodbus.Modbus;
@@ -29,14 +30,15 @@ import net.lockoil.pimodbusmaster.util.ModbusTypeParser;
 @Service
 public class ModbusRequestService {
 	
-	public static List<String> courses = new ArrayList<>();
 	private final Logger log = Logger.getLogger(this.getClass().getSimpleName());
+	
+	@Autowired
+	ModbusTypeParser modbusTypeParser;
 	
 	
 	public Object read(ReadRequest modbusReadRequest) {
 		AbstractModbusType abstractModbusType;
 		List<ReadResponse> responses = new ArrayList<>();
-		ModbusTypeParser modbusTypeParser = new ModbusTypeParser();
 		
 		int slave = modbusReadRequest.getSlave(); 
 		int address = modbusReadRequest.getAddress(); 
@@ -63,7 +65,6 @@ public class ModbusRequestService {
             
             
 		} catch (SerialPortException | ModbusIOException e) {
-			courses.add("Ошибка " + e.getClass().getSimpleName());
 			log.info(e.getClass().getSimpleName());
 			e.printStackTrace();
 		} catch (RuntimeException e) {

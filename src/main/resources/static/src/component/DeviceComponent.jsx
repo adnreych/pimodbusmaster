@@ -100,17 +100,17 @@ console.log("readRequest: ", readRequest);
 		
 		ModbusService.modbusRead(readRequest)
 			.then((response) => {
-				console.log("readResponse: ", response);
 				var inputValues = this.state.inputValues;
-				inputValues[index] = response.data[0];
-				if (response.data[0] == null) {
+				inputValues[index] = response.data;
+				if (response.data == null) {
 					this.setState({ loading: false,
 									  error: "Не удалось прочитать значения регистров" })
 				}
 				else {
-					inputValues[index] = response.data[0].value;
+					inputValues[index] = response.data;
 					this.setState({
 						loading: false,
+						error: null,
 						inputValues: inputValues});
 				}
 		

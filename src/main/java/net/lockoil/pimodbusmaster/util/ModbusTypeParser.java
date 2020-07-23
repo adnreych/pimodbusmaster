@@ -3,9 +3,13 @@ package net.lockoil.pimodbusmaster.util;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
+import org.springframework.stereotype.Component;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import net.lockoil.pimodbusmaster.exceptions.IllegalModbusTypeException;
@@ -22,11 +26,19 @@ import net.lockoil.pimodbusmaster.model.modbustypes.VarTypeLegend;
 import net.lockoil.pimodbusmaster.model.modbustypes.VarTypeModbus;
 import net.lockoil.pimodbusmaster.service.RegistersService;
 
+@Component
 public class ModbusTypeParser {
 	
-	@Autowired
-	RegistersService registersService;
+	private final Logger log = Logger.getLogger(this.getClass().getSimpleName());
 	
+	private RegistersService registersService;
+	
+	
+	@Autowired
+	public ModbusTypeParser(RegistersService registersService) {
+		this.registersService = registersService;
+	}
+
 	public AbstractModbusType parseRead(List<ReadResponse> response, ReadRequest request) throws IllegalModbusTypeException {
 		
 		switch (request.getType()) {
@@ -56,15 +68,10 @@ public class ModbusTypeParser {
 		String legendString = cardRegisterElement.getLegends();
 		ObjectMapper objectMapper = new ObjectMapper();
 	
-		List<String> bitTypeLegendsStrs;
+		List<BitTypeLegend> bitTypeLegends;
 		try {
-			bitTypeLegendsStrs = objectMapper.readValue(legendString, List.class);
-			
-			List<BitTypeLegend> bitTypeLegends = bitTypeLegendsStrs
-												.stream()
-												.map(this::tryParseBitTypeModbus)
-												.collect(Collectors.toList());
-			
+			bitTypeLegends = objectMapper.readValue(legendString, new TypeReference<List<BitTypeLegend>>(){});
+		
 			return new BitTypeModbus(bitTypeLegends, readResponse.getValue());
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
@@ -78,14 +85,9 @@ public class ModbusTypeParser {
 		String legendString = cardRegisterElement.getLegends();
 		ObjectMapper objectMapper = new ObjectMapper();
 	
-		List<String> varTypeLegendsStrs;
+		List<VarTypeLegend> varTypeLegends;
 		try {
-			varTypeLegendsStrs = objectMapper.readValue(legendString, List.class);
-			
-			List<VarTypeLegend> varTypeLegends = varTypeLegendsStrs
-												.stream()
-												.map(this::tryParseVarTypeModbus)
-												.collect(Collectors.toList());
+			varTypeLegends = objectMapper.readValue(legendString, new TypeReference<List<VarTypeLegend>>(){});
 			
 			return new VarTypeModbus(varTypeLegends, readResponse.getValue());
 		} catch (JsonProcessingException e) {
