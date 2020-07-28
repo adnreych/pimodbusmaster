@@ -26,9 +26,7 @@ public class BitTypeModbus implements AbstractModbusType<Integer, Map<String, St
 				.stream()
 				.map(element -> element.getBitQuantity())
 				.reduce(0, Integer::sum);
-		System.out.println("sum " + sum);
 		String arg = "%" + sum + "s";
-		System.out.println("arg " + arg);
 		
 		if (value != 0) {
 			binaryString = Integer.toBinaryString(value).replace(" ", "0");
@@ -36,12 +34,9 @@ public class BitTypeModbus implements AbstractModbusType<Integer, Map<String, St
 			binaryString = Strings.repeat("0", sum);
 		}
 		
-		System.out.println("binaryString " + binaryString);
 		String byteString = String.format(arg, binaryString);
-		System.out.println("byteString " + byteString);
 
 		for(BitTypeLegend bitTypeLegend : byteTypeLegends) {
-			System.out.println("bitTypeLegend " + bitTypeLegend.toString());
 			Integer startBit = bitTypeLegend.getStartBit();			
 			Integer currentBitValue = Integer.parseInt(byteString.substring(startBit, startBit + bitTypeLegend.getBitQuantity()).trim(), 2);
 			valuesMap.put(bitTypeLegend.getDescription(), bitTypeLegend.getPossibleValues().get(currentBitValue));

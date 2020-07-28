@@ -49,7 +49,7 @@ public class ModbusRequestService {
         
         ModbusMaster modbusMaster = null;
 		try {
-			modbusMaster = ModbusMasterFactory.createModbusMasterRTU(DeviceConfig.getStandartDevice());
+			modbusMaster = ModbusMasterFactory.createModbusMasterRTU(DeviceConfig.getByRPiConnection());
 			modbusMaster.connect();
 			
 			int[] registerValues = modbusMaster.readHoldingRegisters(slave, address, count);
@@ -95,7 +95,7 @@ public class ModbusRequestService {
         
         ModbusMaster modbusMaster = null;
 		try {
-			modbusMaster = ModbusMasterFactory.createModbusMasterRTU(DeviceConfig.getStandartDevice());
+			modbusMaster = ModbusMasterFactory.createModbusMasterRTU(DeviceConfig.getByRPiConnection());
 			modbusMaster.connect();
 			modbusMaster.writeMultipleRegisters(slave, startAddress, values);
 			return "OK";

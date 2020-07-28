@@ -8,7 +8,7 @@ import com.intelligt.modbus.jlibmodbus.serial.SerialUtils;
 public class DeviceConfig {
 	
 	
-	public static SerialParameters getStandartDevice() {
+	public static SerialParameters getByRPiConnection() {
 		SerialParameters sp = new SerialParameters();
         sp.setDevice("/dev/ttyUSB0");
         sp.setBaudRate(SerialPort.BaudRate.BAUD_RATE_19200);

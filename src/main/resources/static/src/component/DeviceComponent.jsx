@@ -5,6 +5,7 @@ import LoadRegistersService from '../service/LoadRegistersService';
 import ModbusService from '../service/ModbusService';
 import DeviceService from '../service/DeviceService';
 import SpecialModbusTypesComponent from './SpecialModbusTypesComponent';
+import BitTypeValuesComponent from './BitTypeValuesComponent';
 import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css'; 
 import Option from 'muicss/lib/react/option';
@@ -45,6 +46,7 @@ class DeviceComponent extends Component {
 		this.handleConfirmChangeRegister = this.handleConfirmChangeRegister.bind(this);
 		this.renderDescriptionSpecialTypes = this.renderDescriptionSpecialTypes.bind(this);
 		this.callbackFromSpecialType = this.callbackFromSpecialType.bind(this);
+		this.callbackFromBitType = this.callbackFromBitType.bind(this);
 
     }
 
@@ -85,6 +87,13 @@ class DeviceComponent extends Component {
 					   editedNowSpecialTypeIndexes: editedNowSpecialTypeIndexes})
     }
 
+	callbackFromBitType = (currValue, index) => {
+		var inputValues = this.state.inputValues
+		inputValues[index] = currValue
+		this.setState({ inputValues: inputValues })
+		console.log("STATEFromBitType: ", this.state);
+	}
+
 	handleClickRead = (address, count, index) => {    
 		
 		this.setState({ loading: true })
@@ -96,7 +105,7 @@ class DeviceComponent extends Component {
 			type: this.state.device[index].type
         }
 
-console.log("readRequest: ", readRequest);
+		console.log("readRequest: ", readRequest);
 		
 		ModbusService.modbusRead(readRequest)
 			.then((response) => {
@@ -113,7 +122,7 @@ console.log("readRequest: ", readRequest);
 						error: null,
 						inputValues: inputValues});
 				}
-		
+				console.log("STATEFromRead: ", this.state);
 			})
 			.catch((err) => {
 					  console.log("ERROR: ", err);
@@ -530,10 +539,20 @@ console.log("readRequest: ", readRequest);
                         }
 				</td>
 							
-						<td><input type="text" placeholder="Значение" 
-								value={this.state.inputValues[index]} 
-								ref={index}
-								onChange={(event) => this.handleChange(event, index)} /></td>
+				<td>
+						{(type=="Bit") && <BitTypeValuesComponent 
+							index={index} 
+							legends={legends} 
+							callbackFromParent={this.callbackFromBitType} 
+							value={this.state.inputValues[index]} 
+							/>}
+						
+						{(type!="Bit") && 
+						<input type="text" placeholder="Значение" 
+						value={this.state.inputValues[index]} 
+						ref={index}
+						onChange={(event) => this.handleChange(event, index)} />}
+				</td>
 								
                         <td><button className="btn btn-primary" onClick={() => this.handleClickRead(address, count, index)} disabled={!isRead}>Чтение</button>
 							<button className="btn btn-primary" onClick={() => this.handleClickWrite(address, this.state.inputValues[index], index)} disabled={!isWrite}>Запись</button>
