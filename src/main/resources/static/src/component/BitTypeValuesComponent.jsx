@@ -29,7 +29,7 @@ class BitTypeValuesComponent extends Component {
 				return state;
 		}
 		
-		if (props.value !== undefined) {
+		if (props.value !== undefined && state.currValue !== props.value) {
 				state.currValue = props.value
 				console.log("STATE2", state)
 			    return state;
@@ -40,10 +40,10 @@ class BitTypeValuesComponent extends Component {
 
 	
 
-	handleChangeCurrentValue(event, index) {
+	handleChangeCurrentValue(event, current) {
 		var value = event.target.value
 		var currValue = this.state.currValue
-		currValue[index] = value
+		currValue[current.description] = current.possibleValues[value]
 		this.setState({ currValue: currValue })
 		this.props.callbackFromParent(currValue, this.state.index)
 	}
@@ -66,7 +66,7 @@ class BitTypeValuesComponent extends Component {
 							name="input" 
 							value={this.state.currValue != null ? 
 								current.possibleValues.indexOf(this.state.currValue[current.description]) : current.possibleValues.indexOf(current.possibleValues[0])}
-							onChange={(event) => this.handleChangeCurrentValue(event)} > 
+							onChange={(event) => this.handleChangeCurrentValue(event, current)} > 
 								{this.renderPossibleValues(current.possibleValues)}					
 				    	</Select>
 				</>
