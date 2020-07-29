@@ -91,7 +91,7 @@ class DeviceComponent extends Component {
 		var inputValues = this.state.inputValues
 		inputValues[index] = currValue
 		this.setState({ inputValues: inputValues })
-		console.log("STATEFromBitType: ", this.state);
+		//console.log("STATEFromBitType: ", this.state);
 	}
 
 	handleClickRead = (address, count, index) => {    
@@ -122,7 +122,6 @@ class DeviceComponent extends Component {
 						error: null,
 						inputValues: inputValues});
 				}
-				console.log("STATEFromRead: ", this.state);
 			})
 			.catch((err) => {
 					  console.log("ERROR: ", err);

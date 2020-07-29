@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import * as Strings from '../helpers/strings';
 import 'react-confirm-alert/src/react-confirm-alert.css'; 
 import Option from 'muicss/lib/react/option';
 import Select from 'muicss/lib/react/select';
@@ -12,27 +11,35 @@ class BitTypeValuesComponent extends Component {
 	constructor(props) {
         super(props);
 
-		
-
 		this.state = {
 					loading: false,
 					legends: JSON.parse(this.props.legends),
 					index: this.props.index,
-					currValue: this.props.value != undefined ? this.props.value : null
+					currValue: []
 		        }
 
 		this.handleChangeCurrentValue = this.handleChangeCurrentValue.bind(this);
 
     }
 
-	componentWillMount() {
-		if (this.state.currValue == null) {
-			var currValue = new Array(this.state.legends.length)
-			_times(this.state.legends.length, (i) => {currValue[i] = this.state.legends[i].possibleValues[0]})
-			this.setState({ currValue: currValue })
-		} 	
+	 static getDerivedStateFromProps(props, state) {	
+		if (state.currValue.length == 0) {
+				state.currValue = new Array(state.legends.length).fill({})
+				console.log("STATE1", state)
+				return state;
+		}
+		
+		if (props.value !== undefined) {
+				var propArr = Object.values(props.value)
+				state.currValue = propArr
+				console.log("STATE2", state)
+			    return state;
+			}
+			
+	    return null;   
 	}
 
+	
 
 	handleChangeCurrentValue(event, index) {
 		var value = event.target.value
@@ -51,6 +58,7 @@ class BitTypeValuesComponent extends Component {
 	}
 
 	render() {	
+		console.log("currValue", this.state.currValue)
 		  return this.state.legends.map((current, index) => {
 			return (
 				<>
