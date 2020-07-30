@@ -84,11 +84,11 @@ public class ModbusRequestService {
 		return null;
 	}
 	
-	public String write(WriteRequest modbusWriteRequestRequest) {
+	public String write(WriteRequest modbusWriteRequest) {
 
-		int slave = modbusWriteRequestRequest.getSlave(); 
-		int startAddress = modbusWriteRequestRequest.getAddress(); 
-		int[] values = modbusWriteRequestRequest.getValues();
+		int slave = modbusWriteRequest.getSlave(); 
+		int startAddress = modbusWriteRequest.getAddress(); 
+		int[] values = modbusWriteRequest.getValues();
 		
 		
 		Modbus.setLogLevel(Modbus.LogLevel.LEVEL_DEBUG);

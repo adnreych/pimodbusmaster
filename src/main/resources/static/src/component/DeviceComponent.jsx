@@ -47,6 +47,7 @@ class DeviceComponent extends Component {
 		this.renderDescriptionSpecialTypes = this.renderDescriptionSpecialTypes.bind(this);
 		this.callbackFromSpecialType = this.callbackFromSpecialType.bind(this);
 		this.callbackFromBitType = this.callbackFromBitType.bind(this);
+		this.prepareValueToWrite = this.prepareValueToWrite.bind(this);
 
     }
 

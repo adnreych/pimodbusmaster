@@ -19,7 +19,6 @@ class BitTypeValuesComponent extends Component {
 		        }
 
 		this.handleChangeCurrentValue = this.handleChangeCurrentValue.bind(this);
-		this.prepareValueToWrite = this.prepareValueToWrite.bind(this);
 
     }
 

@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public class VarTypeModbus implements AbstractModbusType<Integer, String> {
+public class VarTypeModbus implements AbstractModbusType<Integer, Integer> {
 
 	private Integer value;
 	private List<VarTypeLegend> legends;
@@ -15,13 +15,13 @@ public class VarTypeModbus implements AbstractModbusType<Integer, String> {
 	}
 	
 	@Override
-	public String readValue() {
+	public Integer readValue() {
 		return legends
 				.stream()
 				.filter(entry -> Objects.equals(entry.getValue(), value))
 				.findFirst()
 				.get()
-				.getDescription();
+				.getValue();
 	}
 
 	@Override
