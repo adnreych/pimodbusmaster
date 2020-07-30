@@ -37,27 +37,7 @@ class BitTypeValuesComponent extends Component {
 	    return null;   
 	}
 	
-	prepareValueToWrite(legends, currVal) {
-		var result = "";
-		
-		legends.forEach((e) => {
-			var bitQuantity = e.bitQuantity
-			console.log("bitQuantity", bitQuantity)
-			var i = e.possibleValues.indexOf(currVal[e.description]).toString(2)
-			console.log("i before", i)
-			if (i.length < bitQuantity) {
-				i = i.padStart((bitQuantity - i.length) + i.length, "0")
-			}
-			console.log("i after", i)
-			result = result + String(i);
-			console.log("result", result)
-		})
-		
-		var cv = this.state.currValue.strToWrite = result
-		this.setState({ currValue: cv })
-		return result;
 
-	}
 
 	
 
@@ -67,7 +47,6 @@ class BitTypeValuesComponent extends Component {
 		currValue[current.description] = current.possibleValues[value]
 		this.setState({ currValue: currValue })
 		this.props.callbackFromParent(currValue, this.state.index)
-		console.log("STR TO WRITE", this.prepareValueToWrite(this.state.legends, this.state.currValue))
 	}
 
 	renderPossibleValues(values) {
@@ -80,13 +59,17 @@ class BitTypeValuesComponent extends Component {
 
 	render() {	
 		  return this.state.legends.map((current) => {
+			if (this.state.currValue == null || this.state.currValue[current.description] == null) {
+				var currValue = this.state.currValue
+				currValue[current.description] = current.possibleValues[0]
+				this.setState({ currValue : currValue })
+			}
 			return (
 				<>
 					<div>{current.description}</div>
 						<Select 
 							name="input" 
-							value={this.state.currValue != null ? 
-								current.possibleValues.indexOf(this.state.currValue[current.description]) : current.possibleValues.indexOf(current.possibleValues[0])}
+							value={current.possibleValues.indexOf(this.state.currValue[current.description])}
 							onChange={(event) => this.handleChangeCurrentValue(event, current)} > 
 								{this.renderPossibleValues(current.possibleValues)}					
 				    	</Select>

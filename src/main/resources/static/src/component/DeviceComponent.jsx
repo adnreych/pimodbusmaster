@@ -143,6 +143,11 @@ class DeviceComponent extends Component {
 
 		console.log("writeRequest: ", writeRequest);
 		
+		if (writeRequest.type == "Bit") {
+			var binaryStr = prepareValueToWrite(this.state.device[index].legends, value)
+			writeRequest.values = [parseInt(binaryStr, 2)]
+		}
+		
 		ModbusService.modbusWrite(writeRequest)
 			.then((response) => {
 				console.log("response: ", response);	
@@ -160,6 +165,28 @@ class DeviceComponent extends Component {
 					  this.setState({ loading: false,
 									  error: "Ошибка записи значения" });
 				  });
+	}
+	
+	prepareValueToWrite(legends, currVal) {
+		var result = "";
+		
+		legends.forEach((e) => {
+			var bitQuantity = e.bitQuantity
+			console.log("bitQuantity", bitQuantity)
+			var i = e.possibleValues.indexOf(currVal[e.description]).toString(2)
+			console.log("i before", i)
+			if (i.length < bitQuantity) {
+				i = i.padStart((bitQuantity - i.length) + i.length, "0")
+			}
+			console.log("i after", i)
+			result = result + String(i);
+			console.log("result", result)
+		})
+		
+		var cv = this.state.currValue.strToWrite = result
+		this.setState({ currValue: cv })
+		return result;
+
 	}
 	
 	handleConfirmChangeRegister(index) {
