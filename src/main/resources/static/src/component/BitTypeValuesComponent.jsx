@@ -19,23 +19,44 @@ class BitTypeValuesComponent extends Component {
 		        }
 
 		this.handleChangeCurrentValue = this.handleChangeCurrentValue.bind(this);
+		this.prepareValueToWrite = this.prepareValueToWrite.bind(this);
 
     }
 
 	 static getDerivedStateFromProps(props, state) {	
 		if (state.currValue.length == 0) {
 				state.currValue = new Array(state.legends.length).fill({})
-				console.log("STATE1", state)
 				return state;
 		}
 		
 		if (props.value !== undefined && state.currValue !== props.value) {
 				state.currValue = props.value
-				console.log("STATE2", state)
 			    return state;
 			}
 			
 	    return null;   
+	}
+	
+	prepareValueToWrite(legends, currVal) {
+		var result = "";
+		
+		legends.forEach((e) => {
+			var bitQuantity = e.bitQuantity
+			console.log("bitQuantity", bitQuantity)
+			var i = e.possibleValues.indexOf(currVal[e.description]).toString(2)
+			console.log("i before", i)
+			if (i.length < bitQuantity) {
+				i = i.padStart((bitQuantity - i.length) + i.length, "0")
+			}
+			console.log("i after", i)
+			result = result + String(i);
+			console.log("result", result)
+		})
+		
+		var cv = this.state.currValue.strToWrite = result
+		this.setState({ currValue: cv })
+		return result;
+
 	}
 
 	
@@ -46,6 +67,7 @@ class BitTypeValuesComponent extends Component {
 		currValue[current.description] = current.possibleValues[value]
 		this.setState({ currValue: currValue })
 		this.props.callbackFromParent(currValue, this.state.index)
+		console.log("STR TO WRITE", this.prepareValueToWrite(this.state.legends, this.state.currValue))
 	}
 
 	renderPossibleValues(values) {
@@ -57,8 +79,7 @@ class BitTypeValuesComponent extends Component {
 	}
 
 	render() {	
-		console.log("currValue", this.state.currValue)
-		  return this.state.legends.map((current, index) => {
+		  return this.state.legends.map((current) => {
 			return (
 				<>
 					<div>{current.description}</div>
