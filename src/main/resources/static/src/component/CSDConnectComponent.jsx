@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import DeviceService from '../service/DeviceService';
 import * as Strings from '../helpers/strings';
+import DeviceComponent from '../component/DeviceComponent';
 
 
 
@@ -14,7 +15,8 @@ class CSDConnectComponent extends Component {
 					deviceId: this.props.match.params.id,
 					number: "",
 					port: "",
-					error : null
+					error : null,
+					success: false
 		        }
 
 		this.handleNumberInput = this.handleNumberInput.bind(this);
@@ -38,7 +40,7 @@ class CSDConnectComponent extends Component {
 	}
 
 	render() {	
-		const {loading, error} = this.state;
+		const {loading, error, success} = this.state;
 		
 		return(
 			<>
@@ -58,19 +60,33 @@ class CSDConnectComponent extends Component {
 					}
 					DeviceService.connectFromCSD(request)
 					.then((response) => {
-						// показываем таблицу регистров устройства
-						this.setState({ 
-							loading: false,
-							error: null
-						 });
+						console.log("response", response)
+						if (response.body == "CONNECT") {
+							this.setState({ 
+								loading: false,
+								error: null,
+								success: true
+							 });
+						} else if (response.body == "NO CARRIER") {
+							this.setState({ 
+								loading: false,
+								error: "Не удается установить соединение с устройством",
+								success: false });
+						}
+						
 					})
 					.catch((err) => {
 							  console.log("ERROR: ", err);
 							  this.setState({ 
 								loading: false,
-								error: "Ошибка при подключении устройства " + err });
+								error: "Ошибка при подключении устройства " + err,
+								success: false });
 						  });	
 			}}>Соединение</button>
+			
+			{success &&
+				<DeviceComponent id={this.state.deviceId} />
+						}
 			
 			{loading &&
                             <img src={Strings.LOADING} />

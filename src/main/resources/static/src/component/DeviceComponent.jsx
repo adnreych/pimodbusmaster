@@ -31,7 +31,8 @@ class DeviceComponent extends Component {
 					addedRegister: {},
 					currentLegend: "",
 					dataFromSpecialType: [],
-					editedNowSpecialTypeIndexes: []
+					editedNowSpecialTypeIndexes: [],
+					CSD: false
 		        }
 
 
@@ -54,7 +55,14 @@ class DeviceComponent extends Component {
 
 	componentDidMount() {
 		this.setState({ loading: true });
-		LoadRegistersService.getDevice(this.props.match.params.id)
+		var id
+		if (this.props.match == undefined) {
+			id = this.props.id
+			this.setState({ CSD : true })
+		} else {
+			id = this.props.match.params.id
+		}
+		LoadRegistersService.getDevice(id)
 			.then(device => {
 				this.setState({ device: device.data});
 				if (this.state.device[0] != null) {
@@ -103,7 +111,8 @@ class DeviceComponent extends Component {
             slave: this.state.address,
            	address: address,
 			count: count,
-			type: this.state.device[index].type
+			type: this.state.device[index].type,
+			isCSD: this.state.CSD
         }
 
 		console.log("readRequest: ", readRequest);
@@ -139,7 +148,8 @@ class DeviceComponent extends Component {
             slave: this.state.address,
            	address: address,
 			values: [value],
-			type: this.state.device[index].type
+			type: this.state.device[index].type,
+			isCSD: this.state.CSD
         }
 
 		console.log("writeRequest: ", writeRequest);

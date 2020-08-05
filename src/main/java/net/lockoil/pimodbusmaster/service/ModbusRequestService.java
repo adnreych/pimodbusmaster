@@ -49,19 +49,23 @@ public class ModbusRequestService {
         
         ModbusMaster modbusMaster = null;
 		try {
-			modbusMaster = ModbusMasterFactory.createModbusMasterRTU(DeviceConfig.getByRPiConnection());
-			modbusMaster.connect();
-			
-			int[] registerValues = modbusMaster.readHoldingRegisters(slave, address, count);
-			
-            for (int value : registerValues) {
-            	address++;
-            	log.info("addr: " + address + " val: " + value);
-            	responses.add(new ReadResponse(address, value));
-             }
-            
-            abstractModbusType = modbusTypeParser.parseRead(responses, modbusReadRequest);
-    		return abstractModbusType.readValue();
+			if (!modbusReadRequest.isCSD()) {
+				modbusMaster = ModbusMasterFactory.createModbusMasterRTU(DeviceConfig.getByRPiConnection());
+				modbusMaster.connect();
+				
+				int[] registerValues = modbusMaster.readHoldingRegisters(slave, address, count);
+				
+	            for (int value : registerValues) {
+	            	address++;
+	            	log.info("addr: " + address + " val: " + value);
+	            	responses.add(new ReadResponse(address, value));
+	             }
+	            
+	            abstractModbusType = modbusTypeParser.parseRead(responses, modbusReadRequest);
+	    		return abstractModbusType.readValue();
+			} else {
+				// чтение через CSD
+			}
             
             
 		} catch (SerialPortException | ModbusIOException e) {
@@ -95,9 +99,13 @@ public class ModbusRequestService {
         
         ModbusMaster modbusMaster = null;
 		try {
-			modbusMaster = ModbusMasterFactory.createModbusMasterRTU(DeviceConfig.getByRPiConnection());
-			modbusMaster.connect();
-			modbusMaster.writeMultipleRegisters(slave, startAddress, values);
+			if (!modbusWriteRequest.isCSD()) {
+				modbusMaster = ModbusMasterFactory.createModbusMasterRTU(DeviceConfig.getByRPiConnection());
+				modbusMaster.connect();
+				modbusMaster.writeMultipleRegisters(slave, startAddress, values);
+			} else {
+				// запись через CSD
+			}
 			return "OK";
 		} catch (SerialPortException | ModbusIOException | ModbusProtocolException | ModbusNumberException | RuntimeException e) {
 			log.info(e.getClass().getSimpleName());

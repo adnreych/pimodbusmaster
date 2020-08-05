@@ -14,6 +14,7 @@ public class ATConnect {
 
     private SerialPort serialPort;
     static CSDResponsePayloadParser csdResponsePayloadParser;
+    String status = "";
     
     
     public String getAtConnection(AtConnectionRequest atConnectionRequest) throws SerialPortException {
@@ -27,7 +28,12 @@ public class ATConnect {
                                       SerialPort.FLOWCONTROL_RTSCTS_OUT);
         serialPort.addEventListener(new ATPortReader(atConnectionRequest.getPhone()), SerialPort.MASK_RXCHAR);
         serialPort.writeString("AT" + "\r");
-        return "CONNECT";
+        
+        while (status.equals("")) {
+        	
+        };
+        
+        return status;
     }
     
     
@@ -54,12 +60,14 @@ public class ATConnect {
 					}
                     
                     if (data.length() > 12 && data.substring(2, 12).equals("NO CARRIER")) {
+                    	status = "NO CARRIER";
                     	throw new CSDException("Не удается соединиться");
 					}
                     
                     if (data.length() > 14 && data.substring(2, 14).equals("CONNECT 9600")) {                	              	
                     	if (serialPort.removeEventListener()) {
-                    		serialPort.addEventListener(new CSDPortReader(), SerialPort.MASK_RXCHAR);                       	                     	
+                    		serialPort.addEventListener(new CSDPortReader(), SerialPort.MASK_RXCHAR);    
+                    		status = "CONNECT";
                     	}
                     }
                 }

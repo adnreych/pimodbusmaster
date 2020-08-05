@@ -10,5 +10,5 @@ public class ReadRequest {
 	private int address;
 	private int count;
 	private String type;
-	
+	boolean isCSD;
 }

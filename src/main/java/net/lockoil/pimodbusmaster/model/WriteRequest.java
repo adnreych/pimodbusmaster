@@ -10,4 +10,5 @@ public class WriteRequest {
 	private int address;
 	private int[] values;
 	private String type;
+	boolean isCSD;
 }
