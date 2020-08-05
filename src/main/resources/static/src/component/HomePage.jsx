@@ -12,11 +12,13 @@ class HomePage extends React.Component {
             user: {},
             users: [],
 			devices: [],
-			currDevice: ""
+			currDevice: "",
+			CSDConnect: false
         };
 
 		this.handleChange = this.handleChange.bind(this);
 		this.handleSubmit = this.handleSubmit.bind(this);
+		this.handleChangeConnectType = this.handleChangeConnectType.bind(this);
     }
 
     componentDidMount() {
@@ -50,8 +52,16 @@ class HomePage extends React.Component {
 		
 	handleSubmit(event) {
 		event.preventDefault(); 
-		this.props.history.push(`/device/${this.state.devices[this.state.currDevice].id}`);   
+		if (!this.state.CSDConnect) {
+			this.props.history.push(`/device/${this.state.devices[this.state.currDevice].id}`);   
+		} else {
+			this.props.history.push(`/csdconnect/${this.state.devices[this.state.currDevice].id}`);   
+		}		
 	  }
+
+	 handleChangeConnectType() {
+        this.setState({CSDConnect: !this.state.handleChange});
+    }
 
     render() {
         const { user } = this.state;
@@ -86,6 +96,11 @@ class HomePage extends React.Component {
 			        </label>
 			        <input type="submit" value="Перейти" />
 			      </form>
+
+				<div>
+	                <input onChange={this.handleChangeConnectType} type="checkbox" />
+	                <label> Соединение по CSD</label>
+           		</div>
 
 
             </div>

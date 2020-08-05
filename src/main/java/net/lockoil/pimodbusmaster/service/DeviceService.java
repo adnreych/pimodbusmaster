@@ -8,7 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import jssc.SerialPortException;
+import net.lockoil.pimodbusmaster.csd.ATConnect;
 import net.lockoil.pimodbusmaster.exceptions.DeviceNotFoundException;
+import net.lockoil.pimodbusmaster.model.AtConnectionRequest;
 import net.lockoil.pimodbusmaster.model.Device;
 import net.lockoil.pimodbusmaster.repository.DeviceRepository;
 
@@ -20,7 +23,10 @@ public class DeviceService {
 	private final DeviceRepository deviceRepository;
 	
 	@Autowired
-	RegistersService loadNewCardService;
+	private ATConnect atConnect;
+	
+	@Autowired
+	private RegistersService loadNewCardService;
 
 	@Autowired
 	public DeviceService(DeviceRepository deviceRepository) {
@@ -48,6 +54,10 @@ public class DeviceService {
 	public void delete(Long id) {
 		loadNewCardService.deleteByDeviceId(id);
 		deviceRepository.deleteById(id);
+	}
+	
+	public String atConnection(AtConnectionRequest atConnectionRequest) throws SerialPortException {
+		return atConnect.getAtConnection(atConnectionRequest);
 	}
 	
 }

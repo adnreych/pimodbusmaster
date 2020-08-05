@@ -7,6 +7,7 @@ import { LoginPage } from '../component/LoginPage';
 import LoadRegistersComponent from '../component/LoadRegistersComponent';
 import DeviceComponent from '../component/DeviceComponent';
 import UserListComponent from '../component/UserListComponent';
+import CSDConnectComponent from '../component/CSDConnectComponent';
 
 
 class App extends React.Component {
@@ -21,7 +22,8 @@ class App extends React.Component {
                                 <PrivateRoute exact path="/" component={HomePage} />     
 								<PrivateRoute exact path="/loadregisters" component={LoadRegistersComponent} />    
 								<PrivateRoute exact path="/device/:id/" component={DeviceComponent} />  
-								<PrivateRoute exact path="/userlist" component={UserListComponent} />                             
+								<PrivateRoute exact path="/userlist" component={UserListComponent} />    
+								<PrivateRoute exact path="/csdconnect/:id/" component={CSDConnectComponent} />                             
                             </div>
                         </Router>
                     </div>
