@@ -28,6 +28,17 @@ class CSDConnectComponent extends Component {
         
     }
 
+	componentWillUnmount() {
+		console.log("componentWillUnmount")	
+		new Promise((resolve, reject) => {
+		  	var request = { 
+							port : this.state.port,
+							phone : this.state.number
+						}
+			DeviceService.disconnectFromCSD(request)
+		});		
+	}
+
 
 	handleNumberInput(event) {
 			var number = event.target.value
@@ -61,13 +72,13 @@ class CSDConnectComponent extends Component {
 					DeviceService.connectFromCSD(request)
 					.then((response) => {
 						console.log("response", response)
-						if (response.body == "CONNECT") {
+						if (response.data == "CONNECT") {
 							this.setState({ 
 								loading: false,
 								error: null,
 								success: true
 							 });
-						} else if (response.body == "NO CARRIER") {
+						} else if (response.data == "NO CARRIER") {
 							this.setState({ 
 								loading: false,
 								error: "Не удается установить соединение с устройством",

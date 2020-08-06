@@ -14,10 +14,11 @@ public class ATConnect {
 
     private SerialPort serialPort;
     static CSDResponsePayloadParser csdResponsePayloadParser;
-    String status = "";
+    volatile private String status = "";
     
     
     public String getAtConnection(AtConnectionRequest atConnectionRequest) throws SerialPortException {
+    	status = "";
     	serialPort = new SerialPort(atConnectionRequest.getPort());
     	serialPort.openPort();
         serialPort.setParams(SerialPort.BAUDRATE_19200,
@@ -29,11 +30,20 @@ public class ATConnect {
         serialPort.addEventListener(new ATPortReader(atConnectionRequest.getPhone()), SerialPort.MASK_RXCHAR);
         serialPort.writeString("AT" + "\r");
         
-        while (status.equals("")) {
-        	
-        };
-        
-        return status;
+        while (true) {
+        	System.out.println("STATUS:" + status);
+        	if (!status.equals("")) return status;
+        }
+    }
+    
+    public boolean closePort(AtConnectionRequest atConnectionRequest) throws SerialPortException {
+    	serialPort = new SerialPort(atConnectionRequest.getPort());
+    	System.out.println("close port " + atConnectionRequest.getPort());
+    	if (serialPort.isOpened()) {
+    		return serialPort.closePort();
+    	} else {
+    		return true;
+    	}	
     }
     
     
@@ -61,17 +71,23 @@ public class ATConnect {
                     
                     if (data.length() > 12 && data.substring(2, 12).equals("NO CARRIER")) {
                     	status = "NO CARRIER";
-                    	throw new CSDException("Не удается соединиться");
+                    	try {
+    						serialPort.closePort();
+    					} catch (SerialPortException e1) {
+    						// TODO Auto-generated catch block
+    						e1.printStackTrace();
+    					}
 					}
                     
-                    if (data.length() > 14 && data.substring(2, 14).equals("CONNECT 9600")) {                	              	
-                    	if (serialPort.removeEventListener()) {
+                    if (data.length() > 14 && data.substring(2, 14).equals("CONNECT 9600")) {  
+                    	status = "CONNECT";
+                    	if (serialPort.removeEventListener()) {                		
                     		serialPort.addEventListener(new CSDPortReader(), SerialPort.MASK_RXCHAR);    
-                    		status = "CONNECT";
+                    		
                     	}
                     }
                 }
-                catch (SerialPortException | CSDException ex) {
+                catch (SerialPortException ex) {
                     System.out.println(ex);
                 }
                 catch (Exception e) {
@@ -92,12 +108,24 @@ public class ATConnect {
 			
             if(event.isRXCHAR() && event.getEventValue() > 0)	{
                 try {
-                	String data = serialPort.readHexString(event.getEventValue());
-                	csdResponsePayloadParser.setResponse(data);
-                	System.out.println("DataFromCSD" + data);
-                	for (int i : csdResponsePayloadParser.parsePayload()) {
-                		System.out.println("i:" + i);
+                	String data = serialPort.readString(event.getEventValue());
+                	if (data.length() > 12 && data.substring(2, 12).equals("NO CARRIER")) {
+                    	status = "NO CARRIER";
+                    	try {
+    						serialPort.closePort();
+    					} catch (SerialPortException e1) {
+    						// TODO Auto-generated catch block
+    						e1.printStackTrace();
+    					}
+					} else {
+						data = serialPort.readHexString(event.getEventValue());
+	                	csdResponsePayloadParser.setResponse(data);
+	                	System.out.println("DataFromCSD" + data);
+	                	for (int i : csdResponsePayloadParser.parsePayload()) {
+	                		System.out.println("i:" + i);
+						}
 					}
+                	
                 	
                 }
                 catch (SerialPortException | CSDException ex) {

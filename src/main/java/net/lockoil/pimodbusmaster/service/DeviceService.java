@@ -56,8 +56,12 @@ public class DeviceService {
 		deviceRepository.deleteById(id);
 	}
 	
-	public String atConnection(AtConnectionRequest atConnectionRequest) throws SerialPortException {
+	public String atConnect(AtConnectionRequest atConnectionRequest) throws SerialPortException {
 		return atConnect.getAtConnection(atConnectionRequest);
+	}
+	
+	public boolean atDisconnect(AtConnectionRequest atConnectionRequest) throws SerialPortException {
+		return atConnect.closePort(atConnectionRequest);
 	}
 	
 }

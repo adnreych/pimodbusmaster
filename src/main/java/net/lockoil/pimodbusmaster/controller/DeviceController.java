@@ -47,8 +47,13 @@ public class DeviceController {
 	  }
 	
 	@PostMapping("/api/csdConnect/")
-	  public String ATConnection(@RequestBody AtConnectionRequest atConnectionRequest) throws SerialPortException {	
-		return deviceService.atConnection(atConnectionRequest);
+	  public String atConnect(@RequestBody AtConnectionRequest atConnectionRequest) throws SerialPortException {	
+		return deviceService.atConnect(atConnectionRequest);
+	  }
+	
+	@PostMapping("/api/csdDisonnect/")
+	  public boolean atDisconnect(@RequestBody AtConnectionRequest atConnectionRequest) throws SerialPortException {	
+		return deviceService.atDisconnect(atConnectionRequest);
 	  }
 	
 
