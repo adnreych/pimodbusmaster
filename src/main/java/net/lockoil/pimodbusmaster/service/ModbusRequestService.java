@@ -78,6 +78,7 @@ public class ModbusRequestService {
 	    		return abstractModbusType.readValue();
 			} else {
 				CSDCommand csdCommand = new CSDCommand(csdPayloadAssembler.readRequestPayloadAssemble(modbusReadRequest));
+				System.out.println("CSDCommand:" + csdCommand.toString());
 				String data = atConnect.CSDRequest(modbusReadRequest.getAtConnectionRequest(), csdCommand.getCommand());
 				byte[] CSDCommand = Utils.getCSDCommand(slave, true);
 				CSDResponsePayloadParser csdResponsePayloadParser =  new CSDResponsePayloadParser(address, count, CSDCommand, data);
@@ -106,7 +107,9 @@ public class ModbusRequestService {
                 log.info(e.getClass().getSimpleName());
             } finally {
                 try {
-                	modbusMaster.disconnect();
+                	if(modbusMaster != null) {
+                		modbusMaster.disconnect();
+                	}
                 } catch (ModbusIOException e) {
                     e.printStackTrace();
                     log.info(e.getClass().getSimpleName());

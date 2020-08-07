@@ -31,7 +31,8 @@ public class CSDResponsePayloadParser {
 		}
 		int[] result = new int[count];
 		List<String> res = Arrays.asList(response.split(" "));
-		res = res.subList(3 + CSDcommandNumber.length, res.size() - 5);  // remove "CSD" in begin and "{CRC}ENDD" in end
+		System.out.println("RES ARR" + res.toString());
+		res = res.subList(3 + CSDcommandNumber.length, res.size() - 4);  // remove "CSD" in begin and "{CRC}ENDD" in end
 		for(int i = 0; i < res.size(); i = i + 2) {
 			String currString = res.get(i) + res.get(i+1);
 			result[i/2] = Integer.parseInt(currString, 16);
@@ -40,7 +41,7 @@ public class CSDResponsePayloadParser {
 	}
 
 	private String parseError() throws CSDException {
-		if (response.substring(0, 14).equals("45 52 52 4F 52")) { // 45 52 52 4F 52 == ERROR
+		if (response.length() >= 14 && response.substring(0, 14).equals("45 52 52 4F 52")) { // 45 52 52 4F 52 == ERROR
 			String errorCode = response.substring(15, 17);
 			switch (errorCode) {
 			case "30":

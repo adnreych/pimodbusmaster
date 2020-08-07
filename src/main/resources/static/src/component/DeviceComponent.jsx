@@ -32,7 +32,8 @@ class DeviceComponent extends Component {
 					currentLegend: "",
 					dataFromSpecialType: [],
 					editedNowSpecialTypeIndexes: [],
-					CSD: false
+					CSD: false,
+					ATRequest: {}
 		        }
 
 
@@ -55,10 +56,12 @@ class DeviceComponent extends Component {
 
 	componentDidMount() {
 		this.setState({ loading: true });
-		var id
+		var id;
 		if (this.props.match == undefined) {
 			id = this.props.id
-			this.setState({ CSD : true })
+			this.setState({ CSD : true,
+							ATRequest: this.props.atRequest
+							})
 		} else {
 			id = this.props.match.params.id
 		}
@@ -112,7 +115,8 @@ class DeviceComponent extends Component {
            	address: address,
 			count: count,
 			type: this.state.device[index].type,
-			isCSD: this.state.CSD
+			isCSD: this.state.CSD,
+			atConnectionRequest: this.state.ATRequest
         }
 
 		console.log("readRequest: ", readRequest);
@@ -149,7 +153,8 @@ class DeviceComponent extends Component {
            	address: address,
 			values: [value],
 			type: this.state.device[index].type,
-			isCSD: this.state.CSD
+			isCSD: this.state.CSD,
+			atConnectionRequest: this.state.ATRequest
         }
 
 		console.log("writeRequest: ", writeRequest);

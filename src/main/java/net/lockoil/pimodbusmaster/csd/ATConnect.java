@@ -1,5 +1,7 @@
 package net.lockoil.pimodbusmaster.csd;
 
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import jssc.SerialPort;
@@ -10,6 +12,7 @@ import net.lockoil.pimodbusmaster.exceptions.CSDException;
 import net.lockoil.pimodbusmaster.model.AtConnectionRequest;
 
 @Component
+@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class ATConnect {
 
     private SerialPort serialPort;
@@ -39,7 +42,6 @@ public class ATConnect {
     }
     
     public String CSDRequest(AtConnectionRequest atConnectionRequest, byte[] command) {
-    	serialPort = new SerialPort(atConnectionRequest.getPort());
     	if (serialPort.isOpened()) {
     		try {
 				serialPort.writeBytes(command);
@@ -51,13 +53,13 @@ public class ATConnect {
 		while (true) {
         	if (isCSDEventArrived) {
         		isCSDEventArrived = false;
+        		System.out.println("CSDEventArrived:" + isCSDEventArrived);
         		return hexData;
         	}
         }		
 	}
     
     public boolean closePort(AtConnectionRequest atConnectionRequest) throws SerialPortException {
-    	serialPort = new SerialPort(atConnectionRequest.getPort());
     	System.out.println("close port " + atConnectionRequest.getPort());
     	if (serialPort.isOpened()) {
     		return serialPort.closePort();
@@ -92,7 +94,6 @@ public class ATConnect {
                     	try {
     						serialPort.closePort();
     					} catch (SerialPortException e1) {
-    						// TODO Auto-generated catch block
     						e1.printStackTrace();
     					}
 					}
@@ -111,7 +112,6 @@ public class ATConnect {
 					try {
 						serialPort.closePort();
 					} catch (SerialPortException e1) {
-						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
 				}
@@ -122,8 +122,8 @@ public class ATConnect {
     private class CSDPortReader implements SerialPortEventListener {
     	
 		public void serialEvent(SerialPortEvent event) {
-			
             if(event.isRXCHAR() && event.getEventValue() > 0)	{
+            	System.out.println("Begin CSDEventArrived:" + isCSDEventArrived);
                 try {
                 	String data = serialPort.readString(event.getEventValue());
                 	if (data.length() > 12 && data.substring(2, 12).equals("NO CARRIER")) {
@@ -131,11 +131,11 @@ public class ATConnect {
                     	try {
     						serialPort.closePort();
     					} catch (SerialPortException e1) {
-    						// TODO Auto-generated catch block
     						e1.printStackTrace();
     					}
 					} else {
 						isCSDEventArrived = true;
+						System.out.println("CSDEventArrived:" + isCSDEventArrived);
 						data = serialPort.readHexString(event.getEventValue());
 						System.out.println("CSDPortReader DATA: " + data.toString());
 					}
@@ -149,7 +149,6 @@ public class ATConnect {
 					try {
 						serialPort.closePort();
 					} catch (SerialPortException e1) {
-						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
 				}

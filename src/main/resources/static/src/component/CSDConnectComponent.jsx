@@ -86,7 +86,12 @@ class CSDConnectComponent extends Component {
 			}}>Соединение</button>
 			
 			{success &&
-				<DeviceComponent id={this.state.deviceId} />
+				<DeviceComponent 
+				id={this.state.deviceId}
+				atRequest = {{
+						port : this.state.port,
+						phone : this.state.number,
+					}} />
 						}
 			
 			{loading &&
