@@ -11,4 +11,5 @@ public class ReadRequest {
 	private int count;
 	private String type;
 	boolean isCSD;
+	AtConnectionRequest atConnectionRequest;
 }

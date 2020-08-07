@@ -4,9 +4,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.springframework.stereotype.Component;
+
 import net.lockoil.pimodbusmaster.model.ReadRequest;
 import net.lockoil.pimodbusmaster.model.WriteRequest;
 
+@Component
 public class CSDPayloadAssembler {
 	
 	public Byte[] readRequestPayloadAssemble(ReadRequest readRequest) {

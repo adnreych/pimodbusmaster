@@ -19,7 +19,13 @@ import com.intelligt.modbus.jlibmodbus.serial.SerialPortException;
 import com.intelligt.modbus.jlibmodbus.serial.SerialPortFactoryJSSC;
 import com.intelligt.modbus.jlibmodbus.serial.SerialUtils;
 
+import net.lockoil.pimodbusmaster.csd.ATConnect;
+import net.lockoil.pimodbusmaster.csd.CSDCommand;
+import net.lockoil.pimodbusmaster.csd.CSDPayloadAssembler;
+import net.lockoil.pimodbusmaster.csd.CSDResponsePayloadParser;
+import net.lockoil.pimodbusmaster.csd.Utils;
 import net.lockoil.pimodbusmaster.deviceconfig.DeviceConfig;
+import net.lockoil.pimodbusmaster.model.AtConnectionRequest;
 import net.lockoil.pimodbusmaster.model.ReadRequest;
 import net.lockoil.pimodbusmaster.model.ReadResponse;
 import net.lockoil.pimodbusmaster.model.WriteRequest;
@@ -34,6 +40,12 @@ public class ModbusRequestService {
 	
 	@Autowired
 	ModbusTypeParser modbusTypeParser;
+	
+	@Autowired
+	CSDPayloadAssembler csdPayloadAssembler;
+	
+	@Autowired
+	ATConnect atConnect;
 	
 	
 	public Object read(ReadRequest modbusReadRequest) {
@@ -55,16 +67,32 @@ public class ModbusRequestService {
 				
 				int[] registerValues = modbusMaster.readHoldingRegisters(slave, address, count);
 				
+				int iterAddress = address;
 	            for (int value : registerValues) {
-	            	address++;
-	            	log.info("addr: " + address + " val: " + value);
-	            	responses.add(new ReadResponse(address, value));
+	            	iterAddress++;
+	            	log.info("addr: " + iterAddress + " val: " + value);
+	            	responses.add(new ReadResponse(iterAddress, value));
 	             }
 	            
 	            abstractModbusType = modbusTypeParser.parseRead(responses, modbusReadRequest);
 	    		return abstractModbusType.readValue();
 			} else {
-				// чтение через CSD
+				CSDCommand csdCommand = new CSDCommand(csdPayloadAssembler.readRequestPayloadAssemble(modbusReadRequest));
+				String data = atConnect.CSDRequest(modbusReadRequest.getAtConnectionRequest(), csdCommand.getCommand());
+				byte[] CSDCommand = Utils.getCSDCommand(slave, true);
+				CSDResponsePayloadParser csdResponsePayloadParser =  new CSDResponsePayloadParser(address, count, CSDCommand, data);
+				
+				int[] registerValues = csdResponsePayloadParser.parseReadResponse();
+				
+				int iterAddress = address;
+	            for (int value : registerValues) {
+	            	iterAddress++;
+	            	log.info("addr: " + iterAddress + " val: " + value);
+	            	responses.add(new ReadResponse(iterAddress, value));
+	             }
+	            
+	            abstractModbusType = modbusTypeParser.parseRead(responses, modbusReadRequest);
+	    		return abstractModbusType.readValue();
 			}
             
             

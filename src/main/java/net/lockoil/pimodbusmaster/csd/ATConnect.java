@@ -15,6 +15,8 @@ public class ATConnect {
     private SerialPort serialPort;
     static CSDResponsePayloadParser csdResponsePayloadParser;
     volatile private String status = "";
+    volatile private boolean isCSDEventArrived = false;
+    volatile private String hexData = "";
     
     
     public String getAtConnection(AtConnectionRequest atConnectionRequest) throws SerialPortException {
@@ -35,6 +37,24 @@ public class ATConnect {
         	if (!status.equals("")) return status;
         }
     }
+    
+    public String CSDRequest(AtConnectionRequest atConnectionRequest, byte[] command) {
+    	serialPort = new SerialPort(atConnectionRequest.getPort());
+    	if (serialPort.isOpened()) {
+    		try {
+				serialPort.writeBytes(command);
+				
+			} catch (SerialPortException e) {
+				e.printStackTrace();
+			}
+    	}
+		while (true) {
+        	if (isCSDEventArrived) {
+        		isCSDEventArrived = false;
+        		return hexData;
+        	}
+        }		
+	}
     
     public boolean closePort(AtConnectionRequest atConnectionRequest) throws SerialPortException {
     	serialPort = new SerialPort(atConnectionRequest.getPort());
@@ -80,8 +100,7 @@ public class ATConnect {
                     if (data.length() > 14 && data.substring(2, 14).equals("CONNECT 9600")) {  
                     	status = "CONNECT";
                     	if (serialPort.removeEventListener()) {                		
-                    		serialPort.addEventListener(new CSDPortReader(), SerialPort.MASK_RXCHAR);    
-                    		
+                    		serialPort.addEventListener(new CSDPortReader(), SerialPort.MASK_RXCHAR);                   		
                     	}
                     }
                 }
@@ -116,17 +135,14 @@ public class ATConnect {
     						e1.printStackTrace();
     					}
 					} else {
+						isCSDEventArrived = true;
 						data = serialPort.readHexString(event.getEventValue());
-	                	csdResponsePayloadParser.setResponse(data);
-	                	System.out.println("DataFromCSD" + data);
-	                	for (int i : csdResponsePayloadParser.parsePayload()) {
-	                		System.out.println("i:" + i);
-						}
+						System.out.println("CSDPortReader DATA: " + data.toString());
 					}
                 	
                 	
                 }
-                catch (SerialPortException | CSDException ex) {
+                catch (SerialPortException ex) {
                     System.out.println(ex);
                 }
                 catch (Exception e) {

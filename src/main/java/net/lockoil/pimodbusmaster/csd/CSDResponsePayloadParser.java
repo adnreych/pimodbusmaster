@@ -8,33 +8,27 @@ import net.lockoil.pimodbusmaster.exceptions.CSDException;
 
 public class CSDResponsePayloadParser {
 	
-	public CSDResponsePayloadParser() {}
 	
+	
+	public CSDResponsePayloadParser(int startAddress, int count, byte[] cSDcommandNumber, String response) {
+		this.startAddress = startAddress;
+		this.count = count;
+		CSDcommandNumber = cSDcommandNumber;
+		this.response = response;
+	}
+
 	private int startAddress;
 	private int count;
 	private byte[] CSDcommandNumber;
 	private String response;
 	
-	public int[] parsePayload() throws CSDException {
-		if (parseError().equals("OK")) {
-			System.out.println("CSDResponsePayloadParser" + this.toString());
-			String command = new String(CSDcommandNumber);
-			System.out.println("command" + command);
-			switch (command) {
-			case "3":
-			case "7":
-			case "17":
-				return parseReadResponse();
-
-			default:
-				break;
-			}
-			return null;
-		}
-		return null;
-	}
 	
-	private int[] parseReadResponse() {
+	public int[] parseReadResponse() {
+		try {
+			parseError();
+		} catch (CSDException e) {
+			e.printStackTrace();
+		}
 		int[] result = new int[count];
 		List<String> res = Arrays.asList(response.split(" "));
 		res = res.subList(3 + CSDcommandNumber.length, res.size() - 5);  // remove "CSD" in begin and "{CRC}ENDD" in end

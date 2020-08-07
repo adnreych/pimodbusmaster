@@ -4,22 +4,17 @@ import java.util.Arrays;
 
 import com.google.common.collect.ObjectArrays;
 
-import net.lockoil.pimodbusmaster.csd.Utils;
-
 public class CSDCommand {
 	
-	private Byte[] CSDcommandNumber;
 	private Byte[] CSDcommandPayload;
-	private Byte[] CMD_COMMAND_PART;
+	private Byte[] CMD_COMMAND_PART = new Byte[] {'C', 'M', 'D'};
     private final Byte[] END_PART = {'E', 'N', 'D', 0x0D};
     private Byte CRC;
     
     
     
-	public CSDCommand(byte[] CSDcommandNumber, Byte[] CSDcommandPayload) {
-		this.CSDcommandNumber = Utils.toByteWrap(CSDcommandNumber);
+	public CSDCommand(Byte[] CSDcommandPayload) {
 		this.CSDcommandPayload = CSDcommandPayload;
-		CMD_COMMAND_PART = ObjectArrays.concat(new Byte[] {'C', 'M', 'D'}, this.CSDcommandNumber, Byte.class);
 		this.CRC = getCRC();
 	}
 	
@@ -46,16 +41,6 @@ public class CSDCommand {
 	}
 
 
-	public Byte[] getCSDcommandNumber() {
-		return CSDcommandNumber;
-	}
-
-
-	public void setCSDcommandNumber(Byte[] cSDcommandNumber) {
-		CSDcommandNumber = cSDcommandNumber;
-	}
-
-
 	public Byte[] getCSDcommandPayload() {
 		return CSDcommandPayload;
 	}
@@ -68,7 +53,7 @@ public class CSDCommand {
 
 	@Override
 	public String toString() {
-		return "CSDCommand [CSDcommandNumber=" + Arrays.toString(CSDcommandNumber) + ", CSDcommandPayload="
+		return "CSDCommand [CSDcommandPayload="
 				+ Arrays.toString(CSDcommandPayload) + ", CMD_COMMAND_PART=" + Arrays.toString(CMD_COMMAND_PART)
 				+ ", END_PART=" + Arrays.toString(END_PART) + ", CRC=" + CRC + "]";
 	}
