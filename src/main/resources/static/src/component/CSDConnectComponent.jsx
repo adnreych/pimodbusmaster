@@ -13,8 +13,8 @@ class CSDConnectComponent extends Component {
 		this.state = {
 					loading: false,
 					deviceId: this.props.match.params.id,
-					number: "",
-					port: "",
+					number: "89805400316",
+					port: "/dev/ttyUSB0",
 					error : null,
 					success: false
 		        }
@@ -23,23 +23,13 @@ class CSDConnectComponent extends Component {
 		this.handlePortInput = this.handlePortInput.bind(this);
 
     }	
-
-    componentDidMount() {
-        
-    }
-
-	componentWillUnmount() {
-		console.log("componentWillUnmount")	
-		new Promise((resolve, reject) => {
-		  	var request = { 
-							port : this.state.port,
-							phone : this.state.number
-						}
-			DeviceService.disconnectFromCSD(request)
-		});		
+	
+	componentDidUpdate() {
+		if(window.onbeforeunload == true) {
+		    alert("RESULT");
+		}
 	}
-
-
+	
 	handleNumberInput(event) {
 			var number = event.target.value
 			this.setState({ number : number})

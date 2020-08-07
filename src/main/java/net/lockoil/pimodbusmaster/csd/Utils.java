@@ -1,8 +1,6 @@
 package net.lockoil.pimodbusmaster.csd;
 
-import java.nio.ByteBuffer;
-
-import com.google.common.collect.ObjectArrays;
+import java.math.BigInteger;
 
 public class Utils {
 	
@@ -23,20 +21,12 @@ public class Utils {
 		return result;
 	}
 	
-	public static byte[] prepareBytesToWrite (int[] input) {
-		Byte[] swap = {};
-		for(int curr : input) {
-			Byte[] bytes = toByteWrap(ByteBuffer.allocate(4).putInt(curr).array());
-			swap = ObjectArrays.concat(swap, bytes , Byte.class);
-		}			
-		return toBytePrimitive(swap);		
+	public static Byte[] prepareBytesToWrite (int i) {
+	    BigInteger bigInt = BigInteger.valueOf(i);     
+	    return toByteWrap(bigInt.toByteArray());		
 	}
 	
 	
-	public static Byte[] preparePayload(Byte[] CSDcommandNumber) {
-		
-		return CSDcommandNumber;
-	}
 	
 	
 

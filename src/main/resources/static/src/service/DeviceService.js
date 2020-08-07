@@ -4,7 +4,7 @@ const SAVE = `/api/savedevice/`
 const GET_ALL = `/api/devices/`
 const DELETE = `/api/deviceDelete/`
 const CSD_CONNECT = `/api/csdConnect/`
-const CSD_DISCONNECT = `/api/csdDisonnect/`
+const CSD_DISCONNECT = `/api/csdDisconnect/`
 
 class DeviceService {
 

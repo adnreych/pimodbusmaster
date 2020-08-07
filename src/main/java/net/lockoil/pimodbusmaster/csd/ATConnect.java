@@ -47,8 +47,6 @@ public class ATConnect {
     }
     
     
-    
-    
 
     private class ATPortReader implements SerialPortEventListener {
     	
