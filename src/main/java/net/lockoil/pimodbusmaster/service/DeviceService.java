@@ -64,4 +64,8 @@ public class DeviceService {
 		return atConnect.closePort(atConnectionRequest);
 	}
 	
+	public void refreshConnection(AtConnectionRequest atConnectionRequest) throws SerialPortException {
+		atConnect.refreshConnectionStatus(atConnectionRequest);
+	}
+	
 }

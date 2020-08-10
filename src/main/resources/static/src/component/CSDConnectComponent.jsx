@@ -80,10 +80,34 @@ class CSDConnectComponent extends Component {
 							  console.log("ERROR: ", err);
 							  this.setState({ 
 								loading: false,
-								error: "Ошибка при подключении устройства " + err,
+								error: "Ошибка при подключении устройства " + err + ".Попробуйте обновить статус соединения",
 								success: false });
 						  });	
-			}}>Соединение</button>
+			}}>Соединение</button>		
+			
+			<button 
+				onClick={() => {
+					this.setState({ loading : true})
+					var request = {
+						port : this.state.port,
+						phone : this.state.number,
+					}
+					DeviceService.refreshCSD(request)
+					.then(() => {
+						this.setState({ 
+								loading: false,
+								error: null,
+							 });
+						
+					})
+					.catch((err) => {
+							  console.log("ERROR: ", err);
+							  this.setState({ 
+								loading: false,
+								error: "Ошибка при обновлении статуса соединения " + err,
+								success: false });
+						  });	
+			}}>Обновить статус соединения</button>
 			
 			{success &&
 				<DeviceComponent 

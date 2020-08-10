@@ -1,5 +1,7 @@
 package net.lockoil.pimodbusmaster.csd;
 
+import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.List;
 
@@ -10,7 +12,7 @@ public class CSDResponsePayloadParser {
 	
 	
 	
-	public CSDResponsePayloadParser(int startAddress, int count, byte[] cSDcommandNumber, String response) {
+	public CSDResponsePayloadParser(int startAddress, int count, byte[] cSDcommandNumber, byte[] response) {
 		this.startAddress = startAddress;
 		this.count = count;
 		CSDcommandNumber = cSDcommandNumber;
@@ -20,7 +22,7 @@ public class CSDResponsePayloadParser {
 	private int startAddress;
 	private int count;
 	private byte[] CSDcommandNumber;
-	private String response;
+	private byte[] response;
 	
 	
 	public int[] parseReadResponse() {
@@ -30,19 +32,30 @@ public class CSDResponsePayloadParser {
 			e.printStackTrace();
 		}
 		int[] result = new int[count];
-		List<String> res = Arrays.asList(response.split(" "));
-		System.out.println("RES ARR" + res.toString());
-		res = res.subList(3 + CSDcommandNumber.length, res.size() - 4);  // remove "CSD" in begin and "{CRC}ENDD" in end
-		for(int i = 0; i < res.size(); i = i + 2) {
-			String currString = res.get(i) + res.get(i+1);
-			result[i/2] = Integer.parseInt(currString, 16);
+
+		for(int i = 0, offset = 4; i < count; i++) {
+			byte[] arr1 = {response[offset], response[offset + 1], response[offset + 2], response[offset + 3] };
+			byte[] arr2 = {response[offset + 4], response[offset + 5], response[offset + 6], response[offset + 7] };
+			int curr1 = ByteBuffer.wrap(arr1).getInt();
+			int curr2 = ByteBuffer.wrap(arr2).getInt();
+			System.out.println("CURR" + curr1 + " CURR2 " + curr2);
+			result[i] = Integer.parseInt("" + curr1 + curr2);
+			offset = offset + 8;
 		}
 		return result;
 	}
 
 	private String parseError() throws CSDException {
-		if (response.length() >= 14 && response.substring(0, 14).equals("45 52 52 4F 52")) { // 45 52 52 4F 52 == ERROR
-			String errorCode = response.substring(15, 17);
+		
+		if (response.length == 0) throw new CSDException("Пустой ответ на запрос");
+		
+		String result = "";
+		for (int i=0; i<5; i++) {
+			result = result + response[i];
+		}
+		
+		if (response.length >= 10 && result.equals("4552524F52")) { // 45 52 52 4F 52 == ERROR
+			String errorCode = response[5] + "";
 			switch (errorCode) {
 			case "30":
 				throw new CSDException("Неизвестная команда");
@@ -85,11 +98,11 @@ public class CSDResponsePayloadParser {
 		CSDcommandNumber = cSDcommandNumber;
 	}
 
-	public String getResponse() {
+	public byte[] getResponse() {
 		return response;
 	}
 
-	public void setResponse(String response) {
+	public void setResponse(byte[] response) {
 		this.response = response;
 	}
 

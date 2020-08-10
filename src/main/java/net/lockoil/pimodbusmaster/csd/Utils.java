@@ -22,7 +22,7 @@ public class Utils {
 	}
 	
 	public static Byte[] prepareBytesToWrite (int i) {
-	    BigInteger bigInt = BigInteger.valueOf(i);     
+	    BigInteger bigInt = BigInteger.valueOf(i); 
 	    return toByteWrap(bigInt.toByteArray());		
 	}
 	

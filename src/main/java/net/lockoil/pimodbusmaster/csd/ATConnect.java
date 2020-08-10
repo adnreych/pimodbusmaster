@@ -8,7 +8,6 @@ import jssc.SerialPort;
 import jssc.SerialPortEvent;
 import jssc.SerialPortEventListener;
 import jssc.SerialPortException;
-import net.lockoil.pimodbusmaster.exceptions.CSDException;
 import net.lockoil.pimodbusmaster.model.AtConnectionRequest;
 
 @Component
@@ -19,7 +18,7 @@ public class ATConnect {
     static CSDResponsePayloadParser csdResponsePayloadParser;
     volatile private String status = "";
     volatile private boolean isCSDEventArrived = false;
-    volatile private String hexData = "";
+    volatile private byte[] byteData;
     
     
     public String getAtConnection(AtConnectionRequest atConnectionRequest) throws SerialPortException {
@@ -36,12 +35,11 @@ public class ATConnect {
         serialPort.writeString("AT" + "\r");
         
         while (true) {
-        	System.out.println("STATUS:" + status);
         	if (!status.equals("")) return status;
         }
     }
     
-    public String CSDRequest(AtConnectionRequest atConnectionRequest, byte[] command) {
+    public byte[] CSDRequest(AtConnectionRequest atConnectionRequest, byte[] command) {
     	if (serialPort.isOpened()) {
     		try {
 				serialPort.writeBytes(command);
@@ -54,7 +52,7 @@ public class ATConnect {
         	if (isCSDEventArrived) {
         		isCSDEventArrived = false;
         		System.out.println("CSDEventArrived:" + isCSDEventArrived);
-        		return hexData;
+        		return byteData;
         	}
         }		
 	}
@@ -66,6 +64,35 @@ public class ATConnect {
     	} else {
     		return true;
     	}	
+    }
+    
+    public void refreshConnectionStatus(AtConnectionRequest atConnectionRequest) {
+    	System.out.println("refreshConnectionStatus");
+    	try {
+    		System.out.println("refreshConnectionStatus2");
+			if (serialPort.isOpened()) {
+				System.out.println("refreshConnectionStatus3");
+				if (serialPort.removeEventListener()) {   
+					System.out.println("refreshConnectionStatus4");
+					serialPort.closePort();
+					getAtConnection(atConnectionRequest);
+				}
+			} else {
+				System.out.println("refreshConnectionStatus5");
+				status = "";
+		    	serialPort.openPort();
+		        serialPort.setParams(SerialPort.BAUDRATE_19200,
+		                             SerialPort.DATABITS_8,
+		                             SerialPort.STOPBITS_1,
+		                             SerialPort.PARITY_NONE);
+		        serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_RTSCTS_IN | 
+		                                      SerialPort.FLOWCONTROL_RTSCTS_OUT);
+		        serialPort.addEventListener(new ATPortReader(atConnectionRequest.getPhone()), SerialPort.MASK_RXCHAR);
+		        serialPort.writeString("AT" + "\r");
+			}
+		} catch (SerialPortException e) {
+			e.printStackTrace();
+		}
     }
     
     
@@ -125,22 +152,15 @@ public class ATConnect {
             if(event.isRXCHAR() && event.getEventValue() > 0)	{
             	System.out.println("Begin CSDEventArrived:" + isCSDEventArrived);
                 try {
-                	String data = serialPort.readString(event.getEventValue());
-                	if (data.length() > 12 && data.substring(2, 12).equals("NO CARRIER")) {
-                    	status = "NO CARRIER";
-                    	try {
-    						serialPort.closePort();
-    					} catch (SerialPortException e1) {
-    						e1.printStackTrace();
-    					}
-					} else {
-						isCSDEventArrived = true;
-						System.out.println("CSDEventArrived:" + isCSDEventArrived);
-						data = serialPort.readHexString(event.getEventValue());
-						System.out.println("CSDPortReader DATA: " + data.toString());
-					}
                 	
+                	byteData = serialPort.readBytes(event.getEventValue());
                 	
+                	for(byte b : byteData) {
+                		System.out.println(b);
+                	}
+					isCSDEventArrived = true;
+					System.out.println("CSDEventArrived:" + isCSDEventArrived);
+        	
                 }
                 catch (SerialPortException ex) {
                     System.out.println(ex);

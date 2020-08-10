@@ -79,9 +79,9 @@ public class ModbusRequestService {
 			} else {
 				CSDCommand csdCommand = new CSDCommand(csdPayloadAssembler.readRequestPayloadAssemble(modbusReadRequest));
 				System.out.println("CSDCommand:" + csdCommand.toString());
-				String data = atConnect.CSDRequest(modbusReadRequest.getAtConnectionRequest(), csdCommand.getCommand());
-				byte[] CSDCommand = Utils.getCSDCommand(slave, true);
-				CSDResponsePayloadParser csdResponsePayloadParser =  new CSDResponsePayloadParser(address, count, CSDCommand, data);
+				byte[] data = atConnect.CSDRequest(modbusReadRequest.getAtConnectionRequest(), csdCommand.getCommand());
+				byte[] commandId = Utils.getCSDCommand(slave, true);
+				CSDResponsePayloadParser csdResponsePayloadParser =  new CSDResponsePayloadParser(address, count, commandId, data);
 				
 				int[] registerValues = csdResponsePayloadParser.parseReadResponse();
 				

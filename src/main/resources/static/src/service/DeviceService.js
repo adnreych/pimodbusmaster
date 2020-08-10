@@ -5,6 +5,7 @@ const GET_ALL = `/api/devices/`
 const DELETE = `/api/deviceDelete/`
 const CSD_CONNECT = `/api/csdConnect/`
 const CSD_DISCONNECT = `/api/csdDisconnect/`
+const CSD_REFRESH = `/api/csdRefresh/`
 
 class DeviceService {
 
@@ -27,6 +28,10 @@ class DeviceService {
 	
 	disconnectFromCSD(number) {
 		return axios.post(`${CSD_DISCONNECT}`, number);
+	}
+	
+	refreshCSD(atConnection) {
+		return axios.post(`${CSD_REFRESH}`, atConnection);
 	}
    
 

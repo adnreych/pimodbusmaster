@@ -6,12 +6,11 @@ import com.google.common.collect.ObjectArrays;
 
 public class CSDCommand {
 	
-	private Byte[] CSDcommandPayload;
 	private Byte[] CMD_COMMAND_PART = new Byte[] {'C', 'M', 'D'};
+	private Byte[] CSDcommandPayload;
+	private Byte CRC;
     private final Byte[] END_PART = {'E', 'N', 'D', 0x0D};
-    private Byte CRC;
-    
-    
+       
     
 	public CSDCommand(Byte[] CSDcommandPayload) {
 		this.CSDcommandPayload = CSDcommandPayload;
@@ -53,13 +52,9 @@ public class CSDCommand {
 
 	@Override
 	public String toString() {
-		return "CSDCommand [CSDcommandPayload="
-				+ Arrays.toString(CSDcommandPayload) + ", CMD_COMMAND_PART=" + Arrays.toString(CMD_COMMAND_PART)
-				+ ", END_PART=" + Arrays.toString(END_PART) + ", CRC=" + CRC + "]";
+		return "CSDCommand [CMD_COMMAND_PART=" + Arrays.toString(CMD_COMMAND_PART) + ", CSDcommandPayload="
+				+ Arrays.toString(CSDcommandPayload) + ", CRC=" + CRC + ", END_PART=" + Arrays.toString(END_PART) + "]";
 	}
-	
-	
-	
-    
+			
     
 }
