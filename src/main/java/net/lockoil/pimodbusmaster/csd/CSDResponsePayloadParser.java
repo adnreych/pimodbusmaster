@@ -32,6 +32,12 @@ public class CSDResponsePayloadParser {
 			e.printStackTrace();
 		}
 		int[] result = new int[count];
+		Byte[] arrayResponse = Utils.toByteWrap(response);
+		List<Byte> list = Arrays.asList(arrayResponse);
+		
+		list = list.subList(4, 4 + count * 2);   // удаляем заголовок и окончание
+		
+		System.out.println("RESPLIST" + list.toString());
 
 		for(int i = 0, offset = 4; i < count; i++) {
 			byte[] arr1 = {response[offset], response[offset + 1], response[offset + 2], response[offset + 3] };
