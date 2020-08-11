@@ -11,4 +11,5 @@ public class WriteRequest {
 	private int[] values;
 	private String type;
 	boolean isCSD;
+	AtConnectionRequest atConnectionRequest;
 }

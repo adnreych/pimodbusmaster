@@ -57,6 +57,7 @@ public class CSDPayloadAssembler {
 		List<Byte> payloadList = new ArrayList<Byte>();
 		Byte[] addressArr;
 		
+		
 		switch (writeRequest.getSlave()) {
 		case 1:
 			// запись в ЦП
@@ -68,7 +69,12 @@ public class CSDPayloadAssembler {
 			payloadList.addAll(Arrays.asList(addressArr));
 			payloadList.addAll(Arrays.asList(Utils.prepareBytesToWrite(writeRequest.getValues().length)));
 			for(int value : writeRequest.getValues()) {
-				payloadList.addAll(Arrays.asList(Utils.prepareBytesToWrite(value)));
+				Byte[] currValArr;
+				currValArr = Utils.prepareBytesToWrite(value);
+				if (currValArr.length == 1) {
+					currValArr = ObjectArrays.concat(new Byte[]{0}, new Byte[]{currValArr[0]} , Byte.class);
+				}
+				payloadList.addAll(Arrays.asList(currValArr));
 			}
 			return payloadList.toArray(new Byte[payloadList.size()]);
 		case 65:
@@ -81,7 +87,12 @@ public class CSDPayloadAssembler {
 			payloadList.addAll(Arrays.asList(addressArr));
 			payloadList.addAll(Arrays.asList(Utils.prepareBytesToWrite(writeRequest.getValues().length)));
 			for(int value : writeRequest.getValues()) {
-				payloadList.addAll(Arrays.asList(Utils.prepareBytesToWrite(value)));
+				Byte[] currValArr;
+				currValArr = Utils.prepareBytesToWrite(value);
+				if (currValArr.length == 1) {
+					currValArr = ObjectArrays.concat(new Byte[]{0}, new Byte[]{currValArr[0]} , Byte.class);
+				}
+				payloadList.addAll(Arrays.asList(currValArr));
 			}
 			return payloadList.toArray(new Byte[payloadList.size()]);
 		default:
@@ -95,7 +106,12 @@ public class CSDPayloadAssembler {
 			payloadList.addAll(Arrays.asList(Utils.prepareBytesToWrite(writeRequest.getValues().length)));
 			payloadList.addAll(Arrays.asList(Utils.prepareBytesToWrite(writeRequest.getSlave())));
 			for(int value : writeRequest.getValues()) {
-				payloadList.addAll(Arrays.asList(Utils.prepareBytesToWrite(value)));
+				Byte[] currValArr;
+				currValArr = Utils.prepareBytesToWrite(value);
+				if (currValArr.length == 1) {
+					currValArr = ObjectArrays.concat(new Byte[]{0}, new Byte[]{currValArr[0]} , Byte.class);
+				}
+				payloadList.addAll(Arrays.asList(currValArr));
 			}
 			return payloadList.toArray(new Byte[payloadList.size()]);
 		}	

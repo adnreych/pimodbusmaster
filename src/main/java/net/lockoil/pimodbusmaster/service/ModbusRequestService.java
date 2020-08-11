@@ -79,7 +79,7 @@ public class ModbusRequestService {
 			} else {
 				CSDCommand csdCommand = new CSDCommand(csdPayloadAssembler.readRequestPayloadAssemble(modbusReadRequest));
 				System.out.println("CSDCommand:" + csdCommand.toString());
-				byte[] data = atConnect.CSDRequest(modbusReadRequest.getAtConnectionRequest(), csdCommand.getCommand());
+				byte[] data = atConnect.CSDReadRequest(modbusReadRequest.getAtConnectionRequest(), csdCommand.getCommand());
 				byte[] commandId = Utils.getCSDCommand(slave, true);
 				CSDResponsePayloadParser csdResponsePayloadParser =  new CSDResponsePayloadParser(address, count, commandId, data);
 				
@@ -135,7 +135,9 @@ public class ModbusRequestService {
 				modbusMaster.connect();
 				modbusMaster.writeMultipleRegisters(slave, startAddress, values);
 			} else {
-				// запись через CSD
+				CSDCommand csdCommand = new CSDCommand(csdPayloadAssembler.writeRequestPayloadAssemble(modbusWriteRequest));
+				System.out.println("CSDCommand:" + csdCommand.toString());
+				atConnect.CSDWriteRequest(modbusWriteRequest.getAtConnectionRequest(), csdCommand.getCommand());
 			}
 			return "OK";
 		} catch (SerialPortException | ModbusIOException | ModbusProtocolException | ModbusNumberException | RuntimeException e) {
@@ -144,8 +146,9 @@ public class ModbusRequestService {
 		}
 		finally {
                 try {
-                	if (modbusMaster.isConnected()) modbusMaster.disconnect();  	
-                	return "ERROR";
+                	if (modbusMaster != null && modbusMaster.isConnected()) {
+                		modbusMaster.disconnect();
+                	}
                 } catch (ModbusIOException e) {
                     e.printStackTrace();
                     log.info(e.getClass().getSimpleName());              

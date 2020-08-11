@@ -42,7 +42,7 @@ public class ATConnect {
         }
     }
     
-    public byte[] CSDRequest(AtConnectionRequest atConnectionRequest, byte[] command) {
+    public byte[] CSDReadRequest(AtConnectionRequest atConnectionRequest, byte[] command) {
     	if (serialPort.isOpened()) {
     		try {
 				serialPort.writeBytes(command);
@@ -58,6 +58,17 @@ public class ATConnect {
         		return byteData;
         	}
         }		
+	}
+    
+    public void CSDWriteRequest(AtConnectionRequest atConnectionRequest, byte[] command) {
+    	if (serialPort.isOpened()) {
+    		try {
+				serialPort.writeBytes(command);
+				
+			} catch (SerialPortException e) {
+				e.printStackTrace();
+			}
+    	}	
 	}
     
     public boolean closePort(AtConnectionRequest atConnectionRequest) throws SerialPortException {

@@ -1,25 +1,20 @@
 package net.lockoil.pimodbusmaster.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import jssc.SerialPortException;
 import net.lockoil.pimodbusmaster.model.AtConnectionRequest;
-import net.lockoil.pimodbusmaster.model.CardRegisterElement;
 import net.lockoil.pimodbusmaster.model.Device;
-import net.lockoil.pimodbusmaster.model.LoadRegistersResource;
 import net.lockoil.pimodbusmaster.service.DeviceService;
 
 @CrossOrigin
@@ -59,7 +54,7 @@ public class DeviceController {
 	
 	@PostMapping("/api/csdRefresh/")
 	  public void atRefresh(@RequestBody AtConnectionRequest atConnectionRequest) throws SerialPortException {	
-		deviceService.refreshConnection(atConnectionRequest);;
+		deviceService.refreshConnection(atConnectionRequest);
 	  }
 	
 	@GetMapping("/api/ports/")
