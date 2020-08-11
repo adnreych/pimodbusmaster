@@ -39,14 +39,11 @@ public class CSDResponsePayloadParser {
 		
 		System.out.println("RESPLIST" + list.toString());
 
-		for(int i = 0, offset = 4; i < count; i++) {
-			byte[] arr1 = {response[offset], response[offset + 1], response[offset + 2], response[offset + 3] };
-			byte[] arr2 = {response[offset + 4], response[offset + 5], response[offset + 6], response[offset + 7] };
-			int curr1 = ByteBuffer.wrap(arr1).getInt();
-			int curr2 = ByteBuffer.wrap(arr2).getInt();
-			System.out.println("CURR" + curr1 + " CURR2 " + curr2);
-			result[i] = Integer.parseInt("" + curr1 + curr2);
-			offset = offset + 8;
+		for(int i = 0, j = 0; i < list.size(); i = i + 2, j++) {
+
+			int curr = ByteBuffer.wrap(new byte[] {0, 0, list.get(i), list.get(i+1)}).getInt();		
+			System.out.println("CURR" + curr);
+			result[j] = curr;
 		}
 		return result;
 	}
