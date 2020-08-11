@@ -68,4 +68,8 @@ public class DeviceService {
 		atConnect.refreshConnectionStatus(atConnectionRequest);
 	}
 	
+	public  String[] getPorts() {
+		return atConnect.getPorts();
+	}
+	
 }

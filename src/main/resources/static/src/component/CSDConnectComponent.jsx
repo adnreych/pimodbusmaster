@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import DeviceService from '../service/DeviceService';
 import * as Strings from '../helpers/strings';
 import DeviceComponent from '../component/DeviceComponent';
+import Option from 'muicss/lib/react/option';
+import Select from 'muicss/lib/react/select';
 
 
 
@@ -15,13 +17,28 @@ class CSDConnectComponent extends Component {
 					deviceId: this.props.match.params.id,
 					number: "89805400316",
 					port: "/dev/ttyUSB0",
+					ports: [],
 					error : null,
 					success: false
 		        }
 
 		this.handleNumberInput = this.handleNumberInput.bind(this);
-		this.handlePortInput = this.handlePortInput.bind(this);
+		this.handleChangePort = this.handleChangePort.bind(this);
 
+    }
+
+    componentDidMount() {
+        DeviceService.getPorts()
+			.then(ports => {
+				console.log("PORTS", ports)
+				this.setState({ 
+					ports: ports.data,
+					port: ports.data[0],
+					})
+			})
+			.catch((err) => {
+					  console.log("ERROR: ", err);
+				  });
     }	
 	
 	componentDidUpdate() {
@@ -35,10 +52,18 @@ class CSDConnectComponent extends Component {
 			this.setState({ number : number})
 	}
 	
-	handlePortInput(event) {
-			var port = event.target.value
-			this.setState({ port : port})
+	
+	handleChangePort(event) {    
+		this.setState({port: event.target.value});  
 	}
+	
+	renderPortsData() {
+	      return this.state.ports.map((current) => {
+	         return (
+				<Option value={current} label={current} />
+	         )
+	      })
+	   }
 
 	render() {	
 		const {loading, error, success} = this.state;
@@ -48,10 +73,14 @@ class CSDConnectComponent extends Component {
 			{error &&
 	                        <div className={'alert alert-danger'}>{this.state.error}</div>
 	                    }
-			<label>Адрес порта</label>
-	        <input type="text" className="form-control" onChange={(event) => this.handlePortInput(event)} />	
+
+			<label>Выберите порт:</label>
+				<Select name="input" value={this.state.port} onChange={this.handleChangePort}>
+					  {this.renderPortsData()}
+				</Select>		        
+			<br/>
 		  	<label>Номер телефона в формате 8ХХХХХХХХХХ</label>
-	        <input type="text" className="form-control" onChange={(event) => this.handleNumberInput(event)} />	
+	        <input type="text" className="form-control" defaultValue="89805400316" onChange={(event) => this.handleNumberInput(event)} />	
 			<button 
 				onClick={() => {
 					this.setState({ loading : true})

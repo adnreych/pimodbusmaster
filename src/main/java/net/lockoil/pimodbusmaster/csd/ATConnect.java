@@ -1,5 +1,7 @@
 package net.lockoil.pimodbusmaster.csd;
 
+import java.util.ArrayList;
+
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -8,6 +10,7 @@ import jssc.SerialPort;
 import jssc.SerialPortEvent;
 import jssc.SerialPortEventListener;
 import jssc.SerialPortException;
+import jssc.SerialPortList;
 import net.lockoil.pimodbusmaster.model.AtConnectionRequest;
 
 @Component
@@ -174,5 +177,9 @@ public class ATConnect {
 				}
             }
 		} 	
+    }
+    
+    public String[] getPorts() {
+    	return SerialPortList.getPortNames();   	
     }
 }

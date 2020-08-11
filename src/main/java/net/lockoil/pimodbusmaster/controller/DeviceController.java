@@ -1,5 +1,6 @@
 package net.lockoil.pimodbusmaster.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -59,6 +60,11 @@ public class DeviceController {
 	@PostMapping("/api/csdRefresh/")
 	  public void atRefresh(@RequestBody AtConnectionRequest atConnectionRequest) throws SerialPortException {	
 		deviceService.refreshConnection(atConnectionRequest);;
+	  }
+	
+	@GetMapping("/api/ports/")
+	  public String[] getPorts() {	
+		return deviceService.getPorts();
 	  }
 
 	
