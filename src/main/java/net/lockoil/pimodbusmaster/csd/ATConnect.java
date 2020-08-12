@@ -54,7 +54,7 @@ public class ATConnect {
 		while (true) {
         	if (isCSDEventArrived) {
         		isCSDEventArrived = false;
-        		System.out.println("CSDEventArrived:" + isCSDEventArrived);
+        		System.out.println("CSDEventArrivedRead:" + isCSDEventArrived);
         		return byteData;
         	}
         }		
@@ -64,7 +64,13 @@ public class ATConnect {
     	if (serialPort.isOpened()) {
     		try {
 				serialPort.writeBytes(command);
-				
+				while (true) {
+		        	if (isCSDEventArrived) {
+		        		isCSDEventArrived = false;
+		        		System.out.println("CSDEventArrivedWrite:" + isCSDEventArrived);
+		        		break;
+		        	}
+		        }	
 			} catch (SerialPortException e) {
 				e.printStackTrace();
 			}

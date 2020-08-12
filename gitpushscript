@@ -1,6 +1,0 @@
-#!/bin/bash
-git add .
-git commit $1
-git push -u origin $2
-#scp -P 2002 /home/denis/eclipse-workspace/pimodbusmaster/target/pimodbusmaster-0.0.1-SNAPSHOT.war pi@192.168.88.23:/usr/src/
-

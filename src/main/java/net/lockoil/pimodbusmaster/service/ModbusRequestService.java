@@ -21,7 +21,7 @@ import com.intelligt.modbus.jlibmodbus.serial.SerialUtils;
 
 import net.lockoil.pimodbusmaster.csd.ATConnect;
 import net.lockoil.pimodbusmaster.csd.CSDCommand;
-import net.lockoil.pimodbusmaster.csd.CSDPayloadAssembler;
+import net.lockoil.pimodbusmaster.csd.CSDRequestPayloadAssembler;
 import net.lockoil.pimodbusmaster.csd.CSDResponsePayloadParser;
 import net.lockoil.pimodbusmaster.csd.Utils;
 import net.lockoil.pimodbusmaster.deviceconfig.DeviceConfig;
@@ -37,17 +37,16 @@ import net.lockoil.pimodbusmaster.util.ModbusTypeParser;
 public class ModbusRequestService {
 	
 	private final Logger log = Logger.getLogger(this.getClass().getSimpleName());
+
+	@Autowired
+	private ModbusTypeParser modbusTypeParser;
 	
 	@Autowired
-	ModbusTypeParser modbusTypeParser;
+	private CSDRequestPayloadAssembler csdRequestPayloadAssembler;
 	
 	@Autowired
-	CSDPayloadAssembler csdPayloadAssembler;
-	
-	@Autowired
-	ATConnect atConnect;
-	
-	
+	private ATConnect atConnect;
+		
 	public Object read(ReadRequest modbusReadRequest) {
 		AbstractModbusType abstractModbusType;
 		List<ReadResponse> responses = new ArrayList<>();
@@ -55,8 +54,7 @@ public class ModbusRequestService {
 		int slave = modbusReadRequest.getSlave(); 
 		int address = modbusReadRequest.getAddress(); 
 		int count = modbusReadRequest.getCount();
-		
-		
+				
 		Modbus.setLogLevel(Modbus.LogLevel.LEVEL_DEBUG);
         
         ModbusMaster modbusMaster = null;
@@ -73,11 +71,8 @@ public class ModbusRequestService {
 	            	log.info("addr: " + iterAddress + " val: " + value);
 	            	responses.add(new ReadResponse(iterAddress, value));
 	             }
-	            
-	            abstractModbusType = modbusTypeParser.parseRead(responses, modbusReadRequest);
-	    		return abstractModbusType.readValue();
 			} else {
-				CSDCommand csdCommand = new CSDCommand(csdPayloadAssembler.readRequestPayloadAssemble(modbusReadRequest));
+				CSDCommand csdCommand = new CSDCommand(csdRequestPayloadAssembler.readRequestPayloadAssemble(modbusReadRequest));
 				System.out.println("CSDCommand:" + csdCommand.toString());
 				byte[] data = atConnect.CSDReadRequest(modbusReadRequest.getAtConnectionRequest(), csdCommand.getCommand());
 				byte[] commandId = Utils.getCSDCommand(slave, true);
@@ -90,13 +85,12 @@ public class ModbusRequestService {
 	            	iterAddress++;
 	            	log.info("addr: " + iterAddress + " val: " + value);
 	            	responses.add(new ReadResponse(iterAddress, value));
-	             }
-	            
-	            abstractModbusType = modbusTypeParser.parseRead(responses, modbusReadRequest);
-	    		return abstractModbusType.readValue();
+	             }	            	        
 			}
-            
-            
+			
+			abstractModbusType = modbusTypeParser.parseRead(responses, modbusReadRequest);
+    		return abstractModbusType.readValue();
+                      
 		} catch (SerialPortException | ModbusIOException e) {
 			log.info(e.getClass().getSimpleName());
 			e.printStackTrace();
@@ -114,8 +108,7 @@ public class ModbusRequestService {
                     e.printStackTrace();
                     log.info(e.getClass().getSimpleName());
                 }
-            }
-		
+            }		
 		return null;
 	}
 	
@@ -124,8 +117,7 @@ public class ModbusRequestService {
 		int slave = modbusWriteRequest.getSlave(); 
 		int startAddress = modbusWriteRequest.getAddress(); 
 		int[] values = modbusWriteRequest.getValues();
-		
-		
+				
 		Modbus.setLogLevel(Modbus.LogLevel.LEVEL_DEBUG);
         
         ModbusMaster modbusMaster = null;
@@ -135,7 +127,7 @@ public class ModbusRequestService {
 				modbusMaster.connect();
 				modbusMaster.writeMultipleRegisters(slave, startAddress, values);
 			} else {
-				CSDCommand csdCommand = new CSDCommand(csdPayloadAssembler.writeRequestPayloadAssemble(modbusWriteRequest));
+				CSDCommand csdCommand = new CSDCommand(csdRequestPayloadAssembler.writeRequestPayloadAssemble(modbusWriteRequest));
 				System.out.println("CSDCommand:" + csdCommand.toString());
 				atConnect.CSDWriteRequest(modbusWriteRequest.getAtConnectionRequest(), csdCommand.getCommand());
 			}
@@ -155,6 +147,5 @@ public class ModbusRequestService {
                 }
         }
 		return "ERROR";
-	}
-	
+	}	
 }

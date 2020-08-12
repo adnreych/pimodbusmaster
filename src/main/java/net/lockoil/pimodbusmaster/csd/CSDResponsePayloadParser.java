@@ -57,18 +57,18 @@ public class CSDResponsePayloadParser {
 			result = result + response[i];
 		}
 		
-		if (response.length >= 10 && result.equals("4552524F52")) { // 45 52 52 4F 52 == ERROR
+		if (response.length >= 10 && result.equals("6982827982")) { // 45 52 52 4F 52 == ERROR
 			String errorCode = response[5] + "";
 			switch (errorCode) {
-			case "30":
+			case "48":
 				throw new CSDException("Неизвестная команда");
-			case "31":
+			case "49":
 				throw new CSDException("Неверный формат команды");
-			case "32":
+			case "50":
 				throw new CSDException("Неверная контрольная сумма");
-			case "35":
+			case "53":
 				throw new CSDException("Ошибка записи flash памяти");
-			case "38":
+			case "56":
 				throw new CSDException("Нет ответа от удаленного устройства");
 			default:
 				throw new CSDException("Неизвестная ошибка CSD");

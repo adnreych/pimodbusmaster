@@ -167,7 +167,7 @@ class DeviceComponent extends Component {
 		ModbusService.modbusWrite(writeRequest)
 			.then((response) => {
 				console.log("response: ", response);	
-				if (response == "OK") {
+				if (response.data == "OK") {
 					this.setState({ loading: false,
 								    success: "Запись значений выполнена успешно" });
 				} else {

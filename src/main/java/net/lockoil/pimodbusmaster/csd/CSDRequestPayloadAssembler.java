@@ -12,7 +12,7 @@ import net.lockoil.pimodbusmaster.model.ReadRequest;
 import net.lockoil.pimodbusmaster.model.WriteRequest;
 
 @Component
-public class CSDPayloadAssembler {
+public class CSDRequestPayloadAssembler {
 	
 	public Byte[] readRequestPayloadAssemble(ReadRequest readRequest) {
 		List<Byte> payloadList = new ArrayList<Byte>();
