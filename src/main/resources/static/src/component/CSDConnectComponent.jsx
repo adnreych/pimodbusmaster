@@ -109,7 +109,7 @@ class CSDConnectComponent extends Component {
 							  console.log("ERROR: ", err);
 							  this.setState({ 
 								loading: false,
-								error: "Ошибка при подключении устройства " + err + ".Попробуйте обновить статус соединения",
+								error: "Ошибка при подключении устройства " + err + ". Нажмите Прервать соединение и попробуйте еще раз",
 								success: false });
 						  });	
 			}}>Соединение</button>		
@@ -121,7 +121,7 @@ class CSDConnectComponent extends Component {
 						port : this.state.port,
 						phone : this.state.number,
 					}
-					DeviceService.refreshCSD(request)
+					DeviceService.disconnectFromCSD(request)
 					.then(() => {
 						this.setState({ 
 								loading: false,
@@ -133,10 +133,10 @@ class CSDConnectComponent extends Component {
 							  console.log("ERROR: ", err);
 							  this.setState({ 
 								loading: false,
-								error: "Ошибка при обновлении статуса соединения " + err,
+								error: "Ошибка при прерывания соединения " + err,
 								success: false });
 						  });	
-			}}>Обновить статус соединения</button>
+			}}>Прервать соединение</button>
 			
 			{success &&
 				<DeviceComponent 

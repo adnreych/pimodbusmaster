@@ -1,7 +1,5 @@
 package net.lockoil.pimodbusmaster.csd;
 
-import java.util.ArrayList;
-
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -54,7 +52,6 @@ public class ATConnect {
 		while (true) {
         	if (isCSDEventArrived) {
         		isCSDEventArrived = false;
-        		System.out.println("CSDEventArrivedRead:" + isCSDEventArrived);
         		return byteData;
         	}
         }		
@@ -67,7 +64,6 @@ public class ATConnect {
 				while (true) {
 		        	if (isCSDEventArrived) {
 		        		isCSDEventArrived = false;
-		        		System.out.println("CSDEventArrivedWrite:" + isCSDEventArrived);
 		        		break;
 		        	}
 		        }	
@@ -85,36 +81,6 @@ public class ATConnect {
     		return true;
     	}	
     }
-    
-    public void refreshConnectionStatus(AtConnectionRequest atConnectionRequest) {
-    	System.out.println("refreshConnectionStatus");
-    	try {
-    		System.out.println("refreshConnectionStatus2");
-			if (serialPort.isOpened()) {
-				System.out.println("refreshConnectionStatus3");
-				if (serialPort.removeEventListener()) {   
-					System.out.println("refreshConnectionStatus4");
-					serialPort.closePort();
-					getAtConnection(atConnectionRequest);
-				}
-			} else {
-				System.out.println("refreshConnectionStatus5");
-				status = "";
-		    	serialPort.openPort();
-		        serialPort.setParams(SerialPort.BAUDRATE_19200,
-		                             SerialPort.DATABITS_8,
-		                             SerialPort.STOPBITS_1,
-		                             SerialPort.PARITY_NONE);
-		        serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_RTSCTS_IN | 
-		                                      SerialPort.FLOWCONTROL_RTSCTS_OUT);
-		        serialPort.addEventListener(new ATPortReader(atConnectionRequest.getPhone()), SerialPort.MASK_RXCHAR);
-		        serialPort.writeString("AT" + "\r");
-			}
-		} catch (SerialPortException e) {
-			e.printStackTrace();
-		}
-    }
-    
     
 
     private class ATPortReader implements SerialPortEventListener {
@@ -170,17 +136,13 @@ public class ATConnect {
     	
 		public void serialEvent(SerialPortEvent event) {
             if(event.isRXCHAR() && event.getEventValue() > 0)	{
-            	System.out.println("Begin CSDEventArrived:" + isCSDEventArrived);
-                try {
-                	
+                try {                	
                 	byteData = serialPort.readBytes(event.getEventValue());
                 	
                 	for(byte b : byteData) {
                 		System.out.println(b);
                 	}
-					isCSDEventArrived = true;
-					System.out.println("CSDEventArrived:" + isCSDEventArrived);
-        	
+					isCSDEventArrived = true;	
                 }
                 catch (SerialPortException ex) {
                     System.out.println(ex);

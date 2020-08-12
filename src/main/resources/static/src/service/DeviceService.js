@@ -31,10 +31,6 @@ class DeviceService {
 		return axios.post(`${CSD_DISCONNECT}`, number);
 	}
 	
-	refreshCSD(atConnection) {
-		return axios.post(`${CSD_REFRESH}`, atConnection);
-	}
-	
 	getPorts() {
 		return axios.get(`${GET_PORTS}`);
 	} 

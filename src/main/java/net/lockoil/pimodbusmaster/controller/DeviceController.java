@@ -52,11 +52,7 @@ public class DeviceController {
 		return deviceService.atDisconnect(atConnectionRequest);
 	  }
 	
-	@PostMapping("/api/csdRefresh/")
-	  public void atRefresh(@RequestBody AtConnectionRequest atConnectionRequest) throws SerialPortException {	
-		deviceService.refreshConnection(atConnectionRequest);
-	  }
-	
+
 	@GetMapping("/api/ports/")
 	  public String[] getPorts() {	
 		return deviceService.getPorts();
