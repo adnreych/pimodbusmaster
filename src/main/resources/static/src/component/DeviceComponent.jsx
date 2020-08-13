@@ -11,6 +11,7 @@ import 'react-confirm-alert/src/react-confirm-alert.css';
 import Option from 'muicss/lib/react/option';
 import Select from 'muicss/lib/react/select';
 import _pull from 'lodash/pull';
+import { Tabs, TabPane } from '../helpers/tab-nav';
 
 
 class DeviceComponent extends Component {
@@ -51,6 +52,7 @@ class DeviceComponent extends Component {
 		this.callbackFromSpecialType = this.callbackFromSpecialType.bind(this);
 		this.callbackFromBitType = this.callbackFromBitType.bind(this);
 		this.prepareValueToWrite = this.prepareValueToWrite.bind(this);
+		this.handleChangeGroupList = this.handleChangeGroupList.bind(this);
 
     }
 
@@ -70,10 +72,15 @@ class DeviceComponent extends Component {
 			.then(device => {
 				var groups = [];
 				device.data.forEach(element => {
-					if (!groups.includes(element.group)) {
-						groups.push(element.group)
+					if (groups.filter(e => e.name == element.group).length == 0) {
+						groups.push({
+							name : element.group,
+							checked: true
+						})
+						console.log("G", groups)
 					}
 				});
+				console.log("GROUPS", groups)
 				this.setState({ device: device.data,
 								groups: groups});
 				if (this.state.device[0] != null) {
@@ -112,6 +119,20 @@ class DeviceComponent extends Component {
 		inputValues[index] = currValue
 		this.setState({ inputValues: inputValues })
 		//console.log("STATEFromBitType: ", this.state);
+	}
+	
+	
+	handleChangeGroupList = (group) => {
+		var groups = this.state.groups	
+		console.log("GROUP FILTER", groups.filter(e => e.name == group.name))
+		var curr = groups.filter(e => e.name == group.name)[0]
+		
+		if (curr.checked) {
+			groups[groups.indexOf(curr)].checked = false
+		} else {
+			groups[groups.indexOf(curr)].checked = true
+		}	
+		this.setState({ groups: groups })
 	}
 
 	handleClickRead = (address, count, index) => {    
@@ -465,7 +486,7 @@ class DeviceComponent extends Component {
 	
 	
 	renderTableData(currentGroup) {
-		return this.state.device.filter(e => e.group == currentGroup).map((current, index) => {
+		return this.state.device.filter(e => e.group == currentGroup.name).map((current, index) => {
 			const TEXT_COLLAPSE_OPTIONS = {
 				  collapse: false, // default state when component rendered
 				  collapseText: '... Развернуть', // text to show when collapsed
@@ -654,32 +675,45 @@ class DeviceComponent extends Component {
    }
 
 	renderByGroups() {
+		return this.state.groups
+			.filter(e => e.checked)
+			.map((current) => {
+				return (
+					<div>
+						<p>{current.name}</p>
+						<table border="1">
+								<tr>
+									<th>Название</th>
+								    <th>Адрес</th>
+								    <th>Количество</th>
+								    <th>Чтение</th>
+								    <th>Запись</th>
+									<th>Тип</th>
+								    <th>Множитель</th>
+								    <th>Суффикс</th>
+									<th>Мин.</th>
+									<th>Макс.</th>
+									<th>Группа</th>
+									<th>Описание</th>
+							   </tr>
+							<tbody>	
+								{this.renderTableData(current)}					  												
+							</tbody>
+						</table>				
+					</div>
+				)
+				   
+		})
+	}
+	
+	renderGroupsCheckboxes() {
 		return this.state.groups.map((current) => {
 			return (
-				<div>
-					<p>{current}</p>
-					<table border="1">
-							<tr>
-								<th>Название</th>
-							    <th>Адрес</th>
-							    <th>Количество</th>
-							    <th>Чтение</th>
-							    <th>Запись</th>
-								<th>Тип</th>
-							    <th>Множитель</th>
-							    <th>Суффикс</th>
-								<th>Мин.</th>
-								<th>Макс.</th>
-								<th>Группа</th>
-								<th>Описание</th>
-						   </tr>
-						<tbody>	
-							{this.renderTableData(current)}					  												
-						</tbody>
-					</table>				
-				</div>
+					<div>
+		                <input onChange={() => this.handleChangeGroupList(current)} checked={current.checked} type="checkbox" />
+		                <label>{current.name}</label>
+	           		</div>
 			)
-				   
 		})
 	}
 
@@ -700,7 +734,15 @@ class DeviceComponent extends Component {
 	                        <div className={'alert alert-success'}>{this.state.success}</div>
 	                    }
 
+				<Tabs activeTab='1'>
+		          <TabPane tab='1'>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.</TabPane>
+		          <TabPane tab='2'>At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.</TabPane>
+		          <TabPane tab='3'>At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</TabPane>
+		        </Tabs>
+
 				<p>Устройство {name}. Адрес {address}.</p>
+				
+				{this.renderGroupsCheckboxes()}	
 
 				{this.renderByGroups()}	
 					
