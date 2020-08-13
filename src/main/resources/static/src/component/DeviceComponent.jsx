@@ -21,6 +21,7 @@ class DeviceComponent extends Component {
 		this.state = {
 					loading: false,
 					device: [],
+					groups: [],
 					name: "",
 					address: "",
 					inputValues: [],
@@ -67,7 +68,14 @@ class DeviceComponent extends Component {
 		}
 		LoadRegistersService.getDevice(id)
 			.then(device => {
-				this.setState({ device: device.data});
+				var groups = [];
+				device.data.forEach(element => {
+					if (!groups.includes(element.group)) {
+						groups.push(element.group)
+					}
+				});
+				this.setState({ device: device.data,
+								groups: groups});
 				if (this.state.device[0] != null) {
 					this.setState({ 
 						name: this.state.device[0].device.name, 
@@ -77,7 +85,7 @@ class DeviceComponent extends Component {
 						dataFromSpecialType: [],
 						editedNow: Array.apply(false, Array(this.state.device.length))});
 				}
-				var dv = this.state.device;
+				var dv = this.state.device;			
 				dv.forEach(element => {
 					element.device = element.device.id;
 				});
@@ -451,208 +459,236 @@ class DeviceComponent extends Component {
 					<p class="small-text">{e}</p>
 				)
 			})
-		}
-		
+		}	
 	}
 
 	
 	
-	renderTableData() {
-      return this.state.device.map((current, index) => {
-		const TEXT_COLLAPSE_OPTIONS = {
-			  collapse: false, // default state when component rendered
-			  collapseText: '... Развернуть', // text to show when collapsed
-			  expandText: 'Свернуть', // text to show when expanded
-			  minHeight: 30, // component height when closed
-			  maxHeight: 250, // expanded to
-			}
-		 const {loading, editedNow} = this.state;
-         const { id, name, address, count, isRead, isWrite, type, multiplier, suffix, min, max, group, legends} = current;
-         return (
-            <tr key={index}>
-               <td>{name}
-					{editedNow[index] &&
-							<div>
-							<br />
-                            <input type="text" className="form-control" defaultValue={name} onChange={(event) => this.handleChangeCurrentRegister(event, "name")}/>
-							</div>
-                        }
-				</td>
-               <td>{address}
-					{editedNow[index] &&
-							<div>
-							<br />
-                            <input type="text" className="form-control" defaultValue={address} onChange={(event) => this.handleChangeCurrentRegister(event, "address")}/>
-							</div>
-                        }
-				</td>
-               <td>{count}
-					{editedNow[index] &&
-							<div>
-							<br />
-                            <input type="text" className="form-control" defaultValue={count} onChange={(event) => this.handleChangeCurrentRegister(event, "count")}/>
-							</div>
-                        }
-				</td>
-               <td>{String(isRead)}
-					{editedNow[index] &&
-							<div>
-							<br />
-                            <Select name="input" defaultValue={String(isRead)} onChange={(event) => this.handleChangeCurrentRegister(event, "isRead")} >
-						          <Option value="true" label="true" />
-								  <Option value="false" label="false" />
-						    </Select>
-							</div>
-                        }
-				</td>
-			   <td>{String(isWrite)}
-					{editedNow[index] &&
-							<div>
-							<br />
-                            <Select name="input" defaultValue={String(isWrite)} onChange={(event) => this.handleChangeCurrentRegister(event, "isWrite")} >
-						          <Option value="true" label="true" />
-								  <Option value="false" label="false" />
-						    </Select>
-							</div>
-                        }
-				</td>
-               <td>{type}
-					{editedNow[index] &&
-							<div>
-							<br />
-							<Select name="input" defaultValue={type} onChange={(event) => this.handleChangeCurrentRegister(event, "type")} >
-						          <Option value="SignedInt" label="SignedInt" />
-								  <Option value="UnsignedInt" label="UnsignedInt" />
-								  <Option value="Float" label="Float" />
-								  <Option value="Variable" label="Variable" />
-								  <Option value="Bit" label="Bit" />
-						    </Select>
-							</div>
-                        }
-				</td>
-               <td>{multiplier}
-					{editedNow[index] &&
-							<div>
-							<br />
-                            <input type="text" className="form-control" defaultValue={multiplier} onChange={(event) => this.handleChangeCurrentRegister(event, "multiplier")}/>
-							</div>
-                        }
-				</td>
-			   <td>{suffix}
-					{editedNow[index] &&
-							<div>
-							<br />
-                            <input type="text" className="form-control" defaultValue={suffix} onChange={(event) => this.handleChangeCurrentRegister(event, "suffix")}/>
-							</div>
-                        }
-				</td>
-			   <td>{min}
-					{editedNow[index] &&
-							<div>
-							<br />
-                            <input type="text" className="form-control" defaultValue={min} onChange={(event) => this.handleChangeCurrentRegister(event, "min")}/>
-							</div>
-                        }
-				</td>
-               <td>{max}
-					{editedNow[index] &&
-							<div>
-							<br />
-                            <input type="text" className="form-control" defaultValue={max} onChange={(event) => this.handleChangeCurrentRegister(event, "max")}/>
-							</div>
-                        }
-				</td>
-				<td>{group}
-					{editedNow[index] &&
-							<div>
-							<br />
-                            <input type="text" className="form-control" defaultValue={group} onChange={(event) => this.handleChangeCurrentRegister(event, "group")}/>
-							</div>
-                        }
-				</td>
-				<td>{(type=="Variable" || type=="Bit") && <ReactTextCollapse options={TEXT_COLLAPSE_OPTIONS}>
-						{this.renderDescriptionSpecialTypes(type, legends, index)}
-					</ReactTextCollapse>}
-					
-					{editedNow[index] &&
-							<div>
-							{(type=="Variable" || type=="Bit") && <SpecialModbusTypesComponent targetType={type} index={index} data={legends} callbackFromParent={this.callbackFromSpecialType } />}
-							</div>
-                        }
-				</td>
-							
-				<td>
-						{(type=="Bit") && <BitTypeValuesComponent 
-							index={index} 
-							legends={legends} 
-							callbackFromParent={this.callbackFromBitType} 
-							value={this.state.inputValues[index]} 
-							/>}
+	renderTableData(currentGroup) {
+		return this.state.device.filter(e => e.group == currentGroup).map((current, index) => {
+			const TEXT_COLLAPSE_OPTIONS = {
+				  collapse: false, // default state when component rendered
+				  collapseText: '... Развернуть', // text to show when collapsed
+				  expandText: 'Свернуть', // text to show when expanded
+				  minHeight: 30, // component height when closed
+				  maxHeight: 250, // expanded to  
+				}
+			 const {loading, editedNow} = this.state;
+	         const {id, name, address, count, isRead, isWrite, type, multiplier, suffix, min, max, group, legends} = current;
+	         return (
+	            <tr key={index}>
+	               <td>{name}
+						{editedNow[index] &&
+								<div>
+								<br />
+	                            <input type="text" className="form-control" defaultValue={name} onChange={(event) => this.handleChangeCurrentRegister(event, "name")}/>
+								</div>
+	                        }
+					</td>
+	               <td>{address}
+						{editedNow[index] &&
+								<div>
+								<br />
+	                            <input type="text" className="form-control" defaultValue={address} onChange={(event) => this.handleChangeCurrentRegister(event, "address")}/>
+								</div>
+	                        }
+					</td>
+	               <td>{count}
+						{editedNow[index] &&
+								<div>
+								<br />
+	                            <input type="text" className="form-control" defaultValue={count} onChange={(event) => this.handleChangeCurrentRegister(event, "count")}/>
+								</div>
+	                        }
+					</td>
+	               <td>{String(isRead)}
+						{editedNow[index] &&
+								<div>
+								<br />
+	                            <Select name="input" defaultValue={String(isRead)} onChange={(event) => this.handleChangeCurrentRegister(event, "isRead")} >
+							          <Option value="true" label="true" />
+									  <Option value="false" label="false" />
+							    </Select>
+								</div>
+	                        }
+					</td>
+				   <td>{String(isWrite)}
+						{editedNow[index] &&
+								<div>
+								<br />
+	                            <Select name="input" defaultValue={String(isWrite)} onChange={(event) => this.handleChangeCurrentRegister(event, "isWrite")} >
+							          <Option value="true" label="true" />
+									  <Option value="false" label="false" />
+							    </Select>
+								</div>
+	                        }
+					</td>
+	               <td>{type}
+						{editedNow[index] &&
+								<div>
+								<br />
+								<Select name="input" defaultValue={type} onChange={(event) => this.handleChangeCurrentRegister(event, "type")} >
+							          <Option value="SignedInt" label="SignedInt" />
+									  <Option value="UnsignedInt" label="UnsignedInt" />
+									  <Option value="Float" label="Float" />
+									  <Option value="Variable" label="Variable" />
+									  <Option value="Bit" label="Bit" />
+							    </Select>
+								</div>
+	                        }
+					</td>
+	               <td>{multiplier}
+						{editedNow[index] &&
+								<div>
+								<br />
+	                            <input type="text" className="form-control" defaultValue={multiplier} onChange={(event) => this.handleChangeCurrentRegister(event, "multiplier")}/>
+								</div>
+	                        }
+					</td>
+				   <td>{suffix}
+						{editedNow[index] &&
+								<div>
+								<br />
+	                            <input type="text" className="form-control" defaultValue={suffix} onChange={(event) => this.handleChangeCurrentRegister(event, "suffix")}/>
+								</div>
+	                        }
+					</td>
+				   <td>{min}
+						{editedNow[index] &&
+								<div>
+								<br />
+	                            <input type="text" className="form-control" defaultValue={min} onChange={(event) => this.handleChangeCurrentRegister(event, "min")}/>
+								</div>
+	                        }
+					</td>
+	               <td>{max}
+						{editedNow[index] &&
+								<div>
+								<br />
+	                            <input type="text" className="form-control" defaultValue={max} onChange={(event) => this.handleChangeCurrentRegister(event, "max")}/>
+								</div>
+	                        }
+					</td>
+					<td>{group}
+						{editedNow[index] &&
+								<div>
+								<br />
+	                            <input type="text" className="form-control" defaultValue={group} onChange={(event) => this.handleChangeCurrentRegister(event, "group")}/>
+								</div>
+	                        }
+					</td>
+					<td>{(type=="Variable" || type=="Bit") && <ReactTextCollapse options={TEXT_COLLAPSE_OPTIONS}>
+							{this.renderDescriptionSpecialTypes(type, legends, index)}
+						</ReactTextCollapse>}
 						
-						{(type!="Bit") && 
-						<input type="text" placeholder="Значение" 
-						value={this.state.inputValues[index]} 
-						ref={index}
-						onChange={(event) => this.handleChange(event, index)} />}
-				</td>
+						{editedNow[index] &&
+								<div>
+								{(type=="Variable" || type=="Bit") && <SpecialModbusTypesComponent targetType={type} index={index} data={legends} callbackFromParent={this.callbackFromSpecialType } />}
+								</div>
+	                        }
+					</td>
 								
-                        <td><button className="btn btn-primary" onClick={() => this.handleClickRead(address, count, index)} disabled={!isRead}>Чтение</button>
-							<button className="btn btn-primary" onClick={() => this.handleClickWrite(address, this.state.inputValues[index], index)} disabled={!isWrite}>Запись</button>
+					<td>
+							{(type=="Bit") && <BitTypeValuesComponent 
+								index={index} 
+								legends={legends} 
+								callbackFromParent={this.callbackFromBitType} 
+								value={this.state.inputValues[index]} 
+								/>}
+							
+							{(type!="Bit") && 
+							<input type="text" placeholder="Значение" 
+							value={this.state.inputValues[index]} 
+							ref={index}
+							onChange={(event) => this.handleChange(event, index)} />}
+					</td>
+									
+	                        <td><button className="btn btn-primary" onClick={() => this.handleClickRead(address, count, index)} disabled={!isRead}>Чтение</button>
+								<button className="btn btn-primary" onClick={() => this.handleClickWrite(address, this.state.inputValues[index], index)} disabled={!isWrite}>Запись</button>
+								</td>
+	                        {loading &&
+	                            <img src={Strings.LOADING} />
+	                        }
+	
+	                        <td><button className="btn btn-primary" onClick={() => this.handleChangeRegister(current, index)} disabled={editedNow[index]}>Изменить</button>
+								<button className="btn btn-primary" onClick={() => {
+									this.handleConfirmChangeRegister(index)
+									this.setState({ loading: true });			
+									console.log("currentOnChange2: ", current);
+									current.legends = JSON.stringify(current.legends)
+									if (!(type=="Variable" || type=="Bit")) {
+										current.legends = null
+									}
+									LoadRegistersService.changeRegister(current)
+										.then(() => {
+											var device = this.state.device;
+											device[index] = current;
+											this.setState({
+												device: device,
+												loading: false,
+												error: null,
+												success: "Данные обновлены успешно"});
+											
+										})
+										.catch((err) => {
+												  console.log("ERROR: ", err);
+												  this.setState({ 
+													loading: false, 
+													error: "Ошибка изменения карты регистров",
+													success: null })
+											  });
+								}} disabled={!editedNow[index] || (this.state.editedNowSpecialTypeIndexes.includes(index) && (type=="Variable" || type=="Bit"))}>Сохранить</button>
+								<button className="btn btn-primary" onClick={() => {
+									this.handleConfirmChangeRegister(index);
+								}} disabled={!editedNow[index]}>Отменить</button>
 							</td>
-                        {loading &&
-                            <img src={Strings.LOADING} />
-                        }
-
-                        <td><button className="btn btn-primary" onClick={() => this.handleChangeRegister(current, index)} disabled={editedNow[index]}>Изменить</button>
-							<button className="btn btn-primary" onClick={() => {
-								this.handleConfirmChangeRegister(index)
-								this.setState({ loading: true });			
-								console.log("currentOnChange2: ", current);
-								current.legends = JSON.stringify(current.legends)
-								if (!(type=="Variable" || type=="Bit")) {
-									current.legends = null
-								}
-								LoadRegistersService.changeRegister(current)
-									.then(() => {
-										var device = this.state.device;
-										device[index] = current;
-										this.setState({
-											device: device,
-											loading: false,
-											error: null,
-											success: "Данные обновлены успешно"});
-										
-									})
-									.catch((err) => {
-											  console.log("ERROR: ", err);
-											  this.setState({ 
-												loading: false, 
-												error: "Ошибка изменения карты регистров",
-												success: null })
-										  });
-							}} disabled={!editedNow[index] || (this.state.editedNowSpecialTypeIndexes.includes(index) && (type=="Variable" || type=="Bit"))}>Сохранить</button>
-							<button className="btn btn-primary" onClick={() => {
-								this.handleConfirmChangeRegister(index);
-							}} disabled={!editedNow[index]}>Отменить</button>
-						</td>
-													
-							<td>
-							<button className="btn btn-primary" onClick={() => this.deleteRegister(id, index)}>Удалить</button>
-							</td>
-							          								
-            </tr>
-					
-         )
-      })
+														
+								<td>
+								<button className="btn btn-primary" onClick={() => this.deleteRegister(id, index)}>Удалить</button>
+								</td>
+								          								
+	            </tr>
+						
+	         )
+	      }) 
    }
 
+	renderByGroups() {
+		return this.state.groups.map((current) => {
+			return (
+				<div>
+					<p>{current}</p>
+					<table border="1">
+							<tr>
+								<th>Название</th>
+							    <th>Адрес</th>
+							    <th>Количество</th>
+							    <th>Чтение</th>
+							    <th>Запись</th>
+								<th>Тип</th>
+							    <th>Множитель</th>
+							    <th>Суффикс</th>
+								<th>Мин.</th>
+								<th>Макс.</th>
+								<th>Группа</th>
+								<th>Описание</th>
+						   </tr>
+						<tbody>	
+							{this.renderTableData(current)}					  												
+						</tbody>
+					</table>				
+				</div>
+			)
+				   
+		})
+	}
+
 
 
 	
 	
-  	render() {
-		
-		const {name, address, loading, error, success} = this.state;
+	render() {	
+		const {loading, error, success, name, address} = this.state;
 		
 	    return (
 			<div>
@@ -663,37 +699,18 @@ class DeviceComponent extends Component {
 				{success &&
 	                        <div className={'alert alert-success'}>{this.state.success}</div>
 	                    }
-				<table border="1">
-				   <caption>Устройство {name}. Адрес {address}.</caption>
-				   <tr>
-					<th>Название</th>
-				    <th>Адрес</th>
-				    <th>Количество</th>
-				    <th>Чтение</th>
-				    <th>Запись</th>
-					<th>Тип</th>
-				    <th>Множитель</th>
-				    <th>Суффикс</th>
-					<th>Мин.</th>
-					<th>Макс.</th>
-					<th>Группа</th>
-					<th>Описание</th>
-				   </tr>
-	
-					<tbody>
-					{this.renderTableData()}
-					</tbody>
-	
-				</table>
-				
+
+				<p>Устройство {name}. Адрес {address}.</p>
+
+				{this.renderByGroups()}	
+					
 				<div className="form-group">
 	                        <button className="btn btn-primary" onClick={() => this.deleteDevice(this.props.match.params.id)} >Удалить устройство</button>
 							<button className="btn btn-primary" onClick={() => this.addRegister()} >Добавить регистр</button>
 	                        {loading &&
 	                            <img src={Strings.LOADING} />
 	                        }
-	                    </div>
-	
+	            </div>
 			</div>
 	    )
 	  }
