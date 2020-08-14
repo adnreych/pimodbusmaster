@@ -11,7 +11,6 @@ import 'react-confirm-alert/src/react-confirm-alert.css';
 import Option from 'muicss/lib/react/option';
 import Select from 'muicss/lib/react/select';
 import _pull from 'lodash/pull';
-import { Tabs, TabPane } from '../helpers/tab-nav';
 
 
 class DeviceComponent extends Component {
@@ -23,6 +22,7 @@ class DeviceComponent extends Component {
 					loading: false,
 					device: [],
 					groups: [],
+					currGroup: 0,
 					name: "",
 					address: "",
 					inputValues: [],
@@ -81,8 +81,19 @@ class DeviceComponent extends Component {
 					}
 				});
 				console.log("GROUPS", groups)
+				var childrenTabs = []
+				groups.forEach((e, index) => {
+					var currChildren = {
+						tab: index,
+						name: e.name
+					}
+					childrenTabs.push(currChildren)
+				})
+				
 				this.setState({ device: device.data,
-								groups: groups});
+								groups: groups,
+								childrenTabs: childrenTabs});
+								
 				if (this.state.device[0] != null) {
 					this.setState({ 
 						name: this.state.device[0].device.name, 
@@ -674,13 +685,20 @@ class DeviceComponent extends Component {
 	      }) 
    }
 
-	renderByGroups() {
-		return this.state.groups
-			.filter(e => e.checked)
-			.map((current) => {
-				return (
+	
+	renderGroupsTabs() {
+		return this.state.groups.map((current, index) => {
+			return(
+				<button className="btn btn-primary" onClick={() => this.setState({ currGroup: index })} >{current.name}</button>
+			)
+		})
+	}
+	
+	renderCurrentGroup(index) {
+		if (this.state.groups.length > 0) {
+			return (
 					<div>
-						<p>{current.name}</p>
+						<p>{this.state.groups[index].name}</p>
 						<table border="1">
 								<tr>
 									<th>Название</th>
@@ -697,28 +715,14 @@ class DeviceComponent extends Component {
 									<th>Описание</th>
 							   </tr>
 							<tbody>	
-								{this.renderTableData(current)}					  												
+								{this.renderTableData(this.state.groups[index])}			  												
 							</tbody>
 						</table>				
 					</div>
-				)
-				   
-		})
-	}
-	
-	renderGroupsCheckboxes() {
-		return this.state.groups.map((current) => {
-			return (
-					<div>
-		                <input onChange={() => this.handleChangeGroupList(current)} checked={current.checked} type="checkbox" />
-		                <label>{current.name}</label>
-	           		</div>
 			)
-		})
+		}
+		
 	}
-
-
-
 	
 	
 	render() {	
@@ -734,17 +738,12 @@ class DeviceComponent extends Component {
 	                        <div className={'alert alert-success'}>{this.state.success}</div>
 	                    }
 
-				<Tabs activeTab='1'>
-		          <TabPane tab='1'>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.</TabPane>
-		          <TabPane tab='2'>At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.</TabPane>
-		          <TabPane tab='3'>At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</TabPane>
-		        </Tabs>
+				
 
 				<p>Устройство {name}. Адрес {address}.</p>
-				
-				{this.renderGroupsCheckboxes()}	
 
-				{this.renderByGroups()}	
+				{this.renderGroupsTabs()}	
+				{this.renderCurrentGroup(this.state.currGroup)}	
 					
 				<div className="form-group">
 	                        <button className="btn btn-primary" onClick={() => this.deleteDevice(this.props.match.params.id)} >Удалить устройство</button>

@@ -4,7 +4,7 @@ export class Tabs extends Component {
     constructor(){
         super();
         this.state = {
-            activeTabIndex: 1
+            activeTabIndex: 0
         }
     }
 
@@ -14,7 +14,9 @@ export class Tabs extends Component {
         return (
             <div>
             <nav>
-                {children.map((el,i) => <button key={i} className={this.state.activeTabIndex == el.props.tab ? 'active button' : 'button'} onClick={() => this.setState({activeTabIndex: parseInt(el.props.tab,10)})}>Tab {el.props.tab} </button>)}
+                {children.map((el,i) => <button key={i} 
+												className={this.state.activeTabIndex == el.props.tab ? 'active button' : 'button'} 
+												onClick={() => this.setState({activeTabIndex: parseInt(el.props.tab,10)})}>{el.props.name} </button>)}
             </nav>
             <hr />
             <div>{children[this.state.activeTabIndex-1]}</div>
