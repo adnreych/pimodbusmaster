@@ -19,6 +19,7 @@ import net.lockoil.pimodbusmaster.model.ReadResponse;
 import net.lockoil.pimodbusmaster.model.modbustypes.AbstractModbusType;
 import net.lockoil.pimodbusmaster.model.modbustypes.BitTypeLegend;
 import net.lockoil.pimodbusmaster.model.modbustypes.BitTypeModbus;
+import net.lockoil.pimodbusmaster.model.modbustypes.BoxTypeModbus;
 import net.lockoil.pimodbusmaster.model.modbustypes.FloatModbus;
 import net.lockoil.pimodbusmaster.model.modbustypes.SignedInt;
 import net.lockoil.pimodbusmaster.model.modbustypes.UnsignedInt;
@@ -56,10 +57,29 @@ public class ModbusTypeParser {
 			
 		case "Variable":
 			return getVarType(response.get(0), request);
+			
+		case "Box":
+			return getBoxType(response.get(0), request);
 
 		default:
 			throw new IllegalModbusTypeException();
 		}					
+	}
+	
+	private BoxTypeModbus getBoxType(ReadResponse readResponse, ReadRequest readRequest) {
+		CardRegisterElement cardRegisterElement = registersService.getRegister(readRequest.getSlave(), readRequest.getAddress());
+		String legendString = cardRegisterElement.getLegends();
+		ObjectMapper objectMapper = new ObjectMapper();
+	
+		List<AbstractModbusType> boxTypeLegends;
+		try {
+			boxTypeLegends = objectMapper.readValue(legendString, new TypeReference<List<AbstractModbusType>>(){});	
+			
+			return new BoxTypeModbus(boxTypeLegends, readResponse.getValue());
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
+		return null;	
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -71,7 +91,7 @@ public class ModbusTypeParser {
 		List<BitTypeLegend> bitTypeLegends;
 		try {
 			bitTypeLegends = objectMapper.readValue(legendString, new TypeReference<List<BitTypeLegend>>(){});
-		
+			
 			return new BitTypeModbus(bitTypeLegends, readResponse.getValue());
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();

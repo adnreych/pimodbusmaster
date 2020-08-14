@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import io.swagger.annotations.ApiOperation;
 import net.lockoil.pimodbusmaster.model.CardRegisterElement;
 import net.lockoil.pimodbusmaster.model.Device;
 import net.lockoil.pimodbusmaster.model.LoadRegistersResource;
@@ -30,6 +31,7 @@ public class LoadRegistersController {
 	@Autowired
 	RegistersService registersService;
 	
+	@ApiOperation(value = "Добавление новых регистров в устройство")
 	@PostMapping("/api/registers/load")
 	  public ResponseEntity<String> loadRegisters(@RequestBody ArrayList<LoadRegistersResource> loadRegistersResources) {
 		
@@ -46,23 +48,26 @@ public class LoadRegistersController {
 		return ResponseEntity.created(uri).build();
 	  }
 	
-
+	@ApiOperation(value = "Возвращает список регистров устройства", response = CardRegisterElement.class, responseContainer = "List")
 	@GetMapping("/api/device/{id}")
 	  public List<CardRegisterElement> getDevice(@PathVariable(value="id") Long id) {	
 		return registersService.getDeviceRegisters(id);
 	  }
 	
+	@ApiOperation(value = "Изменение регистра устройства")
 	@PutMapping("/api/registers/change")
 	  public void changeRegister(@RequestBody LoadRegistersResource loadRegistersResource) {		
 		CardRegisterElement cardRegisterElement = registersService.parseRegisterElement(loadRegistersResource);
 		registersService.changeRegister(cardRegisterElement);		
 	  }
 	
+	@ApiOperation(value = "Удаление регистра устройства")
 	@DeleteMapping("/api/registers/delete/{id}")
 	  public void deleteRegister(@PathVariable(value="id") Long id) {		
 		registersService.deleteRegister(id);		
 	  }
 	
+	@ApiOperation(value = "Добавление регистра устройства")
 	@PostMapping("/api/registers/add")
 	  public Long addRegister(@RequestBody LoadRegistersResource loadRegistersResource) {		
 			CardRegisterElement cardRegisterElement = registersService.parseRegisterElement(loadRegistersResource);

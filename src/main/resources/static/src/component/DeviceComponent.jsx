@@ -77,10 +77,8 @@ class DeviceComponent extends Component {
 							name : element.group,
 							checked: true
 						})
-						console.log("G", groups)
 					}
 				});
-				console.log("GROUPS", groups)
 				var childrenTabs = []
 				groups.forEach((e, index) => {
 					var currChildren = {
@@ -117,7 +115,6 @@ class DeviceComponent extends Component {
 	callbackFromSpecialType = (dataFromSpecialType) => {
         this.setState({ dataFromSpecialType: dataFromSpecialType });
 		var device = this.state.device
-		console.log("device: ", device)
 		var editedNowSpecialTypeIndexes = this.state.editedNowSpecialTypeIndexes;
 		_pull(editedNowSpecialTypeIndexes, dataFromSpecialType.index);
 		device[dataFromSpecialType.index].legends = dataFromSpecialType
@@ -135,7 +132,6 @@ class DeviceComponent extends Component {
 	
 	handleChangeGroupList = (group) => {
 		var groups = this.state.groups	
-		console.log("GROUP FILTER", groups.filter(e => e.name == group.name))
 		var curr = groups.filter(e => e.name == group.name)[0]
 		
 		if (curr.checked) {
@@ -228,15 +224,11 @@ class DeviceComponent extends Component {
 		
 		legends.forEach((e) => {
 			var bitQuantity = e.bitQuantity
-			console.log("bitQuantity", bitQuantity)
 			var i = e.possibleValues.indexOf(currVal[e.description]).toString(2)
-			console.log("i before", i)
 			if (i.length < bitQuantity) {
 				i = i.padStart((bitQuantity - i.length) + i.length, "0")
 			}
-			console.log("i after", i)
 			result = result + String(i);
-			console.log("result", result)
 		})
 		
 		var cv = this.state.currValue.strToWrite = result
