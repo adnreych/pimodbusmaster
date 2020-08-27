@@ -25,7 +25,7 @@ class BoxTypeComponent extends Component {
 			<div>
 								
 				{
-					(this.state.pair.first[0].type !== undefined && this.state.pair.first[0].type == "bitType") 
+					(this.state.pair.first[0] !== undefined && this.state.pair.first[0].type == "bitType") 
 					?
 					<BitTypeValuesComponent 
 								index={this.state.index} 
@@ -42,7 +42,7 @@ class BoxTypeComponent extends Component {
 				
 				
 				{
-					(this.state.pair.second[0].type !== undefined && this.state.pair.second[0].type == "bitType") 
+					(this.state.pair.second[0] !== undefined && this.state.pair.second[0].type == "bitType") 
 					?
 					<BitTypeValuesComponent 
 								index={this.state.index} 

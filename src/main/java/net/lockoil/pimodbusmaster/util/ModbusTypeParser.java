@@ -73,6 +73,7 @@ public class ModbusTypeParser {
 	
 		Pair<AbstractModbusType, AbstractModbusType> boxTypeLegends;
 		try {
+			// здесь получаем легенду из базы, раскладываем hex и корректно заполняем объект
 			boxTypeLegends = objectMapper.readValue(legendString, new TypeReference<Pair<AbstractModbusType, AbstractModbusType>>(){});	
 			
 			return new BoxTypeModbus(boxTypeLegends);

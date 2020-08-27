@@ -143,7 +143,7 @@ class LoadRegistersComponent extends Component {
 			})
 			return bits;
 		} else if (value == "Box") {
-			console.log("BOXLEGEND", legend)
+			
 			legend.first = legend.children.find(obj => {
 			  return obj.name == "First"
 			})
@@ -151,18 +151,25 @@ class LoadRegistersComponent extends Component {
 			  return obj.name == "Second"
 			})
 			
+			console.log("legend.first", legend.first)
+			console.log("legend.second", legend.second)
+			
 			if (legend.first.attributes.type == "Bit" || legend.first.attributes.type == "Variable") {
 				legends.first = this.prepareBoxElement(legend.first.children[0], legend.first.attributes.type)
+				legends.first.type = legend.first.attributes.type
 			} else {
-				legends.first = legend.first
+				legends.first = {}
+				legends.first.type = legend.first.attributes.type
 			}
 			
 			if (legend.second.attributes.type == "Bit" || legend.second.attributes.type == "Variable") {
 				legends.second = this.prepareBoxElement(legend.second.children[0], legend.second.attributes.type)
+				legends.second.type = legend.second.attributes.type
 			} else {
-				legends.second = legend.second
+				legends.second = {}
+				legends.second.type = legend.second.attributes.type
 			}
-			
+			console.log("BOXLEGENDS", legends)
 			return legends;
 		}
 	}
