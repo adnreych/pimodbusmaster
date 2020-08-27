@@ -502,8 +502,6 @@ class DeviceComponent extends Component {
 			 const {loading, editedNow} = this.state;
 	         const {id, name, address, count, isRead, isWrite, type, multiplier, suffix, min, max, group, legends} = current;
 			 var index = this.state.device.indexOf(this.state.device.filter(e => { return e.address === address })[0])
-			console.log("INDEX", index)
-			console.log("DEVICE", this.state.device)
 			 var boxLegends = {}
 			 if (type=="Box") {
 				boxLegends = JSON.parse(legends)

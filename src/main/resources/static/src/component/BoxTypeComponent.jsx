@@ -1,5 +1,5 @@
 import React, { Component } from 'react'; 
-
+import BitTypeValuesComponent from './BitTypeValuesComponent';
 
 class BoxTypeComponent extends Component {
 	
@@ -23,31 +23,40 @@ class BoxTypeComponent extends Component {
 		
 		return(
 			<div>
-				{(this.state.pair.first.type=="Bit") && <BitTypeValuesComponent 
+								
+				{
+					(this.state.pair.first[0].type !== undefined && this.state.pair.first[0].type == "bitType") 
+					?
+					<BitTypeValuesComponent 
 								index={this.state.index} 
-								legends={this.state.pair.first.legends} 
+								legends={JSON.stringify(this.state.pair.first)} 
 								callbackFromParent={this.state.callbackFromParent} 
 								value={this.state.value.first} 
-								/>}
-										
-				{(this.state.pair.first.type!="Bit") && 
-									<input type="text" placeholder="Значение" 
+								/>
+					:
+					<input type="text" placeholder="Значение" 
 									value={this.state.value.first} 
 									ref={this.state.index}
-									onChange={(event) => this.state.handleChange(event, this.state.index)} />}
-									
-				{(this.state.pair.second.type=="Bit") && <BitTypeValuesComponent 
-										index={this.state.index} 
-										legends={this.state.pair.second.legends} 
-										callbackFromParent={this.state.callbackFromParent} 
-										value={this.state.value.second} 
-										/>}
-										
-				{(this.state.pair.second.type!="Bit") && 
-									<input type="text" placeholder="Значение" 
+									onChange={(event) => {}} />
+				}
+				
+				
+				{
+					(this.state.pair.second[0].type !== undefined && this.state.pair.second[0].type == "bitType") 
+					?
+					<BitTypeValuesComponent 
+								index={this.state.index} 
+								legends={JSON.stringify(this.state.pair.second)} 
+								callbackFromParent={this.state.callbackFromParent} 
+								value={this.state.value.second} 
+								/>
+					:
+					<input type="text" placeholder="Значение" 
 									value={this.state.value.second} 
 									ref={this.state.index}
-									onChange={(event) => this.state.handleChange(event, this.state.index)} />}
+									onChange={(event) => {}} />
+				}
+																			
 			</div>
 		)
 		
