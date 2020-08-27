@@ -464,7 +464,6 @@ class DeviceComponent extends Component {
 	renderDescriptionSpecialTypes(type, legends) {
 		var legendStrings = []
 		if (this.state.dataFromSpecialType.length != 0) legends = JSON.stringify(this.state.dataFromSpecialType)
-		console.log("LEGENDS", legends)
 		if (legends == "null" || legends == null) {
 			return(<p class="small-text">Нет описания</p>)
 		} else {
@@ -492,7 +491,7 @@ class DeviceComponent extends Component {
 	
 	
 	renderTableData(currentGroup) {
-		return this.state.device.filter(e => e.group == currentGroup.name).map((current, index) => {
+		return this.state.device.filter(e => e.group == currentGroup.name).map((current) => {
 			const TEXT_COLLAPSE_OPTIONS = {
 				  collapse: false, // default state when component rendered
 				  collapseText: '... Развернуть', // text to show when collapsed
@@ -502,6 +501,9 @@ class DeviceComponent extends Component {
 				}
 			 const {loading, editedNow} = this.state;
 	         const {id, name, address, count, isRead, isWrite, type, multiplier, suffix, min, max, group, legends} = current;
+			 var index = this.state.device.indexOf(this.state.device.filter(e => { return e.address === address })[0])
+			console.log("INDEX", index)
+			console.log("DEVICE", this.state.device)
 			 var boxLegends = {}
 			 if (type=="Box") {
 				boxLegends = JSON.parse(legends)
@@ -510,7 +512,6 @@ class DeviceComponent extends Component {
 				if (boxLegends.first[0] != undefined && boxLegends.first[0].type == "bitType") boxLegends.firstType = "Bit"
 				if (boxLegends.second[0] != undefined && boxLegends.second[0].type == "bitType") boxLegends.secondType = "Bit"
 			 }
-			console.log("boxLegends", boxLegends)
 	         return (
 	            <tr key={index}>
 	               <td>{name}
