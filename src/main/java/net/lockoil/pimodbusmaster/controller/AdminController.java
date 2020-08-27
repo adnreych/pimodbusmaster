@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.ApiOperation;
-import net.lockoil.pimodbusmaster.model.Device;
 import net.lockoil.pimodbusmaster.model.Role;
 import net.lockoil.pimodbusmaster.model.User;
 import net.lockoil.pimodbusmaster.service.RolesService;

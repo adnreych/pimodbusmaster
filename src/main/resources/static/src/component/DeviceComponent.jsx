@@ -6,6 +6,7 @@ import ModbusService from '../service/ModbusService';
 import DeviceService from '../service/DeviceService';
 import SpecialModbusTypesComponent from './SpecialModbusTypesComponent';
 import BitTypeValuesComponent from './BitTypeValuesComponent';
+import BoxTypeComponent from './BoxTypeComponent';
 import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css'; 
 import Option from 'muicss/lib/react/option';
@@ -316,6 +317,8 @@ class DeviceComponent extends Component {
 						  <Option value="Float" label="Float" />
 						  <Option value="Variable" label="Variable" />
 						  <Option value="Bit" label="Bit" />
+						  <Option value="Box" label="Box" />
+						  <Option value="Multiple" label="Multiple" />
 				    </Select>
 					</td>
 					<td>
@@ -461,22 +464,22 @@ class DeviceComponent extends Component {
 	renderDescriptionSpecialTypes(type, legends) {
 		var legendStrings = []
 		if (this.state.dataFromSpecialType.length != 0) legends = JSON.stringify(this.state.dataFromSpecialType)
-		
+		console.log("LEGENDS", legends)
 		if (legends == "null" || legends == null) {
 			return(<p class="small-text">Нет описания</p>)
 		} else {
-			var l = JSON.parse(legends);
-			if (type == "Variable") {
-			l.forEach(e => {
-				var str = `${e.description} : ${e.value}`
-				legendStrings.push(str)
-			})
+				var l = JSON.parse(legends);
+				if (type == "Variable") {
+				l.forEach(e => {
+					var str = `${e.description} : ${e.value}`
+					legendStrings.push(str)
+				})
 			} else if (type == "Bit") {
 				l.forEach(e => {
 					var end = Number(e.startBit) + Number(e.bitQuantity) - 1;
 					var str = `${e.description} (биты ${e.startBit} - ${end}) : ${e.possibleValues}`
 					legendStrings.push(str)
-			})
+				})
 			}
 			return legendStrings.map((e) => {
 				return (
@@ -499,6 +502,15 @@ class DeviceComponent extends Component {
 				}
 			 const {loading, editedNow} = this.state;
 	         const {id, name, address, count, isRead, isWrite, type, multiplier, suffix, min, max, group, legends} = current;
+			 var boxLegends = {}
+			 if (type=="Box") {
+				boxLegends = JSON.parse(legends)
+				if (boxLegends.first[0] != undefined && boxLegends.first[0].type == "varType") boxLegends.firstType = "Variable"
+				if (boxLegends.second[0] != undefined && boxLegends.second[0].type == "varType") boxLegends.secondType = "Variable"
+				if (boxLegends.first[0] != undefined && boxLegends.first[0].type == "bitType") boxLegends.firstType = "Bit"
+				if (boxLegends.second[0] != undefined && boxLegends.second[0].type == "bitType") boxLegends.secondType = "Bit"
+			 }
+			console.log("boxLegends", boxLegends)
 	         return (
 	            <tr key={index}>
 	               <td>{name}
@@ -557,6 +569,8 @@ class DeviceComponent extends Component {
 									  <Option value="Float" label="Float" />
 									  <Option value="Variable" label="Variable" />
 									  <Option value="Bit" label="Bit" />
+									  <Option value="Box" label="Box" />
+									  <Option value="Multiple" label="Multiple" />
 							    </Select>
 								</div>
 	                        }
@@ -602,7 +616,12 @@ class DeviceComponent extends Component {
 	                        }
 					</td>
 					<td>{(type=="Variable" || type=="Bit") && <ReactTextCollapse options={TEXT_COLLAPSE_OPTIONS}>
-							{this.renderDescriptionSpecialTypes(type, legends, index)}
+							{this.renderDescriptionSpecialTypes(type, legends)}
+						</ReactTextCollapse>}
+						
+						{(type=="Box") && <ReactTextCollapse options={TEXT_COLLAPSE_OPTIONS}>
+							{(boxLegends.firstType !== undefined) && <>{this.renderDescriptionSpecialTypes(boxLegends.firstType, JSON.stringify(boxLegends.first))}</>}
+							{(boxLegends.secondType !== undefined) && <><hr />{this.renderDescriptionSpecialTypes(boxLegends.secondType, JSON.stringify(boxLegends.second))}</>}
 						</ReactTextCollapse>}
 						
 						{editedNow[index] &&
@@ -619,8 +638,15 @@ class DeviceComponent extends Component {
 								callbackFromParent={this.callbackFromBitType} 
 								value={this.state.inputValues[index]} 
 								/>}
+								
+							{(type=="Box") && <BoxTypeComponent 
+								index={index} 
+								pair={legends} 
+								callbackFromParent={this.callbackFromBitType} 
+								value={this.state.inputValues[index]} 
+								/>}
 							
-							{(type!="Bit") && 
+							{(type!="Bit" && type!="Box") && 
 							<input type="text" placeholder="Значение" 
 							value={this.state.inputValues[index]} 
 							ref={index}

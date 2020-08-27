@@ -24,6 +24,7 @@ class LoadRegistersComponent extends Component {
 	  this.handleChangeDeviceAddress = this.handleChangeDeviceAddress.bind(this);
 	  this.onFileUploadHandler = this.onFileUploadHandler.bind(this);
 	  this.handleModbusTypeLegend = this.handleModbusTypeLegend.bind(this);
+	  this.prepareBoxElement = this.prepareBoxElement.bind(this);
 
     }
 
@@ -66,7 +67,8 @@ class LoadRegistersComponent extends Component {
 						case "Type":
 							dataElement.type = e.value; 
 							// обработка нестандартных типов
-							if (e.value == "Bit" || e.value == "Variable") dataElement.legends = this.handleModbusTypeLegend(element, e.value);
+							if (e.value == "Bit" || e.value == "Variable" || e.value == "Box") 
+								dataElement.legends = this.handleModbusTypeLegend(element, e.value);
 							break;
 						case "Multiplier":
 							dataElement.multiplier = e.value;
@@ -140,7 +142,60 @@ class LoadRegistersComponent extends Component {
 				bits.push(bit)
 			})
 			return bits;
+		} else if (value == "Box") {
+			console.log("BOXLEGEND", legend)
+			legend.first = legend.children.find(obj => {
+			  return obj.name == "First"
+			})
+			legend.second = legend.children.find(obj => {
+			  return obj.name == "Second"
+			})
+			
+			if (legend.first.attributes.type == "Bit" || legend.first.attributes.type == "Variable") {
+				legends.first = this.prepareBoxElement(legend.first.children[0], legend.first.attributes.type)
+			} else {
+				legends.first = legend.first
+			}
+			
+			if (legend.second.attributes.type == "Bit" || legend.second.attributes.type == "Variable") {
+				legends.second = this.prepareBoxElement(legend.second.children[0], legend.second.attributes.type)
+			} else {
+				legends.second = legend.second
+			}
+			
+			return legends;
 		}
+	}
+	
+	prepareBoxElement(legend, type) {	// преобразование аргумента в arg[0] для handleModbusTypeLegend
+		var result = []
+		if (type == "Bit") {
+			legend.children.forEach((e) => {
+				var description = []
+				e.children.forEach((el) => {
+					description.push(el.value)			
+				})
+				var curr = {	
+					startBit: e.attributes.start,
+					bitQuantity: e.attributes.quantity,
+					description: e.attributes.bitName,
+					possibleValues: description,
+					type: "bitType"
+				}
+				result.push(curr)	
+			})
+			return result
+		} else if (type == "Variable") {
+			legend.children.forEach((e) => {
+				var curr = {			
+					description: e.value,
+					value : e.attributes.value,
+					type: "varType"
+				}
+				result.push(curr)
+			})
+			return result
+		}		
 	}
 
   	handleClick() {    

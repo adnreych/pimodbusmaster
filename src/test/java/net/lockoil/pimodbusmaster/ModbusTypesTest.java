@@ -22,6 +22,7 @@ public class ModbusTypesTest {
 	BitTypeModbus bitTypeModbusZero;
 	VarTypeModbus varTypeModbus;
 	BitTypeLegend bitTypeLegend;
+	BoxTypeModbus boxTypeModbus;
 	
 	@Before
 	public void setValues() {
@@ -83,6 +84,8 @@ public class ModbusTypesTest {
 		bitTypeLegends.add(bitTypeLegend);
 		bitTypeLegends.add(bitTypeLegend2);
 		bitTypeModbus = new BitTypeModbus(bitTypeLegends, 5);
+		
+		boxTypeModbus = new BoxTypeModbus(Pair.of(bitTypeModbus, new SignedInt(5)));
 	}
 	
 	@Test
@@ -108,13 +111,13 @@ public class ModbusTypesTest {
 	
 	@Test
 	public void testReadVarModbus() {
-		assertEquals("Ошибка", varTypeModbus.readValue());
+		assertEquals(new Integer(200), varTypeModbus.readValue());
 	}
 	
 	@Test
 	public void testReadAfterWriteVarModbus() {
 		varTypeModbus.writeValue(300);
-		assertEquals("Принудительно включен", varTypeModbus.readValue());
+		assertEquals(new Integer(300), varTypeModbus.readValue());
 	}
 	
 	@Test 
@@ -134,7 +137,7 @@ public class ModbusTypesTest {
 	}
 	
 	@Test 
-	public void testBitTypeReadZerAfterWrite() {
+	public void testBitTypeReadZeroAfterWrite() {
 		Map<String, String> valuesMap = new HashMap<>();
 		bitTypeModbus.writeValue(0);
 		valuesMap.put("Состояние входа 1", "Выкл");
@@ -149,6 +152,16 @@ public class ModbusTypesTest {
 		valuesMap.put("Питание", "Выкл");
 		valuesMap.put("Был перезагружен", "Нет");
 		assertEquals(valuesMap, bitTypeModbus.readValue());
+	}
+	
+	@Test 
+	public void testBoxTypeReadFirst() {
+		assertEquals(bitTypeModbus.readValue(), boxTypeModbus.readValue().getFirst());
+	}
+	
+	@Test 
+	public void testBoxTypeReadSecond() {
+		assertEquals(5, boxTypeModbus.readValue().getSecond());
 	}
 
 	

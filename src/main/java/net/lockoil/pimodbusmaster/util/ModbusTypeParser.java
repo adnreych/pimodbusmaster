@@ -71,11 +71,11 @@ public class ModbusTypeParser {
 		String legendString = cardRegisterElement.getLegends();
 		ObjectMapper objectMapper = new ObjectMapper();
 	
-		List<AbstractModbusType> boxTypeLegends;
+		Pair<AbstractModbusType, AbstractModbusType> boxTypeLegends;
 		try {
-			boxTypeLegends = objectMapper.readValue(legendString, new TypeReference<List<AbstractModbusType>>(){});	
+			boxTypeLegends = objectMapper.readValue(legendString, new TypeReference<Pair<AbstractModbusType, AbstractModbusType>>(){});	
 			
-			return new BoxTypeModbus(boxTypeLegends, readResponse.getValue());
+			return new BoxTypeModbus(boxTypeLegends);
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 		}
