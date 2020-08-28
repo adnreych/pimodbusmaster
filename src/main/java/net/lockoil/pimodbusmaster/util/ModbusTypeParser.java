@@ -1,12 +1,8 @@
 package net.lockoil.pimodbusmaster.util;
 
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
 

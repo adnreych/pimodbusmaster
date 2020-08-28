@@ -77,10 +77,10 @@ class LoadRegistersComponent extends Component {
 							dataElement.suffix = e.value;
 							break;
 						case "Min":
-							dataElement.min = e.value;
+							dataElement.minValue = e.value;
 							break;
 						case "Max":
-							dataElement.max = e.value;
+							dataElement.maxValue = e.value;
 							break;
 						case "Group":
 							dataElement.group = e.value;
@@ -96,8 +96,8 @@ class LoadRegistersComponent extends Component {
 				if (+element.max < +element.min) this.setState( prevState => ({ error: [...prevState.error, "Ошибка в регистре " + element.address + " Максимальное значение не может быть меньше минимального"]}));
 				if (!Number.isInteger(+element.address)) this.setState( prevState => ({ error: [...prevState.error, "Ошибка в регистре " + element.address + " Адрес должен быть целым числом"]}));
 				if (!Number.isInteger(+element.count)) this.setState( prevState => ({ error: [...prevState.error, "Ошибка в регистре " + element.address + " Количество регистров должно быть целым числом"]}));
-				if (!Number.isInteger(+element.max)) this.setState( prevState => ({ error: [...prevState.error, "Ошибка в регистре " + element.address + " Максимальное значение должно быть целым числом"]}));
-				if (!Number.isInteger(+element.min)) this.setState( prevState => ({ error: [...prevState.error, "Ошибка в регистре " + element.address + " Минимальное значение должно быть целым числом"]}));
+				if (!Number.isInteger(+element.maxValue)) this.setState( prevState => ({ error: [...prevState.error, "Ошибка в регистре " + element.address + " Максимальное значение должно быть целым числом"]}));
+				if (!Number.isInteger(+element.minValue)) this.setState( prevState => ({ error: [...prevState.error, "Ошибка в регистре " + element.address + " Минимальное значение должно быть целым числом"]}));
 				if ((element.isWrite != "false" && element.isWrite != "true") || (element.isRead != "false" && element.isRead != "true"))
 					this.setState( prevState => ({ error: [...prevState.error, "Ошибка в регистре " + element.address + " Допустимые значения чтения и записи: true, false"]}));
 			});
@@ -259,7 +259,7 @@ class LoadRegistersComponent extends Component {
 	
 	renderTableData() {
       return this.state.data.map((current, index) => {
-         const { name, address, count, isRead, isWrite, type, multiplier, suffix, min, max, group, legends } = current;
+         const { name, address, count, isRead, isWrite, type, multiplier, suffix, minValue, maxValue, group, legends } = current;
 		console.log("current", current);
 		var legendStrings = []
 		if (type == "Variable") {
@@ -285,8 +285,8 @@ class LoadRegistersComponent extends Component {
                <td>{type}</td>
                <td>{multiplier}</td>
                <td>{suffix}</td>
-			   <td>{min}</td>
-               <td>{max}</td>
+			   <td>{minValue}</td>
+               <td>{maxValue}</td>
 			   <td>{group}</td>
             </tr>
          )

@@ -520,7 +520,7 @@ class DeviceComponent extends Component {
 				  maxHeight: 250, // expanded to  
 				}
 			 const {loading, editedNow} = this.state;
-	         const {id, name, address, count, isRead, isWrite, type, multiplier, suffix, min, max, group, legends} = current;
+	         const {id, name, address, count, isRead, isWrite, type, multiplier, suffix, minValue, maxValue, group, legends} = current;
 			 var index = this.state.device.indexOf(this.state.device.filter(e => { return e.address === address })[0])
 			 var boxLegends = {}
 			 if (type=="Box") {
@@ -591,46 +591,6 @@ class DeviceComponent extends Component {
 								</div>
 	                        }
 					</td>
-	               <td>{multiplier}
-						{editedNow[index] &&
-								<div>
-								<br />
-	                            <input type="text" className="form-control" defaultValue={multiplier} onChange={(event) => this.handleChangeCurrentRegister(event, "multiplier")}/>
-								</div>
-	                        }
-					</td>
-				   <td>{suffix}
-						{editedNow[index] &&
-								<div>
-								<br />
-	                            <input type="text" className="form-control" defaultValue={suffix} onChange={(event) => this.handleChangeCurrentRegister(event, "suffix")}/>
-								</div>
-	                        }
-					</td>
-				   <td>{min}
-						{editedNow[index] &&
-								<div>
-								<br />
-	                            <input type="text" className="form-control" defaultValue={min} onChange={(event) => this.handleChangeCurrentRegister(event, "min")}/>
-								</div>
-	                        }
-					</td>
-	               <td>{max}
-						{editedNow[index] &&
-								<div>
-								<br />
-	                            <input type="text" className="form-control" defaultValue={max} onChange={(event) => this.handleChangeCurrentRegister(event, "max")}/>
-								</div>
-	                        }
-					</td>
-					<td>{group}
-						{editedNow[index] &&
-								<div>
-								<br />
-	                            <input type="text" className="form-control" defaultValue={group} onChange={(event) => this.handleChangeCurrentRegister(event, "group")}/>
-								</div>
-	                        }
-					</td>
 					<td>{(type=="Variable" || type=="Bit") && <ReactTextCollapse options={TEXT_COLLAPSE_OPTIONS}>
 							{this.renderDescriptionSpecialTypes(type, legends)}
 						</ReactTextCollapse>}
@@ -641,6 +601,10 @@ class DeviceComponent extends Component {
 							{(boxLegends.second.type === "Variable" || boxLegends.second.type === "Bit") 
 								&& <><hr />{this.renderDescriptionSpecialTypes(boxLegends.second.type, JSON.stringify(boxLegends.second.content))}</>}
 						</ReactTextCollapse>}
+						
+						{(type!="Variable" && type!="Bit" && type!="Box" && (multiplier != null)) && <p class="small-text">*{multiplier}</p>}
+						{(type!="Variable" && type!="Bit" && type!="Box" && (suffix != "")) && <p class="small-text">Единица измерения: {suffix}</p>}		
+						{(type!="Variable" && type!="Bit" && type!="Box" && (minValue != null && maxValue != null)) && <p class="small-text">От {minValue} до {maxValue}</p>}
 						
 						{editedNow[index] &&
 								<div>
@@ -743,11 +707,6 @@ class DeviceComponent extends Component {
 								    <th>Чтение</th>
 								    <th>Запись</th>
 									<th>Тип</th>
-								    <th>Множитель</th>
-								    <th>Суффикс</th>
-									<th>Мин.</th>
-									<th>Макс.</th>
-									<th>Группа</th>
 									<th>Описание</th>
 							   </tr>
 							<tbody>	
