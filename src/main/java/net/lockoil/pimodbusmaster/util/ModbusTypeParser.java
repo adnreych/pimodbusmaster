@@ -1,15 +1,19 @@
 package net.lockoil.pimodbusmaster.util;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import net.lockoil.pimodbusmaster.exceptions.IllegalModbusTypeException;
@@ -68,20 +72,57 @@ public class ModbusTypeParser {
 	
 	private BoxTypeModbus getBoxType(ReadResponse readResponse, ReadRequest readRequest) {
 		CardRegisterElement cardRegisterElement = registersService.getRegister(readRequest.getSlave(), readRequest.getAddress());
-		ObjectMapper objectMapper = new ObjectMapper();
-	
 		Pair<AbstractModbusType, AbstractModbusType> boxTypeLegends;
-		int value = readResponse.getValue();
-		// здесь получаем  раскладываем hex на 2 значения и заполняем ими 2 получившихся типа
 		
-		boxTypeLegends = parseBoxPair(cardRegisterElement.getLegends());	
+		boxTypeLegends = parseBoxPair(cardRegisterElement.getLegends(), readResponse);	
 		
 		return new BoxTypeModbus(boxTypeLegends);	
 	}
 	
-	private Pair<AbstractModbusType, AbstractModbusType> parseBoxPair(String legend) {
-		return null;
+	private Pair<AbstractModbusType, AbstractModbusType> parseBoxPair(String legend, ReadResponse readResponse) {
+		ObjectMapper objectMapper = new ObjectMapper();
+		JsonNode jsonNode;
 		
+		try {		
+			Integer value = readResponse.getValue();
+			String hexValStr = String.format("%04x", value);
+			Integer firstVal = Integer.parseInt(hexValStr.substring(0, 2), 16);
+			Integer secondVal = Integer.parseInt(hexValStr.substring(2, 4), 16);
+			
+			jsonNode = objectMapper.readTree(legend);
+			JsonNode first = jsonNode.get("first");
+			JsonNode second = jsonNode.get("second");
+			
+			AbstractModbusType firstInBox = parsePairElement(first, firstVal);
+			AbstractModbusType secondInBox = parsePairElement(second, secondVal);
+			
+			return Pair.of(firstInBox, secondInBox);
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (JsonProcessingException | IllegalModbusTypeException e) {
+			e.printStackTrace();
+		}		
+		return null;		
+	}
+	
+	private AbstractModbusType parsePairElement(JsonNode pairElement, int value) 
+			throws JsonMappingException, JsonProcessingException, IllegalModbusTypeException {
+		ObjectMapper objectMapper = new ObjectMapper();
+		
+		switch (pairElement.get("type").toString()) {
+		case "UnsignedInt":
+			return new UnsignedInt(value);
+		case "SignedInt":
+			return new SignedInt(value);
+		case "Bit":
+			List<BitTypeLegend> bitTypeLegends = objectMapper.readValue(pairElement.get("content").toPrettyString(), new TypeReference<List<BitTypeLegend>>(){});
+			return new BitTypeModbus(bitTypeLegends, value);
+		case "Variable":
+			List<VarTypeLegend> varTypeLegends = objectMapper.readValue(pairElement.get("content").toPrettyString(), new TypeReference<List<VarTypeLegend>>(){});
+			return new VarTypeModbus(varTypeLegends, value);
+		default:
+			throw new IllegalModbusTypeException();
+		}
 	}
 	
 	private BitTypeModbus getBitType(ReadResponse readResponse, ReadRequest readRequest) {
@@ -91,7 +132,7 @@ public class ModbusTypeParser {
 	
 		List<BitTypeLegend> bitTypeLegends;
 		try {
-			bitTypeLegends = objectMapper.readValue(legendString, new TypeReference<List<BitTypeLegend>>(){});
+			bitTypeLegends = objectMapper.readValue(legendString, new TypeReference<List<BitTypeLegend>>(){});		
 			
 			return new BitTypeModbus(bitTypeLegends, readResponse.getValue());
 		} catch (JsonProcessingException e) {

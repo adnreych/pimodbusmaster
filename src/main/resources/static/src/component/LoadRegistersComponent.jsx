@@ -119,7 +119,6 @@ class LoadRegistersComponent extends Component {
 				var variable = {			
 					description: e.value,
 					value : e.attributes.value,
-					type: "varType"
 				}
 				variables.push(variable)
 			})
@@ -137,7 +136,6 @@ class LoadRegistersComponent extends Component {
 		           	bitQuantity: e.attributes.quantity,
 					description: e.attributes.bitName,
 					possibleValues: possibleValues,
-					type: "bitType"
 		        }
 				bits.push(bit)
 			})
