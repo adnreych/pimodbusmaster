@@ -68,22 +68,22 @@ public class ModbusTypeParser {
 	
 	private BoxTypeModbus getBoxType(ReadResponse readResponse, ReadRequest readRequest) {
 		CardRegisterElement cardRegisterElement = registersService.getRegister(readRequest.getSlave(), readRequest.getAddress());
-		String legendString = cardRegisterElement.getLegends();
 		ObjectMapper objectMapper = new ObjectMapper();
 	
 		Pair<AbstractModbusType, AbstractModbusType> boxTypeLegends;
-		try {
-			// здесь получаем легенду из базы, раскладываем hex и корректно заполняем объект
-			boxTypeLegends = objectMapper.readValue(legendString, new TypeReference<Pair<AbstractModbusType, AbstractModbusType>>(){});	
-			
-			return new BoxTypeModbus(boxTypeLegends);
-		} catch (JsonProcessingException e) {
-			e.printStackTrace();
-		}
-		return null;	
+		int value = readResponse.getValue();
+		// здесь получаем  раскладываем hex на 2 значения и заполняем ими 2 получившихся типа
+		
+		boxTypeLegends = parseBoxPair(cardRegisterElement.getLegends());	
+		
+		return new BoxTypeModbus(boxTypeLegends);	
 	}
 	
-	@SuppressWarnings("unchecked")
+	private Pair<AbstractModbusType, AbstractModbusType> parseBoxPair(String legend) {
+		return null;
+		
+	}
+	
 	private BitTypeModbus getBitType(ReadResponse readResponse, ReadRequest readRequest) {
 		CardRegisterElement cardRegisterElement = registersService.getRegister(readRequest.getSlave(), readRequest.getAddress());
 		String legendString = cardRegisterElement.getLegends();
@@ -100,7 +100,6 @@ public class ModbusTypeParser {
 		return null;
 	}
 	
-	@SuppressWarnings("unchecked")
 	private VarTypeModbus getVarType(ReadResponse readResponse, ReadRequest readRequest) {
 		CardRegisterElement cardRegisterElement = registersService.getRegister(readRequest.getSlave(), readRequest.getAddress());
 		String legendString = cardRegisterElement.getLegends();
@@ -117,24 +116,5 @@ public class ModbusTypeParser {
 		return null;
 	}
 	
-	private BitTypeLegend tryParseBitTypeModbus(String s) {
-		ObjectMapper objectMapper = new ObjectMapper();
-		try {
-			return objectMapper.readValue(s, BitTypeLegend.class);
-		} catch (JsonProcessingException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-	
-	private VarTypeLegend tryParseVarTypeModbus(String s) {
-		ObjectMapper objectMapper = new ObjectMapper();
-		try {
-			return objectMapper.readValue(s, VarTypeLegend.class);
-		} catch (JsonProcessingException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
 
 }

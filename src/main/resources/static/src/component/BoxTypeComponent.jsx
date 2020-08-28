@@ -25,11 +25,11 @@ class BoxTypeComponent extends Component {
 			<div>
 								
 				{
-					(this.state.pair.first[0] !== undefined && this.state.pair.first[0].type == "bitType") 
+					(this.state.pair.first !== undefined && this.state.pair.first.type === "Bit") 
 					?
 					<BitTypeValuesComponent 
 								index={this.state.index} 
-								legends={JSON.stringify(this.state.pair.first)} 
+								legends={JSON.stringify(this.state.pair.first.content)} 
 								callbackFromParent={this.state.callbackFromParent} 
 								value={this.state.value.first} 
 								/>
@@ -42,11 +42,11 @@ class BoxTypeComponent extends Component {
 				
 				
 				{
-					(this.state.pair.second[0] !== undefined && this.state.pair.second[0].type == "bitType") 
+					(this.state.pair.second !== undefined && this.state.pair.second.type === "Bit") 
 					?
 					<BitTypeValuesComponent 
 								index={this.state.index} 
-								legends={JSON.stringify(this.state.pair.second)} 
+								legends={JSON.stringify(this.state.pair.second.content)} 
 								callbackFromParent={this.state.callbackFromParent} 
 								value={this.state.value.second} 
 								/>

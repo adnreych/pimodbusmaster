@@ -2,6 +2,8 @@ package net.lockoil.pimodbusmaster.model.modbustypes;
 
 import org.springframework.data.util.Pair;
 
+import lombok.Setter;
+
 public class BoxTypeModbus implements AbstractModbusType<Integer, Pair<Object, Object>> {
 	
 	private Pair<AbstractModbusType, AbstractModbusType> content;

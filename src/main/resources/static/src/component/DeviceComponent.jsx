@@ -489,7 +489,6 @@ class DeviceComponent extends Component {
 	}
 
 	
-	
 	renderTableData(currentGroup) {
 		return this.state.device.filter(e => e.group == currentGroup.name).map((current) => {
 			const TEXT_COLLAPSE_OPTIONS = {
@@ -504,11 +503,12 @@ class DeviceComponent extends Component {
 			 var index = this.state.device.indexOf(this.state.device.filter(e => { return e.address === address })[0])
 			 var boxLegends = {}
 			 if (type=="Box") {
+				console.log(legends)
 				boxLegends = JSON.parse(legends)
-				if (boxLegends.first[0] != undefined && boxLegends.first[0].type == "varType") boxLegends.firstType = "Variable"
-				if (boxLegends.second[0] != undefined && boxLegends.second[0].type == "varType") boxLegends.secondType = "Variable"
-				if (boxLegends.first[0] != undefined && boxLegends.first[0].type == "bitType") boxLegends.firstType = "Bit"
-				if (boxLegends.second[0] != undefined && boxLegends.second[0].type == "bitType") boxLegends.secondType = "Bit"
+				if (boxLegends.first.content !== undefined && boxLegends.first.content.type == "Variable") boxLegends.firstType = "Variable"
+				if (boxLegends.first.content !== undefined && boxLegends.second.content.type == "Variable") boxLegends.secondType = "Variable"
+				if (boxLegends.first.content !== undefined && boxLegends.first.content.type == "Bit") boxLegends.firstType = "Bit"
+				if (boxLegends.first.content !== undefined && boxLegends.second.content.type == "Bit") boxLegends.secondType = "Bit"
 			 }
 	         return (
 	            <tr key={index}>
@@ -619,8 +619,10 @@ class DeviceComponent extends Component {
 						</ReactTextCollapse>}
 						
 						{(type=="Box") && <ReactTextCollapse options={TEXT_COLLAPSE_OPTIONS}>
-							{(boxLegends.firstType !== undefined) && <>{this.renderDescriptionSpecialTypes(boxLegends.firstType, JSON.stringify(boxLegends.first))}</>}
-							{(boxLegends.secondType !== undefined) && <><hr />{this.renderDescriptionSpecialTypes(boxLegends.secondType, JSON.stringify(boxLegends.second))}</>}
+							{(boxLegends.first.type === "Variable" || boxLegends.first.type === "Bit") 
+								&& <>{this.renderDescriptionSpecialTypes(boxLegends.first.type, JSON.stringify(boxLegends.first.content))}</>}
+							{(boxLegends.second.type === "Variable" || boxLegends.second.type === "Bit") 
+								&& <><hr />{this.renderDescriptionSpecialTypes(boxLegends.second.type, JSON.stringify(boxLegends.second.content))}</>}
 						</ReactTextCollapse>}
 						
 						{editedNow[index] &&

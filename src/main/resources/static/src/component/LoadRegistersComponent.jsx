@@ -155,7 +155,8 @@ class LoadRegistersComponent extends Component {
 			console.log("legend.second", legend.second)
 			
 			if (legend.first.attributes.type == "Bit" || legend.first.attributes.type == "Variable") {
-				legends.first = this.prepareBoxElement(legend.first.children[0], legend.first.attributes.type)
+				legends.first = {}
+				legends.first.content = this.prepareBoxElement(legend.first.children[0], legend.first.attributes.type)
 				legends.first.type = legend.first.attributes.type
 			} else {
 				legends.first = {}
@@ -163,7 +164,8 @@ class LoadRegistersComponent extends Component {
 			}
 			
 			if (legend.second.attributes.type == "Bit" || legend.second.attributes.type == "Variable") {
-				legends.second = this.prepareBoxElement(legend.second.children[0], legend.second.attributes.type)
+				legends.second = {}
+				legends.second.content = this.prepareBoxElement(legend.second.children[0], legend.second.attributes.type)
 				legends.second.type = legend.second.attributes.type
 			} else {
 				legends.second = {}
