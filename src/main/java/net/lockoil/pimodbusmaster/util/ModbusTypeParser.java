@@ -108,8 +108,7 @@ public class ModbusTypeParser {
 	private AbstractModbusType parsePairElement(JsonNode pairElement, int value) 
 			throws JsonMappingException, JsonProcessingException, IllegalModbusTypeException {
 		ObjectMapper objectMapper = new ObjectMapper();
-		
-		switch (pairElement.get("type").toString()) {
+		switch (pairElement.get("type").asText()) {
 		case "UnsignedInt":
 			return new UnsignedInt(value);
 		case "SignedInt":

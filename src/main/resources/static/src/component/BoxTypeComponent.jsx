@@ -14,7 +14,18 @@ class BoxTypeComponent extends Component {
 					handleChange: this.props.handleChange,
 					value: this.props.value !== undefined ? this.props.value : "" 
 		        }
+
+		this.handleChangeCurrentValue = this.handleChangeCurrentValue.bind(this);
     }
+
+
+	handleChangeCurrentValue(event, position) {
+		var value = event.target.value
+		var currValue = this.state.value
+		currValue[position] = current.possibleValues[value]
+		this.setState({ value: currValue })
+		this.props.callbackFromParent(currValue, this.state.index)
+	}
 
 
 	renderBoxType() {
@@ -37,7 +48,7 @@ class BoxTypeComponent extends Component {
 					<input type="text" placeholder="Значение" 
 									value={this.state.value.first} 
 									ref={this.state.index}
-									onChange={(event) => {}} />
+									onChange={(event) => this.handleChangeCurrentValue(event, "first")} />
 				}
 				
 				
@@ -54,7 +65,7 @@ class BoxTypeComponent extends Component {
 					<input type="text" placeholder="Значение" 
 									value={this.state.value.second} 
 									ref={this.state.index}
-									onChange={(event) => {}} />
+									onChange={(event) => this.handleChangeCurrentValue(event, "second")} />
 				}
 																			
 			</div>

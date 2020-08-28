@@ -173,6 +173,7 @@ class DeviceComponent extends Component {
 						error: null,
 						inputValues: inputValues});
 				}
+				console.log("inputValues: ", this.state.inputValues);
 			})
 			.catch((err) => {
 					  console.log("ERROR: ", err);
@@ -199,6 +200,26 @@ class DeviceComponent extends Component {
 		if (writeRequest.type == "Bit") {
 			var binaryStr = prepareValueToWrite(this.state.device[index].legends, value)
 			writeRequest.values = [parseInt(binaryStr, 2)]
+		}
+		
+		if (writeRequest.type == "Box") {
+			var first, second
+			if (this.state.device[index].legends.first == "Bit") {
+				var binaryStr = prepareValueToWrite(this.state.device[index].legends.first, value.first)
+				first = parseInt(binaryStr, 2)
+			} else {
+				first = value.first
+			}
+			
+			if (this.state.device[index].legends.second == "Bit") {
+				var binaryStr = prepareValueToWrite(this.state.device[index].legends.second, value.second)
+				second = parseInt(binaryStr, 2)
+			} else {
+				second = value.second
+			}
+			
+			var result = String(first) + String(second)
+			writeRequest.values = [parseInt(result, 10)]
 		}
 		
 		ModbusService.modbusWrite(writeRequest)
@@ -505,10 +526,6 @@ class DeviceComponent extends Component {
 			 if (type=="Box") {
 				console.log(legends)
 				boxLegends = JSON.parse(legends)
-				if (boxLegends.first.content !== undefined && boxLegends.first.content.type == "Variable") boxLegends.firstType = "Variable"
-				if (boxLegends.first.content !== undefined && boxLegends.second.content.type == "Variable") boxLegends.secondType = "Variable"
-				if (boxLegends.first.content !== undefined && boxLegends.first.content.type == "Bit") boxLegends.firstType = "Bit"
-				if (boxLegends.first.content !== undefined && boxLegends.second.content.type == "Bit") boxLegends.secondType = "Bit"
 			 }
 	         return (
 	            <tr key={index}>
