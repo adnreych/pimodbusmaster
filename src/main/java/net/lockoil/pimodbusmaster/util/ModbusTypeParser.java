@@ -95,14 +95,14 @@ public class ModbusTypeParser {
 			return Pair.of(firstInBox, secondInBox);
 		} catch (JsonMappingException e) {
 			e.printStackTrace();
-		} catch (JsonProcessingException | IllegalModbusTypeException e) {
+		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 		}		
 		return null;		
 	}
 	
-	private AbstractModbusType parsePairElement(JsonNode pairElement, int value) 
-			throws JsonMappingException, JsonProcessingException, IllegalModbusTypeException {
+	public AbstractModbusType parsePairElement(JsonNode pairElement, int value) 
+			 {
 		ObjectMapper objectMapper = new ObjectMapper();
 		switch (pairElement.get("type").asText()) {
 		case "UnsignedInt":
@@ -110,13 +110,28 @@ public class ModbusTypeParser {
 		case "SignedInt":
 			return new SignedInt(value);
 		case "Bit":
-			List<BitTypeLegend> bitTypeLegends = objectMapper.readValue(pairElement.get("content").toPrettyString(), new TypeReference<List<BitTypeLegend>>(){});
-			return new BitTypeModbus(bitTypeLegends, value);
+			List<BitTypeLegend> bitTypeLegends;
+			try {
+				bitTypeLegends = objectMapper.readValue(pairElement.get("content").toPrettyString(), new TypeReference<List<BitTypeLegend>>(){});
+				return new BitTypeModbus(bitTypeLegends, value);
+			} catch (JsonMappingException e) {
+				e.printStackTrace();
+			} catch (JsonProcessingException e) {
+				e.printStackTrace();
+			}
+			return null;
 		case "Variable":
-			List<VarTypeLegend> varTypeLegends = objectMapper.readValue(pairElement.get("content").toPrettyString(), new TypeReference<List<VarTypeLegend>>(){});
-			return new VarTypeModbus(varTypeLegends, value);
+			List<VarTypeLegend> varTypeLegends;
+			try {
+				varTypeLegends = objectMapper.readValue(pairElement.get("content").toPrettyString(), new TypeReference<List<VarTypeLegend>>(){});
+			} catch (JsonMappingException e) {
+				e.printStackTrace();
+			} catch (JsonProcessingException e) {
+				e.printStackTrace();
+			}
+			return null;
 		default:
-			throw new IllegalModbusTypeException();
+			return null;
 		}
 	}
 	

@@ -4,6 +4,9 @@ import org.springframework.data.util.Pair;
 
 import lombok.Setter;
 
+/**
+ * Тип для хранения 2 AbstractModbusType в одном регистре
+ */
 public class BoxTypeModbus implements AbstractModbusType<Integer, Pair<Object, Object>> {
 	
 	private Pair<AbstractModbusType, AbstractModbusType> content;
