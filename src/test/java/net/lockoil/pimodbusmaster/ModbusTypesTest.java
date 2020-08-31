@@ -5,6 +5,7 @@ import net.lockoil.pimodbusmaster.model.modbustypes.*;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,9 @@ public class ModbusTypesTest {
 	VarTypeModbus varTypeModbus;
 	BitTypeLegend bitTypeLegend;
 	BoxTypeModbus boxTypeModbus;
+	MultipleTypeModbus multipleTypeModbusOneArg;
+	MultipleTypeModbus multipleTypeModbusThreeArgs;
+	MultipleTypeModbus multipleTypeModbusThreeArgsFloat;
 	
 	@Before
 	public void setValues() {
@@ -86,6 +90,15 @@ public class ModbusTypesTest {
 		bitTypeModbus = new BitTypeModbus(bitTypeLegends, 5);
 		
 		boxTypeModbus = new BoxTypeModbus(Pair.of(bitTypeModbus, new SignedInt(5)));
+		
+		List<Integer> hexStringArrayList = Arrays.asList(76, 90, 13, 84);  // LZqT
+		multipleTypeModbusOneArg = new MultipleTypeModbus(hexStringArrayList);
+		
+		String single = "UnsignedInt";
+		multipleTypeModbusThreeArgs = new MultipleTypeModbus(hexStringArrayList, single, "");
+		
+		single = "Float";
+		multipleTypeModbusThreeArgsFloat = new MultipleTypeModbus(hexStringArrayList, single, "");
 	}
 	
 	@Test
@@ -162,6 +175,21 @@ public class ModbusTypesTest {
 	@Test 
 	public void testBoxTypeReadSecond() {
 		assertEquals(5, boxTypeModbus.readValue().getSecond());
+	}
+	
+	@Test 
+	public void testMultipleOneArgRead() {
+		assertEquals("LZqT", multipleTypeModbusOneArg.readValue().get(0));
+	}
+	
+	@Test 
+	public void testMultipleThreeArgsIntRead() {
+		assertEquals(Arrays.asList(76, 90, 13, 84), multipleTypeModbusThreeArgs.readValue().get(0));
+	}
+	
+	@Test 
+	public void testMultipleThreeArgsFloatRead() {
+		assertEquals(Arrays.asList(4.25322, 7.00089), multipleTypeModbusThreeArgsFloat.readValue().get(0));
 	}
 
 	

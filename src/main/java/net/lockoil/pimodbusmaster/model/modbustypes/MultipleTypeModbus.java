@@ -1,5 +1,6 @@
 package net.lockoil.pimodbusmaster.model.modbustypes;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -11,27 +12,36 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.xml.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
 
 import net.lockoil.pimodbusmaster.util.ModbusTypeParser;
 
 /**
- * Несколько идущих подряд регистров имеют одинаковое описание
+ * Несколько идущих подряд регистров
  */
-public class MultipleTypeModbus implements AbstractModbusType<Integer, List<AbstractModbusType>> {
+public class MultipleTypeModbus implements AbstractModbusType<Integer, List<Object>> {
+	
+	public MultipleTypeModbus(List<Integer> value, String single, String legend) {
+		this.value = value;
+		this.single = single;
+		this.legend = legend;
+		isASCII = true;
+	}
 	
 	public MultipleTypeModbus(List<Integer> value) {
 		this.value = value;
+		isASCII = false;
 	}
 	
 	private List<Integer> value;
 
 	/**
-	 * Регистры связаны друг с другом
+	 * В регистрах хранится ASCII строка
 	 */
-	private boolean isSeparated;	
+	private boolean isASCII;	
 	
 	/**
-	 * Тип элемента, если регистры не связаны
+	 * Тип элемента, если {@link #isASCII} null
 	 */
 	private String single;
 		
@@ -40,38 +50,37 @@ public class MultipleTypeModbus implements AbstractModbusType<Integer, List<Abst
 	 */
 	private String legend;
 	
-	/**
-	 * Количество элементов в кортеже
-	 */
-	private int elementsCount;
-	
-	/**
-	 * Количество регистров, которое занимает один элемент кортежа
-	 */
-	private int elementLength;
-	
 	@Autowired
 	private  ModbusTypeParser modbusTypeParser;
 
 	@Override
-	public List<AbstractModbusType> readValue() {
-		if (isSeparated) {
+	public List<Object> readValue() {
+		if (isASCII) {
 			switch (single) {
 			case "UnsignedInt":
 				return value
 						.stream()
 						.map(e -> new UnsignedInt(e))
+						.collect(Collectors.toList())
+						.stream()
+						.map(e -> e.readValue())
 						.collect(Collectors.toList());
 			case "SignedInt":
 				return value
 						.stream()
 						.map(e -> new SignedInt(e))
+						.collect(Collectors.toList())
+						.stream()
+						.map(e -> e.readValue())
 						.collect(Collectors.toList());
 			case "Float":
 				return IntStream
 						.range(0, value.size())
 						.filter(i -> i % 2 == 0)
 						.mapToObj(i -> new FloatModbus(Pair.of(value.get(i), value.get(i + 1))))
+						.collect(Collectors.toList())
+						.stream()
+						.map(e -> e.readValue())
 						.collect(Collectors.toList());
 			case "Variable":			
 				try {
@@ -81,6 +90,9 @@ public class MultipleTypeModbus implements AbstractModbusType<Integer, List<Abst
 					return value
 							.stream()
 							.map(e -> new VarTypeModbus(varTypeLegends, e))
+							.collect(Collectors.toList())
+							.stream()
+							.map(e -> e.readValue())
 							.collect(Collectors.toList());
 				} catch (JsonProcessingException e1) {
 					e1.printStackTrace();
@@ -94,6 +106,9 @@ public class MultipleTypeModbus implements AbstractModbusType<Integer, List<Abst
 					return value
 							.stream()
 							.map(e -> new BitTypeModbus(bitTypeLegends, e))
+							.collect(Collectors.toList())
+							.stream()
+							.map(e -> e.readValue())
 							.collect(Collectors.toList());
 				} catch (JsonProcessingException e1) {
 					e1.printStackTrace();
@@ -115,16 +130,26 @@ public class MultipleTypeModbus implements AbstractModbusType<Integer, List<Abst
 							.map(e -> new BoxTypeModbus(
 									Pair.of(modbusTypeParser.parsePairElement(first, e.getFirst()), 
 											modbusTypeParser.parsePairElement(second, e.getSecond()))))
+							.collect(Collectors.toList())
+							.stream()
+							.map(e -> e.readValue())
 							.collect(Collectors.toList());
 				} catch (JsonProcessingException e1) {
 					e1.printStackTrace();
 				}
-				break;			
+				break;	
 			default:
 				break;
 			}
 		} else {
-			
+			String result = value.stream().map(e -> Pair.of(
+							Integer.parseInt(String.format("%04x", e).substring(0, 2), 16), 
+							Integer.parseInt(String.format("%04x", e).substring(2, 4), 16)))
+						  .map(e -> Character.toString((char) e.getFirst().intValue()) + Character.toString((char) e.getSecond().intValue()))
+						  .collect(Collectors.toList())
+						  .stream()
+						  .reduce("", (subtotal, element) -> subtotal + element);
+			return Collections.singletonList(result);
 		}
 		return null;
 	}

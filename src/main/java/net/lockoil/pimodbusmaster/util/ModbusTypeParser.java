@@ -1,6 +1,8 @@
 package net.lockoil.pimodbusmaster.util;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
@@ -21,6 +23,7 @@ import net.lockoil.pimodbusmaster.model.modbustypes.BitTypeLegend;
 import net.lockoil.pimodbusmaster.model.modbustypes.BitTypeModbus;
 import net.lockoil.pimodbusmaster.model.modbustypes.BoxTypeModbus;
 import net.lockoil.pimodbusmaster.model.modbustypes.FloatModbus;
+import net.lockoil.pimodbusmaster.model.modbustypes.MultipleTypeModbus;
 import net.lockoil.pimodbusmaster.model.modbustypes.SignedInt;
 import net.lockoil.pimodbusmaster.model.modbustypes.UnsignedInt;
 import net.lockoil.pimodbusmaster.model.modbustypes.VarTypeLegend;
@@ -39,7 +42,10 @@ public class ModbusTypeParser {
 	public ModbusTypeParser(RegistersService registersService) {
 		this.registersService = registersService;
 	}
-
+	
+	/**
+	 * Возвращает конкретную реализацию AbstractModbusType
+	 */
 	public AbstractModbusType parseRead(List<ReadResponse> response, ReadRequest request) throws IllegalModbusTypeException {
 		
 		switch (request.getType()) {
@@ -60,13 +66,44 @@ public class ModbusTypeParser {
 			
 		case "Box":
 			return getBoxType(response.get(0), request);
+			
+		case "Multiple":
+			return getMultipleType(response, request);
 
 		default:
 			throw new IllegalModbusTypeException();
 		}					
 	}
 	
-	private BoxTypeModbus getBoxType(ReadResponse readResponse, ReadRequest readRequest) {
+	private MultipleTypeModbus getMultipleType(List<ReadResponse> readResponse, ReadRequest readRequest) {
+		ObjectMapper objectMapper = new ObjectMapper();
+		JsonNode jsonNode;
+		CardRegisterElement cardRegisterElement = registersService.getRegister(readRequest.getSlave(), readRequest.getAddress());
+		List<Integer> values = readResponse
+									.stream()
+									.map(e -> e.getValue())
+									.collect(Collectors.toList());		
+		try {
+			jsonNode = objectMapper.readTree(cardRegisterElement.getLegends());
+			String single = jsonNode.has("single") ? jsonNode.get("single").asText() : null;
+			String legend = jsonNode.has("legend") ? jsonNode.get("legend").asText() : "";
+			
+			if (single == null) {
+				return new MultipleTypeModbus(values);
+			} else {
+				return new MultipleTypeModbus(values, single, legend);
+			}
+			
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
+		return null;
+		
+	}
+	
+	private BoxTypeModbus getBoxType(ReadResponse readResponse, ReadRequest readRequest) {	
 		CardRegisterElement cardRegisterElement = registersService.getRegister(readRequest.getSlave(), readRequest.getAddress());
 		Pair<AbstractModbusType, AbstractModbusType> boxTypeLegends;
 		
