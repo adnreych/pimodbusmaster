@@ -76,8 +76,11 @@ public class MultipleTypeModbus implements AbstractModbusType<Integer, List<Obje
 			case "Float":
 				return IntStream
 						.range(0, value.size())
-						.filter(i -> i % 2 == 0)
-						.mapToObj(i -> new FloatModbus(Pair.of(value.get(i), value.get(i + 1))))
+						.filter(i -> i % 2 == 0 && i != 1)
+						.mapToObj(i -> {
+							System.out.println("value.get(i) " + value.get(i) + " value.get(i + 1)" + value.get(i + 1));
+							return new FloatModbus(Pair.of(value.get(i), value.get(i + 1)));
+						})
 						.collect(Collectors.toList())
 						.stream()
 						.map(e -> e.readValue())
@@ -142,9 +145,11 @@ public class MultipleTypeModbus implements AbstractModbusType<Integer, List<Obje
 				break;
 			}
 		} else {
-			String result = value.stream().map(e -> Pair.of(
-							Integer.parseInt(String.format("%04x", e).substring(0, 2), 16), 
-							Integer.parseInt(String.format("%04x", e).substring(2, 4), 16)))
+			String result = value
+						  .stream()
+						  .map(e -> Pair.of(
+										Integer.parseInt(String.format("%02x", Integer.parseInt(e.toString().substring(0, 2))), 16), 
+										Integer.parseInt(String.format("%02x", Integer.parseInt(e.toString().substring(2, 4))), 16)))
 						  .map(e -> Character.toString((char) e.getFirst().intValue()) + Character.toString((char) e.getSecond().intValue()))
 						  .collect(Collectors.toList())
 						  .stream()

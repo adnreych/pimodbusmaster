@@ -91,13 +91,15 @@ public class ModbusTypesTest {
 		
 		boxTypeModbus = new BoxTypeModbus(Pair.of(bitTypeModbus, new SignedInt(5)));
 		
-		List<Integer> hexStringArrayList = Arrays.asList(76, 90, 13, 84);  // LZqT
+		List<Integer> hexStringArrayList = Arrays.asList(7690, 8384);  // LZST
 		multipleTypeModbusOneArg = new MultipleTypeModbus(hexStringArrayList);
 		
 		String single = "UnsignedInt";
+		hexStringArrayList = Arrays.asList(76, 90, 113, 84); 
 		multipleTypeModbusThreeArgs = new MultipleTypeModbus(hexStringArrayList, single, "");
 		
 		single = "Float";
+		hexStringArrayList = Arrays.asList(76, 90, 113, 84); 
 		multipleTypeModbusThreeArgsFloat = new MultipleTypeModbus(hexStringArrayList, single, "");
 	}
 	
@@ -179,17 +181,17 @@ public class ModbusTypesTest {
 	
 	@Test 
 	public void testMultipleOneArgRead() {
-		assertEquals("LZqT", multipleTypeModbusOneArg.readValue().get(0));
+		assertEquals("LZST", multipleTypeModbusOneArg.readValue().get(0));
 	}
 	
 	@Test 
 	public void testMultipleThreeArgsIntRead() {
-		assertEquals(Arrays.asList(76, 90, 13, 84), multipleTypeModbusThreeArgs.readValue().get(0));
+		assertEquals(Arrays.asList(76, 90, 113, 84), multipleTypeModbusThreeArgs.readValue());
 	}
 	
 	@Test 
 	public void testMultipleThreeArgsFloatRead() {
-		assertEquals(Arrays.asList(4.25322, 7.00089), multipleTypeModbusThreeArgsFloat.readValue().get(0));
+		assertEquals(Arrays.asList(6.97962, 1.03775), multipleTypeModbusThreeArgsFloat.readValue());
 	}
 
 	
