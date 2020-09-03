@@ -25,6 +25,9 @@ class LoadRegistersComponent extends Component {
 	  this.onFileUploadHandler = this.onFileUploadHandler.bind(this);
 	  this.handleModbusTypeLegend = this.handleModbusTypeLegend.bind(this);
 	  this.prepareBoxElement = this.prepareBoxElement.bind(this);
+	  this.handleBoxType = this.handleBoxType.bind(this);
+	  this.handleBitType = this.handleBitType.bind(this);
+	  this.handleVarType = this.handleVarType.bind(this);
 
     }
 
@@ -67,7 +70,7 @@ class LoadRegistersComponent extends Component {
 						case "Type":
 							dataElement.type = e.value; 
 							// обработка нестандартных типов
-							if (e.value == "Bit" || e.value == "Variable" || e.value == "Box") 
+							if (e.value == "Bit" || e.value == "Variable" || e.value == "Box" || e.value == "Multiple") 
 								dataElement.legends = this.handleModbusTypeLegend(element, e.value);
 							break;
 						case "Multiplier":
@@ -104,53 +107,51 @@ class LoadRegistersComponent extends Component {
 			
 			if (this.state.error.length == 0) this.setState({ error: null});
 			this.setState({ data : data});
-			console.log("data", data);
     	};
 	}
 	
 	handleModbusTypeLegend(legend, value) {
 		var legends = {};
 		if (value == "Variable") {
-			legends = legend.children.find(obj => {
-			  return obj.name == "Vars"
-			})
-			var variables = []
-			legends.children.forEach(e => {
-				var variable = {			
-					description: e.value,
-					value : e.attributes.value,
-				}
-				variables.push(variable)
-			})
-			return variables;
+			return this.handleVarType(legend)
 		} else if (value == "Bit") {
-			legends = legend.children.find(obj => {
-			  return obj.name == "Bits"
-			})
-			var bits = []
-			legends.children.forEach(e => {
-				var possibleValues = [];
-				e.children.forEach(possibleValue => possibleValues.push(possibleValue.value))
-				var bit = {
-		            startBit: e.attributes.start,
-		           	bitQuantity: e.attributes.quantity,
-					description: e.attributes.bitName,
-					possibleValues: possibleValues,
-		        }
-				bits.push(bit)
-			})
-			return bits;
+			return this.handleBitType(legend)
 		} else if (value == "Box") {
-			
-			legend.first = legend.children.find(obj => {
+			return this.handleBoxType(legend)			
+		} else if (value == "Multiple") {		
+			legends = legend.children.find(obj => {
+			  return obj.name == "Multiple"
+			})
+			var legend = {}
+			legend.isASCII = JSON.parse(legends.attributes.isASCII.toLowerCase());
+			console.log("MULTIPLE legs", legends)
+			console.log("legends.attributes.single", legends.attributes.single)	
+			console.log("legend.isASCII", legend.isASCII)	
+			if (legend.isASCII) {
+				
+			} else {
+				legend.single = legends.attributes.single
+				if (legend.single == "Variable") {
+					legend.legend = this.handleVarType(legends.children[0])	
+				} else if (legend.single == "Bit") {
+					legend.legend = this.handleBitType(legends.children[0], true)
+				} else if (legend.single == "Box") {
+					legend.legend = this.handleBoxType(legends.children[0])			
+				} 
+			}
+			console.log("MULTIPLE", legend)		
+			return legend
+		}
+	}
+	
+	handleBoxType(legend, fromMultiple) {
+		var legends = {}
+		legend.first = legend.children.find(obj => {
 			  return obj.name == "First"
 			})
 			legend.second = legend.children.find(obj => {
 			  return obj.name == "Second"
 			})
-			
-			console.log("legend.first", legend.first)
-			console.log("legend.second", legend.second)
 			
 			if (legend.first.attributes.type == "Bit" || legend.first.attributes.type == "Variable") {
 				legends.first = {}
@@ -169,9 +170,51 @@ class LoadRegistersComponent extends Component {
 				legends.second = {}
 				legends.second.type = legend.second.attributes.type
 			}
-			console.log("BOXLEGENDS", legends)
 			return legends;
+	}
+	
+	handleBitType(legend, fromMultiple) {
+		var legends = {}
+		if (fromMultiple) {
+			legends = legend
+		} else {
+			legends = legend.children.find(obj => {
+			  return obj.name == "Bits"
+			})
+		}		
+			var bits = []
+			legends.children.forEach(e => {
+				var possibleValues = [];
+				e.children.forEach(possibleValue => possibleValues.push(possibleValue.value))
+				var bit = {
+		            startBit: e.attributes.start,
+		           	bitQuantity: e.attributes.quantity,
+					description: e.attributes.bitName,
+					possibleValues: possibleValues,
+		        }
+				bits.push(bit)
+			})
+			return bits;
+	}
+	
+	handleVarType(legend, fromMultiple) {		
+		var legends = {}
+		if (fromMultiple) {
+			legends = legend
+		} else {
+			legends = legend.children.find(obj => {
+			  return obj.name == "Vars"
+			})
 		}
+			var variables = []
+			legends.children.forEach(e => {
+				var variable = {			
+					description: e.value,
+					value : e.attributes.value,
+				}
+				variables.push(variable)
+			})
+			return variables;
 	}
 	
 	prepareBoxElement(legend, type) {	// преобразование аргумента в arg[0] для handleModbusTypeLegend
