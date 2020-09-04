@@ -7,6 +7,7 @@ import DeviceService from '../service/DeviceService';
 import SpecialModbusTypesComponent from './SpecialModbusTypesComponent';
 import BitTypeValuesComponent from './BitTypeValuesComponent';
 import BoxTypeComponent from './BoxTypeComponent';
+import MultipleTypeComponent from './MultipleTypeComponent';
 import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css'; 
 import Option from 'muicss/lib/react/option';
@@ -512,17 +513,18 @@ class DeviceComponent extends Component {
 	
 	renderTableData(currentGroup) {
 		return this.state.device.filter(e => e.group == currentGroup.name).map((current) => {
-			const TEXT_COLLAPSE_OPTIONS = {
-				  collapse: false, // default state when component rendered
-				  collapseText: '... Развернуть', // text to show when collapsed
-				  expandText: 'Свернуть', // text to show when expanded
-				  minHeight: 30, // component height when closed
-				  maxHeight: 250, // expanded to  
-				}
+			
 			 const {loading, editedNow} = this.state;
 	         const {id, name, address, count, isRead, isWrite, type, multiplier, suffix, minValue, maxValue, group, legends} = current;
 			 var index = this.state.device.indexOf(this.state.device.filter(e => { return e.address === address })[0])
 			 var boxLegends = {}
+		
+			 if (type=="Multiple") {
+				return(
+					<MultipleTypeComponent registerInfo={current} count={count} inputValues={new Array(count)}  callbackFromBitType={this.callbackFromBitType} />	
+				)
+			 }
+			
 			 if (type=="Box") {
 				console.log(legends)
 				boxLegends = JSON.parse(legends)
@@ -591,11 +593,11 @@ class DeviceComponent extends Component {
 								</div>
 	                        }
 					</td>
-					<td>{(type=="Variable" || type=="Bit") && <ReactTextCollapse options={TEXT_COLLAPSE_OPTIONS}>
+					<td>{(type=="Variable" || type=="Bit") && <ReactTextCollapse options={Strings.TEXT_COLLAPSE_OPTIONS}>
 							{this.renderDescriptionSpecialTypes(type, legends)}
 						</ReactTextCollapse>}
 						
-						{(type=="Box") && <ReactTextCollapse options={TEXT_COLLAPSE_OPTIONS}>
+						{(type=="Box") && <ReactTextCollapse options={Strings.TEXT_COLLAPSE_OPTIONS}>
 							{(boxLegends.first.type === "Variable" || boxLegends.first.type === "Bit") 
 								&& <>{this.renderDescriptionSpecialTypes(boxLegends.first.type, JSON.stringify(boxLegends.first.content))}</>}
 							{(boxLegends.second.type === "Variable" || boxLegends.second.type === "Bit") 
