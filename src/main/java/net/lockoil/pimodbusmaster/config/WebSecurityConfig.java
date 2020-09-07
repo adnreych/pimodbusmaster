@@ -13,8 +13,9 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 
 import net.lockoil.pimodbusmaster.service.UserDetailServiceImpl;
 
-
-
+/**
+ * Конфиг для настройки Spring Security
+ */
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -52,7 +53,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return new CustomAuthenticationFailureHandler();
     }
     
-    	
     @Autowired
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {

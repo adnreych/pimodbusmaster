@@ -200,7 +200,7 @@ class DeviceComponent extends Component {
 		let writeRequest = {
             slave: this.state.address,
            	address: address,
-			values: [value],
+			values: Array.isArray(value) ? value : [value],
 			type: this.state.device[index].type,
 			isCSD: this.state.CSD,
 			atConnectionRequest: this.state.ATRequest

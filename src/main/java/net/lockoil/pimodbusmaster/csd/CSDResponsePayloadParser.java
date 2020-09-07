@@ -7,7 +7,9 @@ import java.util.List;
 
 import net.lockoil.pimodbusmaster.exceptions.CSDException;
 
-
+/**
+ * Парсер ответа на запрос чтения по CSD
+ */
 public class CSDResponsePayloadParser {
 	
 	
@@ -24,7 +26,10 @@ public class CSDResponsePayloadParser {
 	private byte[] CSDcommandNumber;
 	private byte[] response;
 	
-	
+	/**
+	 * Парсер ответа на запрос чтения по CSD
+	 * @return Полезная нагрузка
+	 */
 	public int[] parseReadResponse() {
 		try {
 			parseError();

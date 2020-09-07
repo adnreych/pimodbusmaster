@@ -4,6 +4,9 @@ import java.util.Arrays;
 
 import com.google.common.collect.ObjectArrays;
 
+/**
+ * Класс для сборки готовой к отправке CSD-команды
+ */
 public class CSDCommand {
 	
 	private Byte[] CMD_COMMAND_PART = new Byte[] {'C', 'M', 'D'};
@@ -29,6 +32,10 @@ public class CSDCommand {
 		return summ;
 	}
 	
+	/**
+	 * Получить готовую для отправки команду
+	 * @return Команда в виде массива
+	 */
 	public byte[] getCommand() {
 		Byte[] swap;
 		swap = ObjectArrays.concat(CMD_COMMAND_PART, CSDcommandPayload , Byte.class);
@@ -39,12 +46,17 @@ public class CSDCommand {
 		return command;
 	}
 
-
+	/**
+	 * Получить полезную нагрузку команды
+	 * @return Полезная нагрузка команды
+	 */
 	public Byte[] getCSDcommandPayload() {
 		return CSDcommandPayload;
 	}
 
-
+	/**
+	 * Установить полезную нагрузку команды
+	 */
 	public void setCSDcommandPayload(Byte[] cSDcommandPayload) {
 		CSDcommandPayload = cSDcommandPayload;
 	}

@@ -11,6 +11,9 @@ import jssc.SerialPortException;
 import jssc.SerialPortList;
 import net.lockoil.pimodbusmaster.model.AtConnectionRequest;
 
+/**
+ * Класс для соединения с устройством по протоколу CSD через модемное AT-соединение.
+ */
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class ATConnect {
@@ -21,7 +24,11 @@ public class ATConnect {
     volatile private boolean isCSDEventArrived = false;
     volatile private byte[] byteData;
     
-    
+	/**
+	 * Соединение через AT
+	 * @param atConnectionRequest Параметры соединения
+	 * @return Статус текущего AT-соединения
+	 */
     public String getAtConnection(AtConnectionRequest atConnectionRequest) throws SerialPortException {
     	status = "";
     	serialPort = new SerialPort(atConnectionRequest.getPort());
@@ -40,6 +47,12 @@ public class ATConnect {
         }
     }
     
+    /**
+	 * Отправить CSD-запрос на чтение и получить ответ
+	 * @param atConnectionRequest Параметры соединения
+	 * @param command CSD-команда
+	 * @return Сырые данные, представляющие ANSI-символы
+	 */
     public byte[] CSDReadRequest(AtConnectionRequest atConnectionRequest, byte[] command) {
     	if (serialPort.isOpened()) {
     		try {
@@ -57,6 +70,11 @@ public class ATConnect {
         }		
 	}
     
+    /**
+	 * Отправить CSD-запрос на запись
+	 * @param atConnectionRequest Параметры соединения
+	 * @param command CSD-команда
+	 */
     public void CSDWriteRequest(AtConnectionRequest atConnectionRequest, byte[] command) {
     	if (serialPort.isOpened()) {
     		try {
@@ -73,6 +91,10 @@ public class ATConnect {
     	}	
 	}
     
+    /**
+   	 * Закрыть указанный в {@link AtConnectionRequest} COM-port
+   	 * @param atConnectionRequest Параметры соединения
+   	 */
     public boolean closePort(AtConnectionRequest atConnectionRequest) throws SerialPortException {
     	System.out.println("close port " + atConnectionRequest.getPort());
     	if (serialPort.isOpened()) {
@@ -158,6 +180,10 @@ public class ATConnect {
 		} 	
     }
     
+    /**
+	 * Получить список COM-портов на устройстве
+	 * @return Список COM-портов
+	 */
     public String[] getPorts() {
     	return SerialPortList.getPortNames();   	
     }

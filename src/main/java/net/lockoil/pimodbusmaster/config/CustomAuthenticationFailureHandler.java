@@ -15,8 +15,10 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class CustomAuthenticationFailureHandler 
-implements AuthenticationFailureHandler {
+/**
+ * Перехватчик ошибок входа 
+ */
+public class CustomAuthenticationFailureHandler implements AuthenticationFailureHandler {
 
   private ObjectMapper objectMapper = new ObjectMapper();
 

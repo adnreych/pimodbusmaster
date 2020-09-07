@@ -11,9 +11,17 @@ import com.google.common.collect.ObjectArrays;
 import net.lockoil.pimodbusmaster.model.ReadRequest;
 import net.lockoil.pimodbusmaster.model.WriteRequest;
 
+/**
+ * Класс для подготовки полезной нагрузки для {@link CSDCommand}}
+ */
 @Component
 public class CSDRequestPayloadAssembler {
 	
+	/**
+	 * Подготовка полезной нагрузки для команды чтения
+	 * @param {@link ReadRequest} параметры запроса
+	 * @return Полезная нагрузка для команды чтения
+	 */
 	public Byte[] readRequestPayloadAssemble(ReadRequest readRequest) {
 		List<Byte> payloadList = new ArrayList<Byte>();
 		Byte[] addressArr;
@@ -53,6 +61,11 @@ public class CSDRequestPayloadAssembler {
 		}
 	}
 	
+	/**
+	 * Подготовка полезной нагрузки для команды записи
+	 * @param {@link WriteRequest} параметры запроса
+	 * @return Полезная нагрузка для команды записи
+	 */
 	public Byte[] writeRequestPayloadAssemble(WriteRequest writeRequest) {
 		List<Byte> payloadList = new ArrayList<Byte>();
 		Byte[] addressArr;
