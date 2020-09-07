@@ -10,7 +10,10 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.session.SessionDestroyedEvent;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
- 
+
+/**
+ * Логгер успешного выхода
+ */
 @Component
 public class LogoutListenerImpl implements ApplicationListener<LogoutSuccessEvent> {
 	

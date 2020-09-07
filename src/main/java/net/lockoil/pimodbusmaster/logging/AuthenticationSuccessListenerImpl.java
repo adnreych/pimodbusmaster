@@ -6,7 +6,9 @@ import org.springframework.security.authentication.event.AuthenticationSuccessEv
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
-
+/**
+ * Логгер успешного входа
+ */
 @Component
 public class AuthenticationSuccessListenerImpl implements ApplicationListener<AuthenticationSuccessEvent> {
 	

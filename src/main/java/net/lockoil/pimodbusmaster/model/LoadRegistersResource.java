@@ -14,6 +14,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import net.lockoil.pimodbusmaster.model.modbustypes.TypeSupportable;
 
+/**
+ * Описание регистра для загрузки в БД. Описание всех полей аналогично {@link CardRegisterElement}
+ */
 @Data
 @NoArgsConstructor
 public class LoadRegistersResource {

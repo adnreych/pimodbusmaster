@@ -13,6 +13,9 @@ import com.google.common.collect.Lists;
 import net.lockoil.pimodbusmaster.model.Role;
 import net.lockoil.pimodbusmaster.repository.RoleRepository;
 
+/**
+ * Действия при старте приложения
+ */
 @Component
 public class StartHooks implements CommandLineRunner {
 	

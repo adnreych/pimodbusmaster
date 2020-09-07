@@ -7,6 +7,9 @@ import org.springframework.security.authentication.event.AuthenticationFailureBa
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
+/**
+ * Логгер ошибок входа
+ */
 @Component
 public class ApplicationFailureListener implements ApplicationListener<AuthenticationFailureBadCredentialsEvent> {
 	
