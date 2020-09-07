@@ -55,6 +55,8 @@ class DeviceComponent extends Component {
 		this.callbackFromBitType = this.callbackFromBitType.bind(this);
 		this.prepareValueToWrite = this.prepareValueToWrite.bind(this);
 		this.handleChangeGroupList = this.handleChangeGroupList.bind(this);
+		this.readCallbackFromMultipleType = this.readCallbackFromMultipleType.bind(this);
+		this.writeCallbackFromMultipleType = this.writeCallbackFromMultipleType.bind(this);
 
     }
 
@@ -129,6 +131,14 @@ class DeviceComponent extends Component {
 		inputValues[index] = currValue
 		this.setState({ inputValues: inputValues })
 		//console.log("STATEFromBitType: ", this.state);
+	}
+	
+	readCallbackFromMultipleType = (address, count, index) => {
+		this.handleClickRead(address, count, index)
+	}
+	
+	writeCallbackFromMultipleType = (address, value, index) => {
+		this.handleClickWrite(address, value, index)		
 	}
 	
 	
@@ -520,8 +530,16 @@ class DeviceComponent extends Component {
 			 var boxLegends = {}
 		
 			 if (type=="Multiple") {
-				return(
-					<MultipleTypeComponent registerInfo={current} count={count} inputValues={new Array(count)}  callbackFromBitType={this.callbackFromBitType} />	
+				return(				
+					<MultipleTypeComponent 
+						registerInfo={current} 
+						count={count} 
+						inputValues={new Array(count)}  
+						index={index}
+						callbackFromBitType={this.callbackFromBitType}
+						writeClick={this.writeCallbackFromMultipleType}
+						readClick={this.readCallbackFromMultipleType}
+						deleteClick={this.deleteRegister} />					
 				)
 			 }
 			
