@@ -534,7 +534,7 @@ class DeviceComponent extends Component {
 					<MultipleTypeComponent 
 						registerInfo={current} 
 						count={count} 
-						inputValues={new Array(count)}  
+						inputValues={this.state.inputValues[index] == undefined ? new Array(count) : this.state.inputValues[index]}  
 						index={index}
 						callbackFromBitType={this.callbackFromBitType}
 						writeClick={this.writeCallbackFromMultipleType}

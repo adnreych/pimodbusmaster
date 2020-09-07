@@ -25,6 +25,19 @@ class MultipleTypeComponent extends Component {
 
     }
 
+	 static getDerivedStateFromProps(props, state) {	
+		if (state.inputValues == new Array(state.count)) {
+				return state;
+		}
+		
+		if (props.inputValues !== new Array(state.count) && state.inputValues !== props.inputValues) {
+				state.inputValues = props.inputValues
+			    return state;
+			}
+			
+	    return null;   
+	}
+
 
 	renderRegisterInfo() {}
 
