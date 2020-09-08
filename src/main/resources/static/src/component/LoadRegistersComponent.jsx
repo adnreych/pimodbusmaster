@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import LoadRegistersService from '../service/LoadRegistersService';
 import DeviceService from '../service/DeviceService';
+import GroupRegistersService from '../service/GroupRegistersService';
 import * as Strings from '../helpers/strings';
 
 
@@ -16,7 +17,8 @@ class LoadRegistersComponent extends Component {
 					loading: false,
 					success: null,
 					deviceName: "",
-					deviceAddress: ""
+					deviceAddress: "",
+					groupsToSave: []
 		        }
 
 	  this.handleClick = this.handleClick.bind(this);
@@ -28,26 +30,61 @@ class LoadRegistersComponent extends Component {
 	  this.handleBoxType = this.handleBoxType.bind(this);
 	  this.handleBitType = this.handleBitType.bind(this);
 	  this.handleVarType = this.handleVarType.bind(this);
+	  this.handleRegisterGroup = this.handleRegisterGroup.bind(this);
+	  this.handleXMLData = this.handleXMLData.bind(this);
 
     }
 
 
 	onFileUploadHandler = event=> {
-			const reader = new FileReader();
-			reader.readAsText(event.target.files[0]);
+			const reader = new FileReader()
+			reader.readAsText(event.target.files[0])
 	    	reader.onloadend = evt => {
-		      const readerData = evt.target.result;
-		      const parser = new DOMParser();
-		      const xmlStr = parser.parseFromString(readerData, "text/xml");
-		      var XMLParser = require("react-xml-parser");
+		      const readerData = evt.target.result
+		      const parser = new DOMParser()
+		      const xmlStr = parser.parseFromString(readerData, "text/xml")
+		      var XMLParser = require("react-xml-parser")
 		      var xml = new XMLParser().parseFromString(
 		        new XMLSerializer().serializeToString(xmlStr.documentElement)
-		      );
+		      )
 			  this.setState({ deviceName : xml.attributes.deviceName,
-							  deviceAddress : xml.attributes.deviceAddress});
-			  var xmlData = xml.getElementsByTagName('Register');
-			  var data = [];
-			  console.log("xmlDATA", xmlData);
+							  deviceAddress : xml.attributes.deviceAddress})
+					
+			  var groupRegistersXmlData = xml.getElementsByTagName('RegisterGroup')
+			  var inGroupData = []
+			  if (groupRegistersXmlData.length != 0) {
+			      groupRegistersXmlData.forEach(e => {
+					var xmlDataGroup = e.getElementsByTagName('Register')
+					inGroupData = inGroupData.concat(this.handleXMLData(xmlDataGroup, e.attributes.name))
+					this.setState({ data : inGroupData})
+				})
+				  
+			  }
+			  
+			  var xmlData = xml.getElementsByTagName('Register')
+			  var data = this.handleXMLData(xmlData).concat(inGroupData)
+			  console.log("data", data)
+			  
+			
+			this.setState({ error: [], success: null})
+			//xml validation 
+			data.forEach(element => {
+				if (+element.max < +element.min) this.setState( prevState => ({ error: [...prevState.error, "Ошибка в регистре " + element.address + " Максимальное значение не может быть меньше минимального"]}));
+				if (!Number.isInteger(+element.address)) this.setState( prevState => ({ error: [...prevState.error, "Ошибка в регистре " + element.address + " Адрес должен быть целым числом"]}));
+				if (!Number.isInteger(+element.count)) this.setState( prevState => ({ error: [...prevState.error, "Ошибка в регистре " + element.address + " Количество регистров должно быть целым числом"]}));
+				if (!Number.isInteger(+element.maxValue)) this.setState( prevState => ({ error: [...prevState.error, "Ошибка в регистре " + element.address + " Максимальное значение должно быть целым числом"]}));
+				if (!Number.isInteger(+element.minValue)) this.setState( prevState => ({ error: [...prevState.error, "Ошибка в регистре " + element.address + " Минимальное значение должно быть целым числом"]}));
+				if ((element.isWrite != "false" && element.isWrite != "true") || (element.isRead != "false" && element.isRead != "true"))
+					this.setState( prevState => ({ error: [...prevState.error, "Ошибка в регистре " + element.address + " Допустимые значения чтения и записи: true, false"]}));
+			});
+			
+			if (this.state.error.length == 0) this.setState({ error: null})
+			this.setState({ data : data})
+    	};
+	}
+	
+	handleXMLData(xmlData, registerGroup) {
+		var data = [];
 			  xmlData.forEach(element => {
 				var dataElement = {};
 				element.children.forEach(e =>  {				
@@ -90,24 +127,15 @@ class LoadRegistersComponent extends Component {
 							break;
 					}
 				})
-				data.push(dataElement)
+				if (registerGroup != undefined) dataElement.registerGroup = registerGroup
+				console.log("FILTERRES", this.state.data.find(e => { return e.address === dataElement.address}))
+				if (this.state.data.find(e => { return e.address === dataElement.address}) == undefined) data.push(dataElement)			
 			})
-			
-			this.setState({ error: [], success: null});
-			//xml validation 
-			data.forEach(element => {
-				if (+element.max < +element.min) this.setState( prevState => ({ error: [...prevState.error, "Ошибка в регистре " + element.address + " Максимальное значение не может быть меньше минимального"]}));
-				if (!Number.isInteger(+element.address)) this.setState( prevState => ({ error: [...prevState.error, "Ошибка в регистре " + element.address + " Адрес должен быть целым числом"]}));
-				if (!Number.isInteger(+element.count)) this.setState( prevState => ({ error: [...prevState.error, "Ошибка в регистре " + element.address + " Количество регистров должно быть целым числом"]}));
-				if (!Number.isInteger(+element.maxValue)) this.setState( prevState => ({ error: [...prevState.error, "Ошибка в регистре " + element.address + " Максимальное значение должно быть целым числом"]}));
-				if (!Number.isInteger(+element.minValue)) this.setState( prevState => ({ error: [...prevState.error, "Ошибка в регистре " + element.address + " Минимальное значение должно быть целым числом"]}));
-				if ((element.isWrite != "false" && element.isWrite != "true") || (element.isRead != "false" && element.isRead != "true"))
-					this.setState( prevState => ({ error: [...prevState.error, "Ошибка в регистре " + element.address + " Допустимые значения чтения и записи: true, false"]}));
-			});
-			
-			if (this.state.error.length == 0) this.setState({ error: null});
-			this.setState({ data : data});
-    	};
+			return data
+	}
+	
+	handleRegisterGroup() {
+		
 	}
 	
 	handleModbusTypeLegend(legend, value) {

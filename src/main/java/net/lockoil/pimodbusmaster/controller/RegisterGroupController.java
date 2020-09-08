@@ -1,5 +1,7 @@
 package net.lockoil.pimodbusmaster.controller;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -22,17 +24,23 @@ public class RegisterGroupController {
 	@Autowired
 	RegisterGroupService registerGroupService;
 	
-	@ApiOperation(value = "Добавляет новую группу регистров", response = Long.class)
+	@ApiOperation(value = "Добавляет новую группу регистров", response = RegisterGroup.class, responseContainer = "List")
 	@PostMapping("/api/registerGroup/save/")
-	  public Long saveDevice(@RequestBody RegisterGroup registerGroup) {	
+	  public List<RegisterGroup> saveAll(@RequestBody List<RegisterGroup> registerGroup) {	
 		log.debug("SaveRegGroup " + registerGroup.toString());
-		return registerGroupService.save(registerGroup).getId();
+		return registerGroupService.saveAll(registerGroup);
 	  }
 	
 	@ApiOperation(value = "Получить группу регистров по его id", response = RegisterGroup.class)
 	@GetMapping("/api/registerGroup/{id}")
 	  public RegisterGroup getRegisterGroup(@PathVariable(value="id") Long id) {		
 		return registerGroupService.findById(id);
+	  }
+	
+	@ApiOperation(value = "Получить список всех групп регистров", response = RegisterGroup.class, responseContainer = "List")
+	@GetMapping("/api/registerGroup/")
+	  public List<RegisterGroup> getAllRegisterGroup() {		
+		return registerGroupService.findAll();
 	  }
 
 }
