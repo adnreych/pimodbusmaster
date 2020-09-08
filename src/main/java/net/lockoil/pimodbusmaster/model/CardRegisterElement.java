@@ -101,9 +101,9 @@ public class CardRegisterElement {
 	private Long maxValue;
 	
 	/**
-	 * Название группы, в которой состоит регистр
+	 * Название вкладки, в которой состоит регистр
 	 */
-	@Column(name = "register_group")
+	@Column(name = "register_tab")
 	private String group;
 	
 	/**
@@ -111,5 +111,12 @@ public class CardRegisterElement {
 	 */
 	@Column(name = "legends", columnDefinition="json")
 	private String legends;
+	
+	/**
+	 * Группа регистров
+	 */
+	@ManyToOne
+	@JoinColumn(name = "register_group_id")
+	private RegisterGroup registerGroup;
 
 }

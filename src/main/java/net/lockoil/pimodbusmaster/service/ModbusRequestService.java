@@ -56,7 +56,7 @@ public class ModbusRequestService {
 			if (!modbusReadRequest.isCSD()) {
 				modbusMaster = ModbusMasterFactory.createModbusMasterRTU(DeviceConfig.getByRPiConnection());
 				modbusMaster.connect();
-				
+
 				int[] registerValues = modbusMaster.readHoldingRegisters(slave, address, count);
 				
 				int iterAddress = address;

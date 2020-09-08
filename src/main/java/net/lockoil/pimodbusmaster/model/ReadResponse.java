@@ -2,10 +2,19 @@ package net.lockoil.pimodbusmaster.model;
 
 import lombok.Data;
 
+/**
+ * Ответ на чтение регистров
+ */
 @Data
 public class ReadResponse {
 	
+	/**
+	 * Адрес регистра
+	 */
 	int address;
+	/**
+	 * Значение, связанное с адресом регистра
+	 */
 	int value;
 	
 	public ReadResponse(int address, int value) {
