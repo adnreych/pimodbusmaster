@@ -11,6 +11,8 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -42,6 +44,7 @@ public class RegisterGroup {
 	 * Регистры {@link CardRegisterElement} входящие в группу
 	 */
 	@OneToMany(mappedBy = "registerGroup", cascade = CascadeType.ALL)
+	@JsonIgnore
 	private Set<CardRegisterElement> cardRegisterElements;
 
 }

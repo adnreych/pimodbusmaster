@@ -522,12 +522,29 @@ class DeviceComponent extends Component {
 
 	
 	renderTableData(currentGroup) {
-		return this.state.device.filter(e => e.group == currentGroup.name).map((current) => {
-			
+		var groupNameData = []
+		return this.state.device
+		.filter(e => e.group == currentGroup.name)
+		.sort((a, b) => (a.registerGroup != null && b.registerGroup != null) ? a.registerGroup.id - b.registerGroup.id : 0)
+		.map(
+			(current) => {		
 			 const {loading, editedNow} = this.state;
 	         const {id, name, address, count, isRead, isWrite, type, multiplier, suffix, minValue, maxValue, group, legends} = current;
 			 var index = this.state.device.indexOf(this.state.device.filter(e => { return e.address === address })[0])
 			 var boxLegends = {}
+		
+			 var registerGroupName = current.registerGroup == null ? null : current.registerGroup.name
+			 var firstGroupElement = false
+		
+			 if (current.registerGroup == null) {
+				registerGroupName = null
+			 } else {
+				registerGroupName = current.registerGroup.name
+				if (groupNameData.find(e => e == registerGroupName) == undefined) {
+					groupNameData.push(registerGroupName)
+					firstGroupElement = true
+				}
+			 }
 		
 			 if (type=="Multiple") {
 				return(				
@@ -698,6 +715,12 @@ class DeviceComponent extends Component {
 								<td>
 								<button className="btn btn-primary" onClick={() => this.deleteRegister(id, index)}>Удалить</button>
 								</td>
+								
+								{(firstGroupElement) && <td rowspan="0">
+										<button className="btn btn-primary" onClick={() => {}}>Чтение всей группы ({registerGroupName})</button>
+									</td>}
+								
+								
 								          								
 	            </tr>
 						
