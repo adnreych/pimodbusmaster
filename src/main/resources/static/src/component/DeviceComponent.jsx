@@ -57,6 +57,7 @@ class DeviceComponent extends Component {
 		this.handleChangeGroupList = this.handleChangeGroupList.bind(this);
 		this.readCallbackFromMultipleType = this.readCallbackFromMultipleType.bind(this);
 		this.writeCallbackFromMultipleType = this.writeCallbackFromMultipleType.bind(this);
+		this.handleReadGroup = this.handleReadGroup.bind(this);
 
     }
 
@@ -139,6 +140,13 @@ class DeviceComponent extends Component {
 	
 	writeCallbackFromMultipleType = (address, value, index) => {
 		this.handleClickWrite(address, value, index)		
+	}
+	
+	handleReadGroup(groupId) {
+		var targetRegisters = this.state.device
+			.filter(e => e.registerGroup != null && e.registerGroup.id == groupId)
+			.sort((a, b) => a.address - b.address)
+		
 	}
 	
 	
