@@ -34,6 +34,7 @@ public class LoadRegistersResource {
 	private Long minValue;
 	private Long maxValue;
 	private String group;
+	private String registerGroup;
 	@JsonRawValue
 	private String legends;
 

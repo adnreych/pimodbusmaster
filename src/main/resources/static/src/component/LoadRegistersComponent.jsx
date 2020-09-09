@@ -56,14 +56,16 @@ class LoadRegistersComponent extends Component {
 			      groupRegistersXmlData.forEach(e => {
 					var xmlDataGroup = e.getElementsByTagName('Register')
 					inGroupData = inGroupData.concat(this.handleXMLData(xmlDataGroup, e.attributes.name))
-					this.setState({ data : inGroupData})
+					var groupsToSave = this.state.groupsToSave
+					groupsToSave.push(e.attributes.name)
+					this.setState({ data : inGroupData,
+									groupsToSave: groupsToSave})
 				})
 				  
 			  }
 			  
 			  var xmlData = xml.getElementsByTagName('Register')
 			  var data = this.handleXMLData(xmlData).concat(inGroupData)
-			  console.log("data", data)
 			  
 			
 			this.setState({ error: [], success: null})
@@ -128,7 +130,6 @@ class LoadRegistersComponent extends Component {
 					}
 				})
 				if (registerGroup != undefined) dataElement.registerGroup = registerGroup
-				console.log("FILTERRES", this.state.data.find(e => { return e.address === dataElement.address}))
 				if (this.state.data.find(e => { return e.address === dataElement.address}) == undefined) data.push(dataElement)			
 			})
 			return data
@@ -152,9 +153,6 @@ class LoadRegistersComponent extends Component {
 			})
 			var legend = {}
 			legend.isASCII = JSON.parse(legends.attributes.isASCII.toLowerCase());
-			console.log("MULTIPLE legs", legends)
-			console.log("legends.attributes.single", legends.attributes.single)	
-			console.log("legend.isASCII", legend.isASCII)	
 			if (legend.isASCII) {
 				
 			} else {
@@ -166,8 +164,7 @@ class LoadRegistersComponent extends Component {
 				} else if (legend.single == "Box") {
 					legend.legend = this.handleBoxType(legends.children[0])			
 				} 
-			}
-			console.log("MULTIPLE", legend)		
+			}	
 			return legend
 		}
 	}
@@ -286,34 +283,57 @@ class LoadRegistersComponent extends Component {
            	address: this.state.deviceAddress
         }
 
-		DeviceService.save(device)
+		var groupData = []
+		this.state.groupsToSave.forEach(e => groupData.push({name: e}))
+
+		GroupRegistersService.save(groupData)
 			.then(
-	                (request) => {
-						console.log("data before load: ", data);
+				(response) => {
+						console.log("group response data: ", response.data);
 						data.forEach(element => {
-							element.device = request.data;
-							if (element.legends != null) element.legends = JSON.stringify(element.legends);
+							response.data.forEach(e => {
+								if (element.registerGroup == e.name) {
+									element.registerGroup = e.id
+								}
+							})
 						})
-	                    LoadRegistersService.load(data)
-									.then(
-						                () => {
-											data.forEach(element => {
-												element.device = request.data;
-												if (element.legends != null) element.legends = JSON.parse(element.legends);
-											})
-						                    this.setState( prevState => ({ success: ["Данные успешно загружены"], loading: false}));
-						                }
-						            )
-									.catch((err) => {
-										  console.log("ERROR: ", err);
-											this.setState( prevState => ({ error: ["Ошибка загрузки данных"], loading: false}));
-									  });
-						                }
+						console.log("data after group add: ", data);
+						
+						DeviceService.save(device)
+						.then(
+			                (request) => {
+								console.log("data before load: ", data);
+								data.forEach(element => {
+									element.device = request.data;
+									if (element.legends != null) element.legends = JSON.stringify(element.legends);
+								})
+			                    LoadRegistersService.load(data)
+											.then(
+								                () => {
+													data.forEach(element => {
+														element.device = request.data;
+														if (element.legends != null) element.legends = JSON.parse(element.legends);
+													})
+								                    this.setState( prevState => ({ success: ["Данные успешно загружены"], loading: false}));
+								                }
+								            )
+											.catch((err) => {
+												  console.log("ERROR: ", err);
+													this.setState( prevState => ({ error: ["Ошибка загрузки данных"], loading: false}));
+											  });
+								}
             )
 			.catch((err) => {
 				  console.log("ERROR: ", err);
 					this.setState( prevState => ({ error: ["Ошибка загрузки данных"], loading: false}));
 			  });
+						
+				}) 
+			.catch((err) => {
+							  console.log("ERROR: ", err);
+								this.setState( prevState => ({ error: ["Ошибка добавления новой группы"], loading: false}));
+						  });
+				
 		
 	}
 	

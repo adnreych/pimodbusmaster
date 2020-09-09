@@ -17,6 +17,8 @@ import net.lockoil.pimodbusmaster.exceptions.DeviceNotFoundException;
 import net.lockoil.pimodbusmaster.model.CardRegisterElement;
 import net.lockoil.pimodbusmaster.model.Device;
 import net.lockoil.pimodbusmaster.model.LoadRegistersResource;
+import net.lockoil.pimodbusmaster.model.RegisterGroup;
+import net.lockoil.pimodbusmaster.model.RegisterGroupResource;
 import net.lockoil.pimodbusmaster.model.modbustypes.TypeSupportable;
 import net.lockoil.pimodbusmaster.repository.RegistersRepository;
 
@@ -29,6 +31,9 @@ public class RegistersService {
 	
 	@Autowired
 	private DeviceService deviceService;
+	
+	@Autowired
+	private RegisterGroupService registerGroupService;
 	
 	@Autowired
 	public RegistersService(RegistersRepository registerRepository) {
@@ -86,6 +91,15 @@ public class RegistersService {
 		String group = loadRegistersResource.getGroup() != null ? loadRegistersResource.getGroup() : "Без группы";
 		String legends = loadRegistersResource.getLegends() != null ? loadRegistersResource.getLegends() : null;
 		
+		RegisterGroup registerGroup = null;
+		
+		if (loadRegistersResource.getRegisterGroup() != null) {
+			String registerGroupId = loadRegistersResource.getRegisterGroup();
+			registerGroup = registerGroupService.findById(Long.valueOf(registerGroupId));
+		}
+		
+		
+		
 		CardRegisterElement cardRegisterElement = new CardRegisterElement();
 		Device device;
 		
@@ -105,6 +119,7 @@ public class RegistersService {
 			cardRegisterElement.setMultiplier(multiplier);
 			cardRegisterElement.setGroup(group);
 			cardRegisterElement.setLegends(legends);
+			cardRegisterElement.setRegisterGroup(registerGroup);
 		} catch (DeviceNotFoundException e) {
 			e.printStackTrace();
 		} 

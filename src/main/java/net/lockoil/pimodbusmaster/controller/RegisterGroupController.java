@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.ApiOperation;
 import net.lockoil.pimodbusmaster.model.RegisterGroup;
+import net.lockoil.pimodbusmaster.model.RegisterGroupResource;
 import net.lockoil.pimodbusmaster.service.RegisterGroupService;
 
 @CrossOrigin
@@ -24,9 +25,9 @@ public class RegisterGroupController {
 	@Autowired
 	RegisterGroupService registerGroupService;
 	
-	@ApiOperation(value = "Добавляет новую группу регистров", response = RegisterGroup.class, responseContainer = "List")
+	@ApiOperation(value = "Добавляет новую группу регистров", response = RegisterGroupResource.class, responseContainer = "List")
 	@PostMapping("/api/registerGroup/save/")
-	  public List<RegisterGroup> saveAll(@RequestBody List<RegisterGroup> registerGroup) {	
+	  public List<RegisterGroupResource> saveAll(@RequestBody List<RegisterGroup> registerGroup) {	
 		log.debug("SaveRegGroup " + registerGroup.toString());
 		return registerGroupService.saveAll(registerGroup);
 	  }
