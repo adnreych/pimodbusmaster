@@ -1,7 +1,11 @@
 package net.lockoil.pimodbusmaster.service;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +24,8 @@ import net.lockoil.pimodbusmaster.csd.CSDRequestPayloadAssembler;
 import net.lockoil.pimodbusmaster.csd.CSDResponsePayloadParser;
 import net.lockoil.pimodbusmaster.csd.Utils;
 import net.lockoil.pimodbusmaster.deviceconfig.DeviceConfig;
+import net.lockoil.pimodbusmaster.model.AtConnectionRequest;
+import net.lockoil.pimodbusmaster.model.CardRegisterElement;
 import net.lockoil.pimodbusmaster.model.ReadRequest;
 import net.lockoil.pimodbusmaster.model.ReadResponse;
 import net.lockoil.pimodbusmaster.model.WriteRequest;
@@ -40,8 +46,11 @@ public class ModbusRequestService {
 	
 	@Autowired
 	private ATConnect atConnect;
+	
+	@Autowired
+	private RegistersService registersService;
 		
-	public Object read(ReadRequest modbusReadRequest) {
+	public List<Object> read(ReadRequest modbusReadRequest) {
 		AbstractModbusType abstractModbusType;
 		List<ReadResponse> responses = new ArrayList<>();
 		
@@ -82,9 +91,20 @@ public class ModbusRequestService {
 	             }	            	        
 			}
 			
-			abstractModbusType = modbusTypeParser.parseRead(responses, modbusReadRequest);
-    		return abstractModbusType.readValue();
-                      
+			if (modbusReadRequest.isReadGroups()) {
+				Map<ReadRequest, List<ReadResponse>> splitReqResp = handleGroupRead(modbusReadRequest, responses);
+				List<Object> result = new ArrayList<>();
+				System.out.println("splitReqResp" + splitReqResp.toString());
+				for(ReadRequest readRequest : splitReqResp.keySet()) {
+					result.add(modbusTypeParser.parseRead(splitReqResp.get(readRequest), readRequest).readValue());
+				}
+				return result;
+			} else {
+				abstractModbusType = modbusTypeParser.parseRead(responses, modbusReadRequest);
+	    		return Collections.singletonList(abstractModbusType.readValue());
+			}
+			
+			                     
 		} catch (SerialPortException | ModbusIOException e) {
 			log.info(e.getClass().getSimpleName());
 			e.printStackTrace();
@@ -142,4 +162,49 @@ public class ModbusRequestService {
         }
 		return "ERROR";
 	}	
+	
+	private Map<ReadRequest, List<ReadResponse>> handleGroupRead(ReadRequest modbusReadRequest, List<ReadResponse> responses) {
+		Map<ReadRequest, List<ReadResponse>> splitReqResp = new LinkedHashMap<>();
+		int countSumm = modbusReadRequest.getCount();
+		System.out.println("countSumm" + countSumm);
+		while (countSumm > 0) {
+			List<ReadResponse> innerResponses = new ArrayList<>();
+			int address =  modbusReadRequest.getAddress() + (modbusReadRequest.getCount() - countSumm);
+			CardRegisterElement cardRegisterElement = registersService.getRegister(modbusReadRequest.getDeviceId(), address);
+			int slave = modbusReadRequest.getSlave();
+			Long deviceId = modbusReadRequest.getDeviceId();
+			int count = cardRegisterElement.getCount();
+			String type = cardRegisterElement.getType();
+			boolean isCSD = modbusReadRequest.isCSD();
+			AtConnectionRequest atConnectionRequest = isCSD ? modbusReadRequest.getAtConnectionRequest() : null;		
+			ReadRequest innerReadRequest = new ReadRequest(slave, address, deviceId, count, type, isCSD, atConnectionRequest, false);
+			System.out.println("innerReadRequest" + innerReadRequest.toString());
+			switch (innerReadRequest.getType()) {
+			
+			case "Float":
+				innerResponses.add(responses.remove(0));
+				innerResponses.add(responses.remove(0));
+				break;
+				
+			case "Multiple":				
+				List<ReadResponse> list = responses
+						.stream()
+						.limit(innerReadRequest.getCount())
+						.collect(Collectors.toList());
+				innerResponses.addAll(list);
+				responses.removeAll(list);
+				break;
+				
+			default:
+				innerResponses.add(responses.remove(0));
+				break;
+			}
+			System.out.println("innerResponses" + innerReadRequest.toString());
+			splitReqResp.putIfAbsent(innerReadRequest, innerResponses);		
+			
+			countSumm = countSumm - count;	
+		}
+		
+		return splitReqResp;	
+	}
 }

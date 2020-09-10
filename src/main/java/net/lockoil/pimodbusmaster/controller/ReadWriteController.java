@@ -1,5 +1,7 @@
 package net.lockoil.pimodbusmaster.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,7 +25,7 @@ public class ReadWriteController {
   
   @ApiOperation(value = "Чтение регистров устройства")
   @PostMapping("/api/modbusread")
-  public Object modbusRead(@RequestBody ReadRequest modbusReadRequest) {
+  public List<Object> modbusRead(@RequestBody ReadRequest modbusReadRequest) {
 	return modbusRequestService.read(modbusReadRequest);
   }
   

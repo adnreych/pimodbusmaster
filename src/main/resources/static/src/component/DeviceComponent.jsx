@@ -23,6 +23,7 @@ class DeviceComponent extends Component {
 		this.state = {
 					loading: false,
 					device: [],
+					deviceId: null,
 					groups: [],
 					currGroup: 0,
 					name: "",
@@ -68,10 +69,12 @@ class DeviceComponent extends Component {
 		if (this.props.match == undefined) {
 			id = this.props.id
 			this.setState({ CSD : true,
-							ATRequest: this.props.atRequest
+							ATRequest: this.props.atRequest,
+							deviceId: id
 							})
 		} else {
 			id = this.props.match.params.id
+			this.setState({ deviceId: id })
 		}
 		LoadRegistersService.getDevice(id)
 			.then(device => {
@@ -146,7 +149,11 @@ class DeviceComponent extends Component {
 		var targetRegisters = this.state.device
 			.filter(e => e.registerGroup != null && e.registerGroup.id == groupId)
 			.sort((a, b) => a.address - b.address)
-		
+		console.log("targetRegisters", targetRegisters)
+		if (targetRegisters.length != 0) {
+			var index = this.state.device.indexOf(targetRegisters[0])
+			this.handleClickRead(targetRegisters[0].address, targetRegisters.length, index, true)
+		}	
 	}
 	
 	
@@ -162,17 +169,19 @@ class DeviceComponent extends Component {
 		this.setState({ groups: groups })
 	}
 
-	handleClickRead = (address, count, index) => {    
+	handleClickRead = (address, count, index, readGroups) => {    
 		
 		this.setState({ loading: true })
 		
 		let readRequest = {
             slave: this.state.address,
            	address: address,
+			deviceId: this.state.deviceId,
 			count: count,
 			type: this.state.device[index].type,
 			isCSD: this.state.CSD,
-			atConnectionRequest: this.state.ATRequest
+			atConnectionRequest: this.state.ATRequest,
+			readGroups: readGroups == undefined ? false : readGroups,	
         }
 
 		console.log("readRequest: ", readRequest);
@@ -180,18 +189,19 @@ class DeviceComponent extends Component {
 		ModbusService.modbusRead(readRequest)
 			.then((response) => {
 				var inputValues = this.state.inputValues;
-				inputValues[index] = response.data;
 				if (response.data == null) {
 					this.setState({ loading: false,
 									  error: "Не удалось прочитать значения регистров" })
+					}
+				if (!readGroups) {
+					inputValues[index] = response.data[0];
+				} else {
+					response.data.forEach((e, i) => {inputValues[index + i] = e})
 				}
-				else {
-					inputValues[index] = response.data;
-					this.setState({
-						loading: false,
-						error: null,
-						inputValues: inputValues});
-				}
+				this.setState({
+							loading: false,
+							error: null,
+							inputValues: inputValues});
 				console.log("inputValues: ", this.state.inputValues);
 			})
 			.catch((err) => {
@@ -725,7 +735,7 @@ class DeviceComponent extends Component {
 								</td>
 								
 								{(firstGroupElement) && <td rowspan="0">
-										<button className="btn btn-primary" onClick={() => {}}>Чтение всей группы ({registerGroupName})</button>
+										<button className="btn btn-primary" onClick={() => this.handleReadGroup(current.registerGroup.id)}>Чтение всей группы ({registerGroupName})</button>
 									</td>}
 								
 								

@@ -69,9 +69,7 @@ public class RegistersService {
 	}
 	
 	@Transactional
-	public CardRegisterElement getRegister(Integer deviceAddress, Integer registerAddress) {
-		Device device = deviceService.findByAddress(deviceAddress);
-		Long deviceId = device.getId();
+	public CardRegisterElement getRegister(Long deviceId, Integer registerAddress) {
 		return Optional.of(registerRepository.findByAddressAndDeviceId(registerAddress, deviceId).get(0)).get();
 	}
 	

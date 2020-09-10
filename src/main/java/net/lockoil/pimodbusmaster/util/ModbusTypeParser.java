@@ -78,7 +78,7 @@ public class ModbusTypeParser {
 	private MultipleTypeModbus getMultipleType(List<ReadResponse> readResponse, ReadRequest readRequest) {
 		ObjectMapper objectMapper = new ObjectMapper();
 		JsonNode jsonNode;
-		CardRegisterElement cardRegisterElement = registersService.getRegister(readRequest.getSlave(), readRequest.getAddress());
+		CardRegisterElement cardRegisterElement = registersService.getRegister(readRequest.getDeviceId(), readRequest.getAddress());
 		List<Integer> values = readResponse
 									.stream()
 									.map(e -> e.getValue())
@@ -104,7 +104,7 @@ public class ModbusTypeParser {
 	}
 	
 	private BoxTypeModbus getBoxType(ReadResponse readResponse, ReadRequest readRequest) {	
-		CardRegisterElement cardRegisterElement = registersService.getRegister(readRequest.getSlave(), readRequest.getAddress());
+		CardRegisterElement cardRegisterElement = registersService.getRegister(readRequest.getDeviceId(), readRequest.getAddress());
 		Pair<AbstractModbusType, AbstractModbusType> boxTypeLegends;
 		
 		boxTypeLegends = parseBoxPair(cardRegisterElement.getLegends(), readResponse);	
@@ -173,7 +173,7 @@ public class ModbusTypeParser {
 	}
 	
 	private BitTypeModbus getBitType(ReadResponse readResponse, ReadRequest readRequest) {
-		CardRegisterElement cardRegisterElement = registersService.getRegister(readRequest.getSlave(), readRequest.getAddress());
+		CardRegisterElement cardRegisterElement = registersService.getRegister(readRequest.getDeviceId(), readRequest.getAddress());
 		String legendString = cardRegisterElement.getLegends();
 		ObjectMapper objectMapper = new ObjectMapper();
 	
@@ -189,7 +189,7 @@ public class ModbusTypeParser {
 	}
 	
 	private VarTypeModbus getVarType(ReadResponse readResponse, ReadRequest readRequest) {
-		CardRegisterElement cardRegisterElement = registersService.getRegister(readRequest.getSlave(), readRequest.getAddress());
+		CardRegisterElement cardRegisterElement = registersService.getRegister(readRequest.getDeviceId(), readRequest.getAddress());
 		String legendString = cardRegisterElement.getLegends();
 		ObjectMapper objectMapper = new ObjectMapper();
 	
