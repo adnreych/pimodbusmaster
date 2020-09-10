@@ -13,6 +13,7 @@ import 'react-confirm-alert/src/react-confirm-alert.css';
 import Option from 'muicss/lib/react/option';
 import Select from 'muicss/lib/react/select';
 import _pull from 'lodash/pull';
+import _times from 'lodash/times';
 
 
 class DeviceComponent extends Component {
@@ -59,6 +60,7 @@ class DeviceComponent extends Component {
 		this.readCallbackFromMultipleType = this.readCallbackFromMultipleType.bind(this);
 		this.writeCallbackFromMultipleType = this.writeCallbackFromMultipleType.bind(this);
 		this.handleReadGroup = this.handleReadGroup.bind(this);
+		this.handleWriteGroup = this.handleWriteGroup.bind(this);
 
     }
 
@@ -153,6 +155,24 @@ class DeviceComponent extends Component {
 		if (targetRegisters.length != 0) {
 			var index = this.state.device.indexOf(targetRegisters[0])
 			this.handleClickRead(targetRegisters[0].address, targetRegisters.length, index, true)
+		}	
+	}
+	
+	handleWriteGroup(groupId) {
+		var values = []
+		var targetRegisters = this.state.device
+			.filter(e => e.registerGroup != null && e.registerGroup.id == groupId)
+			.sort((a, b) => a.address - b.address)
+				
+		if (targetRegisters.length != 0) {
+			var index = this.state.device.indexOf(targetRegisters[0])
+			_times(targetRegisters.length, (i) => values.push(this.state.inputValues[index + i]))
+			console.log("values", values)
+			if (values.length != targetRegisters.length) {
+				this.setState({ error: "Заполните все значения для записи группы регистров!" })
+			} else {
+				this.handleClickWrite(targetRegisters[0].address, values, index)
+			}		
 		}	
 	}
 	
@@ -736,6 +756,7 @@ class DeviceComponent extends Component {
 								
 								{(firstGroupElement) && <td rowspan="0">
 										<button className="btn btn-primary" onClick={() => this.handleReadGroup(current.registerGroup.id)}>Чтение всей группы ({registerGroupName})</button>
+										<button className="btn btn-primary" onClick={() => this.handleWriteGroup(current.registerGroup.id)}>Запись всей группы ({registerGroupName})</button>
 									</td>}
 								
 								
