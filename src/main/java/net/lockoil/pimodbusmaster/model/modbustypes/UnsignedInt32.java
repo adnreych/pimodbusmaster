@@ -2,6 +2,9 @@ package net.lockoil.pimodbusmaster.model.modbustypes;
 
 import org.springframework.data.util.Pair;
 
+/**
+ * Беззнаковое целое, занимает 2 регистра
+ */
 public class UnsignedInt32 implements AbstractModbusType<Integer, Integer> {
 	
 	private Pair<Integer, Integer> value;
