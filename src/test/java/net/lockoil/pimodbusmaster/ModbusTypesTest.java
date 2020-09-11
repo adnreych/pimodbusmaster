@@ -27,6 +27,7 @@ public class ModbusTypesTest {
 	MultipleTypeModbus multipleTypeModbusOneArg;
 	MultipleTypeModbus multipleTypeModbusThreeArgs;
 	MultipleTypeModbus multipleTypeModbusThreeArgsFloat;
+	CommaFloat commaFloat;
 	
 	@Before
 	public void setValues() {
@@ -101,6 +102,8 @@ public class ModbusTypesTest {
 		single = "Float";
 		hexStringArrayList = Arrays.asList(76, 90, 113, 84); 
 		multipleTypeModbusThreeArgsFloat = new MultipleTypeModbus(hexStringArrayList, single, "");
+		
+		commaFloat = new CommaFloat(Arrays.asList(34, 54, 1, 45, 45, 44), 2);
 	}
 	
 	@Test
@@ -192,6 +195,12 @@ public class ModbusTypesTest {
 	@Test 
 	public void testMultipleThreeArgsFloatRead() {
 		assertEquals(Arrays.asList(6.97962, 1.03775), multipleTypeModbusThreeArgsFloat.readValue());
+	}
+	
+	@Test 
+	public void testCommaFloatRead() {
+		assertEquals(new Double(3454014545.44), commaFloat.readValue());
+		
 	}
 
 	
