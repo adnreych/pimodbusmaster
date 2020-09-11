@@ -26,6 +26,7 @@ import net.lockoil.pimodbusmaster.model.modbustypes.FloatModbus;
 import net.lockoil.pimodbusmaster.model.modbustypes.MultipleTypeModbus;
 import net.lockoil.pimodbusmaster.model.modbustypes.SignedInt;
 import net.lockoil.pimodbusmaster.model.modbustypes.UnsignedInt;
+import net.lockoil.pimodbusmaster.model.modbustypes.UnsignedInt32;
 import net.lockoil.pimodbusmaster.model.modbustypes.VarTypeLegend;
 import net.lockoil.pimodbusmaster.model.modbustypes.VarTypeModbus;
 import net.lockoil.pimodbusmaster.service.RegistersService;
@@ -44,13 +45,19 @@ public class ModbusTypeParser {
 	}
 	
 	/**
-	 * Возвращает конкретную реализацию AbstractModbusType
+	 * Возвращает конкретную реализацию AbstractModbusType.
+	 * Добавляя новый тип сюда, его же нужно добавить в метод 
+	 * {@link net.lockoil.pimodbusmaster.service.ModbusRequestService#handleGroupRead(ReadRequest, List<ReadResponse>) handleGroupRead}
+	 * если это необходимо
 	 */
 	public AbstractModbusType parseRead(List<ReadResponse> response, ReadRequest request) throws IllegalModbusTypeException {
 		
 		switch (request.getType()) {
 		case "UnsignedInt":
 			return new UnsignedInt(response.get(0).getValue());
+			
+		case "UnsignedInt32":
+			return new UnsignedInt32(Pair.of(response.get(0).getValue(), response.get(1).getValue()));
 			
 		case "SignedInt":
 			return new SignedInt(response.get(0).getValue());

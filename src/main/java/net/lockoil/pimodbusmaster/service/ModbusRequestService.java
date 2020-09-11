@@ -186,6 +186,11 @@ public class ModbusRequestService {
 				innerResponses.add(responses.remove(0));
 				break;
 				
+			case "UnsignedInt32":
+				innerResponses.add(responses.remove(0));
+				innerResponses.add(responses.remove(0));
+				break;
+				
 			case "Multiple":				
 				List<ReadResponse> list = responses
 						.stream()
