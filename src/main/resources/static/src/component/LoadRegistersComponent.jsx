@@ -32,6 +32,7 @@ class LoadRegistersComponent extends Component {
 	  this.handleVarType = this.handleVarType.bind(this);
 	  this.handleRegisterGroup = this.handleRegisterGroup.bind(this);
 	  this.handleXMLData = this.handleXMLData.bind(this);
+	  this.handleCommaFloatType = this.handleCommaFloatType.bind(this);
 
     }
 
@@ -109,7 +110,7 @@ class LoadRegistersComponent extends Component {
 						case "Type":
 							dataElement.type = e.value; 
 							// обработка нестандартных типов
-							if (e.value == "Bit" || e.value == "Variable" || e.value == "Box" || e.value == "Multiple") 
+							if (e.value == "Bit" || e.value == "Variable" || e.value == "Box" || e.value == "Multiple" || e.value == "CommaFloat") 
 								dataElement.legends = this.handleModbusTypeLegend(element, e.value);
 							break;
 						case "Multiplier":
@@ -147,6 +148,8 @@ class LoadRegistersComponent extends Component {
 			return this.handleBitType(legend)
 		} else if (value == "Box") {
 			return this.handleBoxType(legend)			
+		} else if (value == "CommaFloat") {
+			return this.handleCommaFloatType(legend)
 		} else if (value == "Multiple") {		
 			legends = legend.children.find(obj => {
 			  return obj.name == "Multiple"
@@ -167,6 +170,11 @@ class LoadRegistersComponent extends Component {
 			}	
 			return legend
 		}
+	}
+	
+	handleCommaFloatType(legend, fromMultiple) {
+		var legends = {}
+		
 	}
 	
 	handleBoxType(legend, fromMultiple) {

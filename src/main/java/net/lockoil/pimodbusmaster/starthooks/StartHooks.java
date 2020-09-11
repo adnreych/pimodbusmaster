@@ -37,6 +37,7 @@ public class StartHooks implements CommandLineRunner {
 						  	        		.filter(e -> !currentRoles.contains(e))
 						  	        		.collect(Collectors.toList());
   	        
+  	        // заполняем роли, если они не заполнены
   	        if (!newRolesNames.isEmpty()) {
   	        	newRolesNames
 	        		.stream()

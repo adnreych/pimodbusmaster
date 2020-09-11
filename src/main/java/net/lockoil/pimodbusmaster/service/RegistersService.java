@@ -22,6 +22,9 @@ import net.lockoil.pimodbusmaster.model.RegisterGroupResource;
 import net.lockoil.pimodbusmaster.model.modbustypes.TypeSupportable;
 import net.lockoil.pimodbusmaster.repository.RegistersRepository;
 
+/**
+ * Сервис для работы с сущностями регистров
+ */
 @Service
 public class RegistersService {
 	

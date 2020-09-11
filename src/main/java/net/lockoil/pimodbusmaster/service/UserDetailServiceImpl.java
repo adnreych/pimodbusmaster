@@ -21,7 +21,7 @@ import net.lockoil.pimodbusmaster.repository.UserRepository;
 
 
 /**
- * This class is used by spring security to authenticate and authorize user
+ * Сервис для работы с сущностями пользователей
  **/
 @Service
 public class UserDetailServiceImpl implements UserDetailsService  {

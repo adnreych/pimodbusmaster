@@ -9,6 +9,9 @@ import com.google.common.collect.Lists;
 import net.lockoil.pimodbusmaster.model.Role;
 import net.lockoil.pimodbusmaster.repository.RoleRepository;
 
+/**
+ * Сервис для работы с ролями пользователей
+ */
 @Service
 public class RolesService {
 	

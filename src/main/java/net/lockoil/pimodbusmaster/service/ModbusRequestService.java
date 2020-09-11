@@ -32,7 +32,9 @@ import net.lockoil.pimodbusmaster.model.WriteRequest;
 import net.lockoil.pimodbusmaster.model.modbustypes.AbstractModbusType;
 import net.lockoil.pimodbusmaster.util.ModbusTypeParser;
 
-
+/**
+ * Сервис чтения и записи регистров
+ */
 @Service
 public class ModbusRequestService {
 	
@@ -50,6 +52,10 @@ public class ModbusRequestService {
 	@Autowired
 	private RegistersService registersService;
 		
+	/**
+	 * Чтение регистров
+	 * @return Список считанных значений
+	 */
 	public List<Object> read(ReadRequest modbusReadRequest) {
 		AbstractModbusType abstractModbusType;
 		List<ReadResponse> responses = new ArrayList<>();
@@ -126,6 +132,9 @@ public class ModbusRequestService {
 		return null;
 	}
 	
+	/**
+	 * Запись регистров
+	 */
 	public String write(WriteRequest modbusWriteRequest) {
 
 		int slave = modbusWriteRequest.getSlave(); 

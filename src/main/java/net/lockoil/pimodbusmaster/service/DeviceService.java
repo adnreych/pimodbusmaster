@@ -15,6 +15,9 @@ import net.lockoil.pimodbusmaster.model.AtConnectionRequest;
 import net.lockoil.pimodbusmaster.model.Device;
 import net.lockoil.pimodbusmaster.repository.DeviceRepository;
 
+/**
+ * Сервис добавленных в приложение устройств
+ */
 @Service
 public class DeviceService {
 	
