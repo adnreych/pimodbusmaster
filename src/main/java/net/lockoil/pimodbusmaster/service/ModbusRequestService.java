@@ -182,16 +182,13 @@ public class ModbusRequestService {
 			switch (innerReadRequest.getType()) {
 			
 			case "Float":
-				innerResponses.add(responses.remove(0));
-				innerResponses.add(responses.remove(0));
-				break;
-				
 			case "UnsignedInt32":
 				innerResponses.add(responses.remove(0));
 				innerResponses.add(responses.remove(0));
 				break;
 				
-			case "Multiple":				
+			case "Multiple":
+			case "CommaFloat":
 				List<ReadResponse> list = responses
 						.stream()
 						.limit(innerReadRequest.getCount())

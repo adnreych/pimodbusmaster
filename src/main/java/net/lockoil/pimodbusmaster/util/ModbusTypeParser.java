@@ -22,6 +22,7 @@ import net.lockoil.pimodbusmaster.model.modbustypes.AbstractModbusType;
 import net.lockoil.pimodbusmaster.model.modbustypes.BitTypeLegend;
 import net.lockoil.pimodbusmaster.model.modbustypes.BitTypeModbus;
 import net.lockoil.pimodbusmaster.model.modbustypes.BoxTypeModbus;
+import net.lockoil.pimodbusmaster.model.modbustypes.CommaFloat;
 import net.lockoil.pimodbusmaster.model.modbustypes.FloatModbus;
 import net.lockoil.pimodbusmaster.model.modbustypes.MultipleTypeModbus;
 import net.lockoil.pimodbusmaster.model.modbustypes.SignedInt;
@@ -64,6 +65,9 @@ public class ModbusTypeParser {
 			
 		case "Float":
 			return new FloatModbus(Pair.of(response.get(0).getValue(), response.get(1).getValue()));
+			
+		case "CommaFloat":
+			return getCommaFloatType(response, request);
 	
 		case "Bit":
 			return getBitType(response.get(0), request);
@@ -80,6 +84,29 @@ public class ModbusTypeParser {
 		default:
 			throw new IllegalModbusTypeException();
 		}					
+	}
+	
+	private CommaFloat getCommaFloatType(List<ReadResponse> readResponse, ReadRequest readRequest) {
+		ObjectMapper objectMapper = new ObjectMapper();
+		JsonNode jsonNode;
+		CardRegisterElement cardRegisterElement = registersService.getRegister(readRequest.getDeviceId(), readRequest.getAddress());
+		List<Integer> values = readResponse
+				.stream()
+				.map(e -> e.getValue())
+				.collect(Collectors.toList());
+		try {
+			jsonNode = objectMapper.readTree(cardRegisterElement.getLegends());
+			String signsCountStr = jsonNode.has("signsCount") ? jsonNode.get("signsCount").asText() : "2";
+			Integer signsCount = Integer.valueOf(signsCountStr);
+			
+			return new CommaFloat(values, signsCount);
+			
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 	
 	private MultipleTypeModbus getMultipleType(List<ReadResponse> readResponse, ReadRequest readRequest) {

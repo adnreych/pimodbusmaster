@@ -45,7 +45,6 @@ public class ReadRequest {
 	 */
 	AtConnectionRequest atConnectionRequest;
 	
-	
 	/**
 	 * true - если читается группа регистров
 	 */
