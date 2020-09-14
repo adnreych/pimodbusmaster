@@ -262,6 +262,9 @@ class DeviceComponent extends Component {
 			if (this.state.device[index].legends.first == "Bit") {
 				var binaryStr = this.prepareBitValueToWrite(this.state.device[index].legends.first, value.first)
 				first = parseInt(binaryStr, 2)
+			} else if (writeRequest.type == "CommaFloat") {
+				var values = this.prepareCommaFloatValueToWrite(value.first)
+				first = values
 			} else {
 				first = value.first
 			}
@@ -269,7 +272,10 @@ class DeviceComponent extends Component {
 			if (this.state.device[index].legends.second == "Bit") {
 				var binaryStr = this.prepareBitValueToWrite(this.state.device[index].legends.second, value.second)
 				second = parseInt(binaryStr, 2)
-			} else {
+			} else if (writeRequest.type == "CommaFloat") {
+				var values = this.prepareCommaFloatValueToWrite(value.second)
+				second = values
+			}  else {
 				second = value.second
 			}
 			
