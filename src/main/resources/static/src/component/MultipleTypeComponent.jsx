@@ -46,10 +46,34 @@ class MultipleTypeComponent extends Component {
 	render() {	
 		console.log("MULTIPLESTATE", this.state)
 		if (this.state.isASCII) {
+			const {id, name, count, address, isRead, isWrite, multiplier, suffix, minValue, maxValue} = this.state.registerInfo;
 			return(
-				<div>
-					{this.renderRegisterInfo(0)}
-				</div>
+				<tr>
+					<td>{name}</td>
+			               <td>{address}</td>	
+							<td>{count}</td>
+							<td>{String(isRead)}</td>
+							<td>{String(isWrite)}</td>	
+							<td>Строка</td>	
+							<td></td>	
+												
+							<td>
+									<input type="text" placeholder="Значение" 
+									value={this.state.inputValues} 
+									onChange={(event) => this.handleChange(event, this.state.index)} />
+							</td>	
+							<td></td>	
+							<td>
+								<button className="btn btn-primary" 
+									onClick={() => this.props.readClick(address, this.state.count, this.state.index)} 
+									disabled={!isRead}>Чтение</button>
+								<button className="btn btn-primary" 
+									onClick={() => this.props.writeClick(address, this.state.inputValues, this.state.index)} 
+									disabled={!isWrite}>Запись</button></td>	
+							<td>
+								<button className="btn btn-primary" 
+									onClick={() => this.props.deleteClick(id, this.state.index)}>Удалить</button></td>	
+				</tr>
 			)
 		} else {
 			return _times(this.state.count, (index) => {

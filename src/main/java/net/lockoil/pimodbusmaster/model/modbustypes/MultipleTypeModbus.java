@@ -25,12 +25,12 @@ public class MultipleTypeModbus implements AbstractModbusType<Integer, List<Obje
 		this.value = value;
 		this.single = single;
 		this.legend = legend;
-		isASCII = true;
+		isASCII = false;
 	}
 	
 	public MultipleTypeModbus(List<Integer> value) {
 		this.value = value;
-		isASCII = false;
+		isASCII = true;
 	}
 	
 	private List<Integer> value;
@@ -55,7 +55,7 @@ public class MultipleTypeModbus implements AbstractModbusType<Integer, List<Obje
 
 	@Override
 	public List<Object> readValue() {
-		if (isASCII) {
+		if (!isASCII) {
 			switch (single) {
 			case "UnsignedInt":
 				return value

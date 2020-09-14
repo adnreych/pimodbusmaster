@@ -320,12 +320,8 @@ class DeviceComponent extends Component {
 	
 	prepareCommaFloatValueToWrite(currVal) {
 		var result = []
-		console.log("currVal0: ", currVal)
 		var currValStr = String(currVal)
-		console.log("currVal1: ", currValStr)
 		currValStr = currValStr.replace("\.", "")
-		console.log("currVal2: ", currValStr)
-		console.log("currValStr.length % 4: ", currValStr.length % 4)
 		switch (currValStr.length % 4) {
 			case 0:
 				currValStr = currValStr
@@ -343,12 +339,10 @@ class DeviceComponent extends Component {
 				currValStr = currValStr
 				break
 		}
-		console.log("currVal3: ", currValStr)
 		while (currValStr.length > 0) {
 			var subStr = currValStr.substring(0, 4)
 			result.push(Number(subStr))
 			currValStr = currValStr.replace(subStr, "")
-			console.log("result: ", result)
 		}
 		return result
 	}
