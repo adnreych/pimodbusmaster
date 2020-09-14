@@ -166,6 +166,8 @@ class LoadRegistersComponent extends Component {
 					legend.legend = this.handleBitType(legends.children[0], true)
 				} else if (legend.single == "Box") {
 					legend.legend = this.handleBoxType(legends.children[0])			
+				} else if (legend.single == "CommaFloat") {
+					legend.legend = this.handleCommaFloatType(legends.children[0], true)			
 				} 
 			}	
 			return legend
@@ -173,8 +175,18 @@ class LoadRegistersComponent extends Component {
 	}
 	
 	handleCommaFloatType(legend, fromMultiple) {
+		console.log("COMMAFLOAT LEGEND", legend)
 		var legends = {}
-		
+		if (fromMultiple) {
+			legends = legend.attributes
+		} else {
+			legends = legend.children.find(obj => {
+			  return obj.name == "CommaFloat"
+			})
+			legends = legends.attributes
+		}
+		console.log("COMMAFLOAT LEGENDs", legends)
+		return legends
 	}
 	
 	handleBoxType(legend, fromMultiple) {
@@ -203,7 +215,7 @@ class LoadRegistersComponent extends Component {
 				legends.second = {}
 				legends.second.type = legend.second.attributes.type
 			}
-			return legends;
+			return legends
 	}
 	
 	handleBitType(legend, fromMultiple) {
