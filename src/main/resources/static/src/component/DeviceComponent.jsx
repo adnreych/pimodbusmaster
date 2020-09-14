@@ -55,12 +55,13 @@ class DeviceComponent extends Component {
 		this.renderDescriptionSpecialTypes = this.renderDescriptionSpecialTypes.bind(this);
 		this.callbackFromSpecialType = this.callbackFromSpecialType.bind(this);
 		this.callbackFromBitType = this.callbackFromBitType.bind(this);
-		this.prepareValueToWrite = this.prepareValueToWrite.bind(this);
+		this.prepareBitValueToWrite = this.prepareBitValueToWrite.bind(this);
 		this.handleChangeGroupList = this.handleChangeGroupList.bind(this);
 		this.readCallbackFromMultipleType = this.readCallbackFromMultipleType.bind(this);
 		this.writeCallbackFromMultipleType = this.writeCallbackFromMultipleType.bind(this);
 		this.handleReadGroup = this.handleReadGroup.bind(this);
 		this.handleWriteGroup = this.handleWriteGroup.bind(this);
+		this.prepareCommaFloatValueToWrite = this.prepareCommaFloatValueToWrite.bind(this);
 
     }
 
@@ -247,21 +248,26 @@ class DeviceComponent extends Component {
 		console.log("writeRequest: ", writeRequest);
 		
 		if (writeRequest.type == "Bit") {
-			var binaryStr = prepareValueToWrite(this.state.device[index].legends, value)
+			var binaryStr = this.prepareBitValueToWrite(this.state.device[index].legends, value)
 			writeRequest.values = [parseInt(binaryStr, 2)]
+		}
+		
+		if (writeRequest.type == "CommaFloat") {
+			var values = this.prepareCommaFloatValueToWrite(value)
+			writeRequest.values = values
 		}
 		
 		if (writeRequest.type == "Box") {
 			var first, second
 			if (this.state.device[index].legends.first == "Bit") {
-				var binaryStr = prepareValueToWrite(this.state.device[index].legends.first, value.first)
+				var binaryStr = this.prepareBitValueToWrite(this.state.device[index].legends.first, value.first)
 				first = parseInt(binaryStr, 2)
 			} else {
 				first = value.first
 			}
 			
 			if (this.state.device[index].legends.second == "Bit") {
-				var binaryStr = prepareValueToWrite(this.state.device[index].legends.second, value.second)
+				var binaryStr = this.prepareBitValueToWrite(this.state.device[index].legends.second, value.second)
 				second = parseInt(binaryStr, 2)
 			} else {
 				second = value.second
@@ -290,22 +296,55 @@ class DeviceComponent extends Component {
 				  });
 	}
 	
-	prepareValueToWrite(legends, currVal) {
-		var result = "";
-		
+	prepareBitValueToWrite(legends, currVal) {
+		var result = ""		
 		legends.forEach((e) => {
 			var bitQuantity = e.bitQuantity
 			var i = e.possibleValues.indexOf(currVal[e.description]).toString(2)
 			if (i.length < bitQuantity) {
 				i = i.padStart((bitQuantity - i.length) + i.length, "0")
 			}
-			result = result + String(i);
+			result = result + String(i)
 		})
 		
 		var cv = this.state.currValue.strToWrite = result
 		this.setState({ currValue: cv })
-		return result;
-
+		return result
+	}
+	
+	prepareCommaFloatValueToWrite(currVal) {
+		var result = []
+		console.log("currVal0: ", currVal)
+		var currValStr = String(currVal)
+		console.log("currVal1: ", currValStr)
+		currValStr = currValStr.replace("\.", "")
+		console.log("currVal2: ", currValStr)
+		console.log("currValStr.length % 4: ", currValStr.length % 4)
+		switch (currValStr.length % 4) {
+			case 0:
+				currValStr = currValStr
+				break
+			case 1:
+				currValStr = "000" + currValStr
+				break
+			case 2:
+				currValStr = "00" + currValStr
+				break
+			case 3:
+				currValStr = "0" + currValStr
+				break
+			default:
+				currValStr = currValStr
+				break
+		}
+		console.log("currVal3: ", currValStr)
+		while (currValStr.length > 0) {
+			var subStr = currValStr.substring(0, 4)
+			result.push(Number(subStr))
+			currValStr = currValStr.replace(subStr, "")
+			console.log("result: ", result)
+		}
+		return result
 	}
 	
 	handleConfirmChangeRegister(index) {
@@ -389,6 +428,8 @@ class DeviceComponent extends Component {
 						  <Option value="Bit" label="Bit" />
 						  <Option value="Box" label="Box" />
 						  <Option value="Multiple" label="Multiple" />
+						  <Option value="UnsignedInt32" label="UnsignedInt32" />
+						  <Option value="CommaFloat" label="CommaFloat" />
 				    </Select>
 					</td>
 					<td>
