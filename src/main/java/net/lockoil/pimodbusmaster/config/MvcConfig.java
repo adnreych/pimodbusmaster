@@ -1,6 +1,8 @@
 package net.lockoil.pimodbusmaster.config;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.RedirectViewControllerRegistration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -22,4 +24,10 @@ public class MvcConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/index.html")
           .addResourceLocations("/WEB-INF/classes/static/build/index.html");
     }
+	
+	@Override
+	public void addViewControllers (ViewControllerRegistry registry) {
+	  RedirectViewControllerRegistration r = registry.addRedirectViewController("/loadregisters", "/");
+	}
+	
 }

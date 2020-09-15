@@ -8,8 +8,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import net.lockoil.pimodbusmaster.model.Device;
 
 public interface DeviceRepository extends JpaRepository<Device, Long> {
-	
-	List<Device> findByAddress(Integer address);
-	
-	
+		
 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Route, useRouteMatch, useParams } from 'react-router-dom';
 
 import { PrivateRoute } from '../component/PrivateRoute';
 import { HomePage } from '../component/HomePage';
@@ -11,6 +11,7 @@ import CSDConnectComponent from '../component/CSDConnectComponent';
 
 
 class App extends React.Component {
+	
     render() {
         return (
             <div className="jumbotron">

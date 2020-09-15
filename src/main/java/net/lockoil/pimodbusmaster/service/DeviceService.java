@@ -49,10 +49,6 @@ public class DeviceService {
 		return deviceRepository.findAll();
 	}
 	
-	public Device findByAddress(Integer address) {
-		return Optional.of(deviceRepository.findByAddress(address).get(0)).get();
-	}
-	
 	@Transactional
 	public void delete(Long id) {
 		loadNewCardService.deleteByDeviceId(id);
