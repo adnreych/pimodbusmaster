@@ -45,13 +45,7 @@ class DeviceComponent extends Component {
 
 		this.handleClickRead = this.handleClickRead.bind(this);
 		this.handleClickWrite = this.handleClickWrite.bind(this);
-		this.deleteDevice = this.deleteDevice.bind(this);
-		this.deleteRegister = this.deleteRegister.bind(this);
-		this.handleChangeRegister = this.handleChangeRegister.bind(this);
-		this.handleChangeCurrentRegister = this.handleChangeCurrentRegister.bind(this);
-		this.addRegister = this.addRegister.bind(this);
-		this.handleChangeAddedRegister = this.handleChangeAddedRegister.bind(this);
-		this.handleConfirmChangeRegister = this.handleConfirmChangeRegister.bind(this);
+		this.deleteDevice = this.deleteDevice.bind(this);		
 		this.renderDescriptionSpecialTypes = this.renderDescriptionSpecialTypes.bind(this);
 		this.callbackFromSpecialType = this.callbackFromSpecialType.bind(this);
 		this.callbackFromBitType = this.callbackFromBitType.bind(this);
@@ -347,168 +341,6 @@ class DeviceComponent extends Component {
 		return result
 	}
 	
-	handleConfirmChangeRegister(index) {
-		var editedNow = this.state.editedNow;
-		var editedNowSpecialTypeIndexes = this.state.editedNowSpecialTypeIndexes;
-		_pull(editedNowSpecialTypeIndexes, index);
-		 editedNow[index] = false;
-		 this.setState({ editedNow:  editedNow,
-						 currentChange: "",
-						 editedNowSpecialTypeIndexes: editedNowSpecialTypeIndexes  });
-	}
-	
-	handleChangeRegister(current, index) {  
-		 var editedNowSpecialTypeIndexes = this.state.editedNowSpecialTypeIndexes;
-		 editedNowSpecialTypeIndexes.push(index);
-		 var editedNow = this.state.editedNow;
-		 editedNow[index] = true;
-		 this.setState({ editedNow:  editedNow,
-						 currentChange: current,
-						 editedNowSpecialTypeIndexes: editedNowSpecialTypeIndexes });
-	  }
-
-	addRegister() {
-		this.setState({
-			addedRegister : {
-				device: this.state.device[0].device,
-				name: "",
-				address: "",
-				count: "",
-				isRead: true,
-				isWrite: false,
-				type: "",
-				multiplier: "",
-				suffix: "",
-				mix: 0,
-				max: 0,
-				group: "",
-				legends: null
-			}
-		})
-		let { name, address, count, isRead, isWrite, type, multiplier, suffix, min, max, group } = this.state.addedRegister;
-		confirmAlert({
-		  closeOnClickOutside: true,
-		  customUI: ({ onClose }) => {
-		    return (
-		      <div className='custom-ui'>
-					<tr>
-					<td>
-			        <label>Название</label>
-	                <input type="text" className="form-control" defaultValue={name} onChange={(event) => this.handleChangeAddedRegister(event, "name")}/>
-					</td>
-					<td>
-					<label>Адрес</label>
-	                <input type="text" className="form-control" defaultValue={address} onChange={(event) => this.handleChangeAddedRegister(event, "address")} />
-					</td>
-					<td>
-					<label>Количество</label>
-	                <input type="text" className="form-control" defaultValue={count} onChange={(event) => this.handleChangeAddedRegister(event, "count")} />
-					</td>
-					<td>
-					<label>Чтение</label>
-					<Select name="input" defaultValue={String(isRead)} onChange={(event) => this.handleChangeAddedRegister(event, "isRead")} >
-				          <Option value="true" label="true" />
-						  <Option value="false" label="false" />
-				    </Select>
-					</td>
-					<td>
-	               	<label>Запись</label>
-					<Select name="input" defaultValue={String(isWrite)} onChange={(event) => this.handleChangeAddedRegister(event, "isWrite")} >
-				          <Option value="true" label="true" />
-						  <Option value="false" label="false" />
-				    </Select>
-					</td>
-					<td>
-	                <label>Тип</label>
-					<Select name="input" defaultValue={type} onChange={(event) => this.handleChangeAddedRegister(event, "type")} >
-				          <Option value="SignedInt" label="SignedInt" />
-						  <Option value="UnsignedInt" label="UnsignedInt" />
-						  <Option value="Float" label="Float" />
-						  <Option value="Variable" label="Variable" />
-						  <Option value="Bit" label="Bit" />
-						  <Option value="Box" label="Box" />
-						  <Option value="Multiple" label="Multiple" />
-						  <Option value="UnsignedInt32" label="UnsignedInt32" />
-						  <Option value="CommaFloat" label="CommaFloat" />
-				    </Select>
-					</td>
-					<td>
-					<label>Множитель</label>
-	                <input type="text" className="form-control" defaultValue={multiplier} onChange={(event) => this.handleChangeAddedRegister(event, "multiplier")} />
-					</td>
-					<td>
-					<label>Суффикс</label>
-	                <input type="text" className="form-control" defaultValue={suffix} onChange={(event) => this.handleChangeAddedRegister(event, "suffix")} />
-					</td>
-					<td>
-					<label>Мин</label>
-	                <input type="text" className="form-control" defaultValue={min} onChange={(event) => this.handleChangeAddedRegister(event, "min")} />
-					</td>
-					<td>
-					<label>Макс</label>
-	                <input type="text" className="form-control" defaultValue={max} onChange={(event) => this.handleChangeAddedRegister(event, "max")} />
-					</td>
-					<td>
-					<label>Группа</label>
-	                <input type="text" className="form-control" defaultValue={group} onChange={(event) => this.handleChangeAddedRegister(event, "group")} />
-					</td>
-					<td>
-			        <button 
-					  onClick={() => {
-							onClose();	
-						}}>Отмена</button>
-					</td>
-					<td>
-			        <button
-			          onClick={() => {
-							this.setState({ loading: true });
-								LoadRegistersService.addRegister(this.state.addedRegister)
-									.then((response) => {	
-										var device = this.state.device;
-										var addedRegister = this.state.addedRegister;
-										addedRegister.id = response.data;
-											device.push(addedRegister);
-											this.setState({
-												device: device,
-												loading: false,
-												error: null,
-												success: "Данные обновлены успешно"
-											})	
-									})
-									.catch((err) => {
-											 console.log("ERROR: ", err);
-											  this.setState({ 
-												loading: false, 
-												error: "Ошибка добавления регистра",
-												success: null })
-										  });
-								onClose();		
-							}}>Сохранить</button>
-						</td>
-					</tr>
-		      </div>
-		    );
-		  }
-		});
-	}
-	
-	handleChangeAddedRegister = (event, key) => {
-		var addedRegister = this.state.addedRegister;
-		addedRegister[key] = event.target.value;
-		if (key == "type") {
-			this.setState({ currentLegend: event.target.value });
-		}	
-		this.setState({ addedRegister: addedRegister });	
-	}
-
-	handleChangeCurrentRegister = (event, key) => {
-		var currentChange = this.state.currentChange;
-		currentChange[key] = event.target.value;
-		if (key == "type") {
-			this.setState({ currentLegend: event.target.value });
-		}	
-		this.setState({ currentChange: currentChange });	
-	}
 	
 	handleChange = (event, index) => {    
 		var inputValues = this.state.inputValues;
@@ -516,34 +348,6 @@ class DeviceComponent extends Component {
 		this.setState({inputValues: inputValues});
 	  }
 
-	deleteRegister(id, index) {
-		confirmAlert({
-	      title: 'Подтвердите удаление регистра',
-	      buttons: [
-	        {
-	          label: 'Да',
-	          onClick: () => {
-				LoadRegistersService.deleteRegister(id)
-					.then(() => {
-						var device = this.state.device;
-						device.splice(index, 1);
-						this.setState({ device: device });	
-					})
-					.catch((err) => {
-							  console.log("ERROR: ", err);
-							  this.setState({ 
-								loading: false,
-								error: "Ошибка при удалении регистра" });
-						  });
-					}
-	        },
-	        {
-	          label: 'Нет',
-	          onClick: () => {}
-	        }
-	      ]
-	    });
-	}
 
 	deleteDevice(id) {	
 		confirmAlert({
@@ -611,20 +415,22 @@ class DeviceComponent extends Component {
 	         const {id, name, address, count, isRead, isWrite, type, multiplier, suffix, minValue, maxValue, group, legends} = current;
 			 var index = this.state.device.indexOf(this.state.device.filter(e => { return e.address === address })[0])
 			 var boxLegends = {}
-		
-			 var registerGroupName = current.registerGroup == null ? null : current.registerGroup.name
-			 var firstGroupElement = false
+			 var firstGroupElement = false	
+			 var borderClass = ""
+			 var registerGroupName
 		
 			 if (current.registerGroup == null) {
 				registerGroupName = null
+				borderClass = "borderless-td-val"
 			 } else {
 				registerGroupName = current.registerGroup.name
 				if (groupNameData.find(e => e == registerGroupName) == undefined) {
 					groupNameData.push(registerGroupName)
 					firstGroupElement = true
 				}
+				borderClass = "no-borderless-td-val"			
 			 }
-		
+					 	
 			 if (type=="Multiple") {
 				return(				
 					<MultipleTypeComponent 
@@ -644,8 +450,9 @@ class DeviceComponent extends Component {
 				boxLegends = JSON.parse(legends)
 			 }
 	         return (
+				<>
 	            <tr key={index}>
-	               <td>{name}
+	               <td class={borderClass}>{name}
 						{editedNow[index] &&
 								<div>
 								<br />
@@ -653,83 +460,8 @@ class DeviceComponent extends Component {
 								</div>
 	                        }
 					</td>
-	               <td>{address}
-						{editedNow[index] &&
-								<div>
-								<br />
-	                            <input type="text" className="form-control" defaultValue={address} onChange={(event) => this.handleChangeCurrentRegister(event, "address")}/>
-								</div>
-	                        }
-					</td>
-	               <td>{count}
-						{editedNow[index] &&
-								<div>
-								<br />
-	                            <input type="text" className="form-control" defaultValue={count} onChange={(event) => this.handleChangeCurrentRegister(event, "count")}/>
-								</div>
-	                        }
-					</td>
-	               <td>{String(isRead)}
-						{editedNow[index] &&
-								<div>
-								<br />
-	                            <Select name="input" defaultValue={String(isRead)} onChange={(event) => this.handleChangeCurrentRegister(event, "isRead")} >
-							          <Option value="true" label="true" />
-									  <Option value="false" label="false" />
-							    </Select>
-								</div>
-	                        }
-					</td>
-				   <td>{String(isWrite)}
-						{editedNow[index] &&
-								<div>
-								<br />
-	                            <Select name="input" defaultValue={String(isWrite)} onChange={(event) => this.handleChangeCurrentRegister(event, "isWrite")} >
-							          <Option value="true" label="true" />
-									  <Option value="false" label="false" />
-							    </Select>
-								</div>
-	                        }
-					</td>
-	               <td>{type}
-						{editedNow[index] &&
-								<div>
-								<br />
-								<Select name="input" defaultValue={type} onChange={(event) => this.handleChangeCurrentRegister(event, "type")} >
-							          <Option value="SignedInt" label="SignedInt" />
-									  <Option value="UnsignedInt" label="UnsignedInt" />
-									  <Option value="Float" label="Float" />
-									  <Option value="Variable" label="Variable" />
-									  <Option value="Bit" label="Bit" />
-									  <Option value="Box" label="Box" />
-									  <Option value="Multiple" label="Multiple" />
-							    </Select>
-								</div>
-	                        }
-					</td>
-					<td>{(type=="Variable" || type=="Bit") && <ReactTextCollapse options={Strings.TEXT_COLLAPSE_OPTIONS}>
-							{this.renderDescriptionSpecialTypes(type, legends)}
-						</ReactTextCollapse>}
-						
-						{(type=="Box") && <ReactTextCollapse options={Strings.TEXT_COLLAPSE_OPTIONS}>
-							{(boxLegends.first.type === "Variable" || boxLegends.first.type === "Bit") 
-								&& <>{this.renderDescriptionSpecialTypes(boxLegends.first.type, JSON.stringify(boxLegends.first.content))}</>}
-							{(boxLegends.second.type === "Variable" || boxLegends.second.type === "Bit") 
-								&& <><hr />{this.renderDescriptionSpecialTypes(boxLegends.second.type, JSON.stringify(boxLegends.second.content))}</>}
-						</ReactTextCollapse>}
-						
-						{(type!="Variable" && type!="Bit" && type!="Box" && (multiplier != null)) && <p class="small-text">*{multiplier}</p>}
-						{(type!="Variable" && type!="Bit" && type!="Box" && (suffix != "")) && <p class="small-text">Единица измерения: {suffix}</p>}		
-						{(type!="Variable" && type!="Bit" && type!="Box" && (minValue != null && maxValue != null)) && <p class="small-text">От {minValue} до {maxValue}</p>}
-						
-						{editedNow[index] &&
-								<div>
-								{(type=="Variable" || type=="Bit") && <SpecialModbusTypesComponent targetType={type} index={index} data={legends} callbackFromParent={this.callbackFromSpecialType } />}
-								</div>
-	                        }
-					</td>
 								
-					<td>
+					<td class={borderClass}>
 							{(type=="Bit") && <BitTypeValuesComponent 
 								index={index} 
 								legends={legends} 
@@ -751,59 +483,27 @@ class DeviceComponent extends Component {
 							onChange={(event) => this.handleChange(event, index)} />}
 					</td>
 									
-	                        <td><button className="btn btn-primary" onClick={() => this.handleClickRead(address, count, index)} disabled={!isRead}>Чтение</button>
+	                        <td class={borderClass}><button className="btn btn-primary" onClick={() => this.handleClickRead(address, count, index)} disabled={!isRead}>Чтение</button>
 								<button className="btn btn-primary" onClick={() => this.handleClickWrite(address, this.state.inputValues[index], index)} disabled={!isWrite}>Запись</button>
 								</td>
 	                        {loading &&
 	                            <img src={Strings.LOADING} />
 	                        }
-	
-	                        <td><button className="btn btn-primary" onClick={() => this.handleChangeRegister(current, index)} disabled={editedNow[index]}>Изменить</button>
-								<button className="btn btn-primary" onClick={() => {
-									this.handleConfirmChangeRegister(index)
-									this.setState({ loading: true });			
-									console.log("currentOnChange2: ", current);
-									current.legends = JSON.stringify(current.legends)
-									if (!(type=="Variable" || type=="Bit")) {
-										current.legends = null
-									}
-									LoadRegistersService.changeRegister(current)
-										.then(() => {
-											var device = this.state.device;
-											device[index] = current;
-											this.setState({
-												device: device,
-												loading: false,
-												error: null,
-												success: "Данные обновлены успешно"});
-											
-										})
-										.catch((err) => {
-												  console.log("ERROR: ", err);
-												  this.setState({ 
-													loading: false, 
-													error: "Ошибка изменения карты регистров",
-													success: null })
-											  });
-								}} disabled={!editedNow[index] || (this.state.editedNowSpecialTypeIndexes.includes(index) && (type=="Variable" || type=="Bit"))}>Сохранить</button>
-								<button className="btn btn-primary" onClick={() => {
-									this.handleConfirmChangeRegister(index);
-								}} disabled={!editedNow[index]}>Отменить</button>
-							</td>
 														
-								<td>
-								<button className="btn btn-primary" onClick={() => this.deleteRegister(id, index)}>Удалить</button>
-								</td>
 								
-								{(firstGroupElement) && <td rowspan="0">
-										<button className="btn btn-primary" onClick={() => this.handleReadGroup(current.registerGroup.id)}>Чтение всей группы ({registerGroupName})</button>
-										<button className="btn btn-primary" onClick={() => this.handleWriteGroup(current.registerGroup.id)}>Запись всей группы ({registerGroupName})</button>
-									</td>}
 								
 								
 								          								
 	            </tr>
-						
+				{(firstGroupElement) && <tr align="right">
+											<td></td>
+											<td></td>
+											<td>
+												<button className="btn btn-primary" onClick={() => this.handleReadGroup(current.registerGroup.id)}>Чтение всей группы ({registerGroupName})</button>
+												<button className="btn btn-primary" onClick={() => this.handleWriteGroup(current.registerGroup.id)}>Запись всей группы ({registerGroupName})</button>
+											</td>
+										</tr> }	
+				</>
 	         )
 	      }) 
    }
@@ -825,12 +525,6 @@ class DeviceComponent extends Component {
 						<table border="1">
 								<tr>
 									<th>Название</th>
-								    <th>Адрес</th>
-								    <th>Количество</th>
-								    <th>Чтение</th>
-								    <th>Запись</th>
-									<th>Тип</th>
-									<th>Описание</th>
 							   </tr>
 							<tbody>	
 								{this.renderTableData(this.state.groups[index])}			  												
@@ -865,7 +559,6 @@ class DeviceComponent extends Component {
 					
 				<div className="form-group">
 	                        <button className="btn btn-primary" onClick={() => this.deleteDevice(this.props.match.params.id)} >Удалить устройство</button>
-							<button className="btn btn-primary" onClick={() => this.addRegister()} >Добавить регистр</button>
 	                        {loading &&
 	                            <img src={Strings.LOADING} />
 	                        }

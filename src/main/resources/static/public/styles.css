@@ -13,16 +13,51 @@
     margin-left: 0.0%;
 }
 
+table {
+	border-collapse: collapse;
+}
+
 th, td {
   padding: 5px;
   text-align: left;
 }
 
+.jumbotron {
+    color: #FFFFFF;
+    background-color: #3f4757;
+}
+
 .btn {
   padding: 1px;
   margin: 1px;
+  background-color: #2a3142;
+  color: white;
+}
+
+.btn-primary:hover {
+	padding: 1px;
+  	margin: 1px;
+    background-color: #ed9200;
+    color: white;
+}
+
+select, textarea, input, button {
+	background-color: #2a3142;
 }
 
 .container {
   margin-left: 0px;
+}
+
+.borderless-td-val {
+	border-bottom: 1px solid #3f4757;
+}
+
+.no-borderless-td-val {
+	
+}
+
+.borderless-td {
+	border-left: 1px solid #3f4757;
+	border-right: 1px solid #3f4757;
 }
