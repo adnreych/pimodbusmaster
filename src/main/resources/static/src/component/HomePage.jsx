@@ -12,7 +12,7 @@ class HomePage extends React.Component {
             user: {},
             users: [],
 			devices: [],
-			currDevice: "",
+			currDevice: 0,
 			CSDConnect: false
         };
 
