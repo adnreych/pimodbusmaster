@@ -1,5 +1,6 @@
 package net.lockoil.pimodbusmaster.util;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -102,8 +103,10 @@ public class ModbusTypeParser {
 			return new CommaFloat(values, signsCount);
 			
 		} catch (JsonMappingException e) {
+			log.error(e.getClass().getSimpleName() + " - " + Arrays.asList(e.getStackTrace()).toString()); 
 			e.printStackTrace();
 		} catch (JsonProcessingException e) {
+			log.error(e.getClass().getSimpleName() + " - " + Arrays.asList(e.getStackTrace()).toString()); 
 			e.printStackTrace();
 		}
 		return null;
@@ -129,8 +132,10 @@ public class ModbusTypeParser {
 			}
 			
 		} catch (JsonMappingException e) {
+			log.error(e.getClass().getSimpleName() + " - " + Arrays.asList(e.getStackTrace()).toString()); 
 			e.printStackTrace();
 		} catch (JsonProcessingException e) {
+			log.error(e.getClass().getSimpleName() + " - " + Arrays.asList(e.getStackTrace()).toString()); 
 			e.printStackTrace();
 		}
 		return null;
@@ -165,8 +170,10 @@ public class ModbusTypeParser {
 			
 			return Pair.of(firstInBox, secondInBox);
 		} catch (JsonMappingException e) {
+			log.error(e.getClass().getSimpleName() + " - " + Arrays.asList(e.getStackTrace()).toString()); 
 			e.printStackTrace();
 		} catch (JsonProcessingException e) {
+			log.error(e.getClass().getSimpleName() + " - " + Arrays.asList(e.getStackTrace()).toString()); 
 			e.printStackTrace();
 		}		
 		return null;		
@@ -186,8 +193,10 @@ public class ModbusTypeParser {
 				bitTypeLegends = objectMapper.readValue(pairElement.get("content").toPrettyString(), new TypeReference<List<BitTypeLegend>>(){});
 				return new BitTypeModbus(bitTypeLegends, value);
 			} catch (JsonMappingException e) {
+				log.error(e.getClass().getSimpleName() + " - " + Arrays.asList(e.getStackTrace()).toString()); 
 				e.printStackTrace();
 			} catch (JsonProcessingException e) {
+				log.error(e.getClass().getSimpleName() + " - " + Arrays.asList(e.getStackTrace()).toString()); 
 				e.printStackTrace();
 			}
 			return null;
@@ -196,8 +205,10 @@ public class ModbusTypeParser {
 			try {
 				varTypeLegends = objectMapper.readValue(pairElement.get("content").toPrettyString(), new TypeReference<List<VarTypeLegend>>(){});
 			} catch (JsonMappingException e) {
+				log.error(e.getClass().getSimpleName() + " - " + Arrays.asList(e.getStackTrace()).toString()); 
 				e.printStackTrace();
 			} catch (JsonProcessingException e) {
+				log.error(e.getClass().getSimpleName() + " - " + Arrays.asList(e.getStackTrace()).toString()); 
 				e.printStackTrace();
 			}
 			return null;
@@ -217,6 +228,7 @@ public class ModbusTypeParser {
 			
 			return new BitTypeModbus(bitTypeLegends, readResponse.getValue());
 		} catch (JsonProcessingException e) {
+			log.error(e.getClass().getSimpleName() + " - " + Arrays.asList(e.getStackTrace()).toString()); 
 			e.printStackTrace();
 		}
 		return null;
@@ -233,6 +245,7 @@ public class ModbusTypeParser {
 			
 			return new VarTypeModbus(varTypeLegends, readResponse.getValue());
 		} catch (JsonProcessingException e) {
+			log.error(e.getClass().getSimpleName() + " - " + Arrays.asList(e.getStackTrace()).toString()); 
 			e.printStackTrace();
 		}
 		return null;

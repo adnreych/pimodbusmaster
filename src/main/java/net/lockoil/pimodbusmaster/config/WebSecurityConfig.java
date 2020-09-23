@@ -1,5 +1,7 @@
 package net.lockoil.pimodbusmaster.config;
 
+import java.util.Properties;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -10,6 +12,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.web.servlet.handler.SimpleMappingExceptionResolver;
 
 import net.lockoil.pimodbusmaster.service.UserDetailServiceImpl;
 

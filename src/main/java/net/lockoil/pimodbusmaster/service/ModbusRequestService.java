@@ -1,6 +1,7 @@
 package net.lockoil.pimodbusmaster.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -55,8 +56,9 @@ public class ModbusRequestService {
 	/**
 	 * Чтение регистров
 	 * @return Список считанных значений
+	 * @throws ModbusIOException 
 	 */
-	public List<Object> read(ReadRequest modbusReadRequest) {
+	public List<Object> read(ReadRequest modbusReadRequest) throws ModbusIOException {
 		AbstractModbusType abstractModbusType;
 		List<ReadResponse> responses = new ArrayList<>();
 		
@@ -112,13 +114,14 @@ public class ModbusRequestService {
 			
 			                     
 		} catch (SerialPortException | ModbusIOException e) {
-			log.info(e.getClass().getSimpleName());
+			log.error(e.getClass().getSimpleName() + " - " + Arrays.asList(e.getStackTrace()).toString()); 
 			e.printStackTrace();
+			throw new ModbusIOException("");
 		} catch (RuntimeException e) {
                 throw e;
             } catch (Exception e) {
                 e.printStackTrace();
-                log.info(e.getClass().getSimpleName());
+                log.error(e.getClass().getSimpleName() + " - " + Arrays.asList(e.getStackTrace()).toString()); 
             } finally {
                 try {
                 	if(modbusMaster != null) {
@@ -126,7 +129,7 @@ public class ModbusRequestService {
                 	}
                 } catch (ModbusIOException e) {
                     e.printStackTrace();
-                    log.info(e.getClass().getSimpleName());
+                    log.error(e.getClass().getSimpleName() + " - " + Arrays.asList(e.getStackTrace()).toString()); 
                 }
             }		
 		return null;
@@ -156,7 +159,7 @@ public class ModbusRequestService {
 			}
 			return "OK";
 		} catch (SerialPortException | ModbusIOException | ModbusProtocolException | ModbusNumberException | RuntimeException e) {
-			log.info(e.getClass().getSimpleName());
+			log.error(e.getClass().getSimpleName() + " - " + Arrays.asList(e.getStackTrace()).toString()); 
 			e.printStackTrace();
 		}
 		finally {
@@ -165,8 +168,8 @@ public class ModbusRequestService {
                 		modbusMaster.disconnect();
                 	}
                 } catch (ModbusIOException e) {
-                    e.printStackTrace();
-                    log.info(e.getClass().getSimpleName());              
+                	log.error(e.getClass().getSimpleName() + " - " + Arrays.asList(e.getStackTrace()).toString()); 
+                	e.printStackTrace();
                 }
         }
 		return "ERROR";

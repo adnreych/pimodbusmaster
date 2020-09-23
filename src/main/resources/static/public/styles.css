@@ -22,6 +22,10 @@ th, td {
   text-align: left;
 }
 
+a:hover {
+    color: #ed9200;
+}
+
 .jumbotron {
     color: #FFFFFF;
     background-color: #3f4757;
