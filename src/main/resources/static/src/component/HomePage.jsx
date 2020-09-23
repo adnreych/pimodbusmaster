@@ -60,7 +60,7 @@ class HomePage extends React.Component {
 	  }
 
 	 handleChangeConnectType() {
-        this.setState({CSDConnect: !this.state.handleChange});
+        this.setState({CSDConnect: !this.state.CSDConnect});
     }
 
     render() {
