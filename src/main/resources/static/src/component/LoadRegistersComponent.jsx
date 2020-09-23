@@ -37,7 +37,7 @@ class LoadRegistersComponent extends Component {
     }
 
 
-	onFileUploadHandler = event=> {
+	onFileUploadHandler = event => {
 			const reader = new FileReader()
 			reader.readAsText(event.target.files[0])
 	    	reader.onloadend = evt => {
@@ -71,7 +71,22 @@ class LoadRegistersComponent extends Component {
 			
 			this.setState({ error: [], success: null})
 			//xml validation 
+			var groupValidationMap = {}
 			data.forEach(element => {
+				
+			});
+			console.log("DATA", data)
+			data.forEach((element, index) => {
+				if (element.registerGroup != undefined) {				
+					if((index != data.length -1) && (data[index + 1].registerGroup != undefined) && (element.address + element.count != data[index + 1].address)) {
+						this.setState( prevState => ({ error: [...prevState.error, "Регистры, состоящие в одной группе должны идти друг за другом."]}))
+					} 
+					if (groupValidationMap[element.registerGroup] != undefined && (groupValidationMap[element.registerGroup] != element.group)) {
+						this.setState( prevState => ({ error: [...prevState.error, "Регистры, состоящие в одной группе не должны принадлежать разным вкладкам."]}))
+					} else {
+						groupValidationMap[element.registerGroup] = element.group
+					}				
+				}
 				if (+element.max < +element.min) this.setState( prevState => ({ error: [...prevState.error, "Ошибка в регистре " + element.address + " Максимальное значение не может быть меньше минимального"]}));
 				if (!Number.isInteger(+element.address)) this.setState( prevState => ({ error: [...prevState.error, "Ошибка в регистре " + element.address + " Адрес должен быть целым числом"]}));
 				if (!Number.isInteger(+element.count)) this.setState( prevState => ({ error: [...prevState.error, "Ошибка в регистре " + element.address + " Количество регистров должно быть целым числом"]}));
@@ -96,10 +111,10 @@ class LoadRegistersComponent extends Component {
 							dataElement.name = e.value;
 							break;
 						case "Address":
-							dataElement.address = e.value;
+							dataElement.address = Number(e.value);
 							break;
 						case "Count":
-							dataElement.count = e.value;
+							dataElement.count = Number(e.value);
 							break;
 						case "IsRead":
 							dataElement.isRead = e.value;
@@ -114,19 +129,19 @@ class LoadRegistersComponent extends Component {
 								dataElement.legends = this.handleModbusTypeLegend(element, e.value);
 							break;
 						case "Multiplier":
-							dataElement.multiplier = e.value;
+							dataElement.multiplier = Number(e.value);
 							break;
 						case "Suffix":
 							dataElement.suffix = e.value;
 							break;
 						case "Min":
-							dataElement.minValue = e.value;
+							dataElement.minValue = Number(e.value);
 							break;
 						case "Max":
-							dataElement.maxValue = e.value;
+							dataElement.maxValue = Number(e.value);
 							break;
 						case "Group":
-							dataElement.group = e.value;
+							dataElement.group = e.value == "" ? "Без группы" : e.value;
 							break;
 					}
 				})
@@ -175,7 +190,6 @@ class LoadRegistersComponent extends Component {
 	}
 	
 	handleCommaFloatType(legend, fromMultiple) {
-		console.log("COMMAFLOAT LEGEND", legend)
 		var legends = {}
 		if (fromMultiple) {
 			legends = legend.attributes
@@ -185,7 +199,6 @@ class LoadRegistersComponent extends Component {
 			})
 			legends = legends.attributes
 		}
-		console.log("COMMAFLOAT LEGENDs", legends)
 		return legends
 	}
 	
@@ -371,7 +384,6 @@ class LoadRegistersComponent extends Component {
 	renderTableData() {
       return this.state.data.map((current, index) => {
          const { name, address, count, isRead, isWrite, type, multiplier, suffix, minValue, maxValue, group, legends } = current;
-		console.log("current", current);
 		var legendStrings = []
 		if (type == "Variable") {
 			legends.forEach(e => {
