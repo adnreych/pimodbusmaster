@@ -406,6 +406,8 @@ class DeviceComponent extends Component {
 	
 	renderTableData(currentGroup) {
 		var groupNameData = []
+		var outerGroupElCount = 0;
+		var currGrName = null;
 		return this.state.device
 		.filter(e => e.group == currentGroup.name)
 		.sort((a, b) => (a.registerGroup != null && b.registerGroup != null) ? a.registerGroup.id - b.registerGroup.id : 0)
@@ -415,21 +417,35 @@ class DeviceComponent extends Component {
 	         const {id, name, address, count, isRead, isWrite, type, multiplier, suffix, minValue, maxValue, group, legends} = current;
 			 var index = this.state.device.indexOf(this.state.device.filter(e => { return e.address === address })[0])
 			 var boxLegends = {}
-			 var firstGroupElement = false	
+			 var lastGroupElement = false	
 			 var borderClass = ""
-			 var registerGroupName
+			 var registerGroupName = ""
+		
+		     var groupElCount = this.state.device
+									.filter(e => ((e.group == currentGroup.name) 
+												&& (e.registerGroup != null) && (current.registerGroup != null) 
+												&& (current.registerGroup.name == e.registerGroup.name))).length
+				
+				console.log("current",current)								
+			console.log("groupElCount",groupElCount)
 		
 			 if (current.registerGroup == null) {
+				outerGroupElCount = 0;
 				registerGroupName = null
-				borderClass = "borderless-td-val"
+				borderClass = "no-borderless-td-val"
 			 } else {
 				registerGroupName = current.registerGroup.name
 				if (groupNameData.find(e => e == registerGroupName) == undefined) {
-					groupNameData.push(registerGroupName)
-					firstGroupElement = true
+					groupNameData.push(registerGroupName)				
 				}
-				borderClass = "no-borderless-td-val"			
+				outerGroupElCount++;
+				if (outerGroupElCount == groupElCount) {
+						lastGroupElement = true
+						outerGroupElCount = 0
+					}
+				borderClass = "borderless-td-val"		
 			 }
+		console.log("groupNameData",groupNameData)
 					 	
 			 if (type=="Multiple") {
 				return(				
@@ -495,7 +511,7 @@ class DeviceComponent extends Component {
 								
 								          								
 	            </tr>
-				{(firstGroupElement) && <tr align="right">
+				{(lastGroupElement) && <tr align="right">
 											<td></td>
 											<td></td>
 											<td>

@@ -1,0 +1,29 @@
+version: "2"
+services:
+  db:
+    image: postgres
+    restart: always
+    container_name: db
+    environment:
+     DATABASE_HOST: 127.0.0.1
+     POSTGRES_DB: pimodbusdb
+     POSTGRES_USER: piuser
+     POSTGRES_PASSWORD: 12345678
+    networks: 
+     - pimodbus
+    volumes: 
+     - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+  web:
+    image: simonov/pimodbus
+    command: java -jar ./pimodbusmaster-0.0.1-SNAPSHOT.war
+    environment:
+     SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/pimodbusdb
+    ports:
+      - "8080:8080"
+    networks: 
+     - pimodbus
+    depends_on:
+     - db
+
+networks:
+  pimodbus: null

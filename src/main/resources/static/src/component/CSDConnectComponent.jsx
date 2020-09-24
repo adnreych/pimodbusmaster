@@ -33,7 +33,7 @@ class CSDConnectComponent extends Component {
 				console.log("PORTS", ports)
 				this.setState({ 
 					ports: ports.data,
-					port: ports.data[0],
+					port: ports.data.length != 0 ? ports.data[0] : "/dev/ttyUSB0",
 					})
 			})
 			.catch((err) => {
