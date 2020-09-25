@@ -51,6 +51,14 @@ public class UserDetailServiceImpl implements UserDetailsService  {
         Optional<User> userFromDb = userRepository.findById(userId);
         return userFromDb.orElse(new User());
     }
+    
+    public User findUserByName(String name) {
+        User user = userRepository.findByUsername(name);
+        if(user == null){
+            throw new UsernameNotFoundException("User not found.");
+        }
+        return user;
+    }
 
     public List<User> allUsers() {
         return userRepository.findAll();

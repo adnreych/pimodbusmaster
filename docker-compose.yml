@@ -14,8 +14,8 @@ services:
     volumes: 
      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
   web:
-    image: simonov/pimodbus
-    command: java -jar ./pimodbusmaster-0.0.1-SNAPSHOT.war
+    build: .
+    command: java -jar /pimodbus/target/pimodbusmaster-0.0.1-SNAPSHOT.war
     environment:
      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/pimodbusdb
     ports:
