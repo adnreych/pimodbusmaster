@@ -33,7 +33,7 @@ public class LoadRegistersResource {
 	private Long multiplier;
 	private Long minValue;
 	private Long maxValue;
-	private String group;
+	private SubDevice subDevice;
 	private String registerGroup;
 	@JsonRawValue
 	private String legends;

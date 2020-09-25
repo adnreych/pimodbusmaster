@@ -19,6 +19,7 @@ import net.lockoil.pimodbusmaster.model.Device;
 import net.lockoil.pimodbusmaster.model.LoadRegistersResource;
 import net.lockoil.pimodbusmaster.model.RegisterGroup;
 import net.lockoil.pimodbusmaster.model.RegisterGroupResource;
+import net.lockoil.pimodbusmaster.model.SubDevice;
 import net.lockoil.pimodbusmaster.model.modbustypes.TypeSupportable;
 import net.lockoil.pimodbusmaster.repository.RegistersRepository;
 
@@ -37,6 +38,9 @@ public class RegistersService {
 	
 	@Autowired
 	private RegisterGroupService registerGroupService;
+	
+	@Autowired
+	private SubDeviceService subDeviceService;
 	
 	@Autowired
 	public RegistersService(RegistersRepository registerRepository) {
@@ -89,7 +93,7 @@ public class RegistersService {
 		Long min = loadRegistersResource.getMinValue() != null ? loadRegistersResource.getMinValue() : null;
 		Long max = loadRegistersResource.getMaxValue() != null ? loadRegistersResource.getMaxValue() : null;
 		Long multiplier = loadRegistersResource.getMultiplier() != null ? loadRegistersResource.getMultiplier() : null;
-		String group = loadRegistersResource.getGroup() != null ? loadRegistersResource.getGroup() : "Без группы";
+		SubDevice subDevice = loadRegistersResource.getSubDevice();
 		String legends = loadRegistersResource.getLegends() != null ? loadRegistersResource.getLegends() : null;
 		
 		RegisterGroup registerGroup = null;
@@ -98,7 +102,11 @@ public class RegistersService {
 			String registerGroupId = loadRegistersResource.getRegisterGroup();
 			registerGroup = registerGroupService.findById(Long.valueOf(registerGroupId));
 		}
-		
+
+		SubDevice subDeviceFromDb = subDeviceService.getByAddressAndDeviceId(subDevice.getAddress(), subDevice.getDeviceId());
+		if (subDeviceFromDb == null) {
+			subDeviceFromDb = subDeviceService.save(subDevice);
+		}
 		
 		
 		CardRegisterElement cardRegisterElement = new CardRegisterElement();
@@ -118,7 +126,7 @@ public class RegistersService {
 			cardRegisterElement.setMinValue(min);
 			cardRegisterElement.setMaxValue(max);
 			cardRegisterElement.setMultiplier(multiplier);
-			cardRegisterElement.setGroup(group);
+			cardRegisterElement.setSubDevice(subDeviceFromDb);;
 			cardRegisterElement.setLegends(legends);
 			cardRegisterElement.setRegisterGroup(registerGroup);
 		} catch (DeviceNotFoundException e) {

@@ -26,6 +26,12 @@ public class SubDevice {
 	private Long id;
 	
 	/**
+	 * id основного устройства
+	 */
+	@Column(name = "device_id")
+	private Long deviceId;
+	
+	/**
 	 * Название устройства
 	 */
 	@Column(name = "name")

@@ -3,6 +3,8 @@ import LoadRegistersService from '../service/LoadRegistersService';
 import DeviceService from '../service/DeviceService';
 import GroupRegistersService from '../service/GroupRegistersService';
 import * as Strings from '../helpers/strings';
+import _isEqual from 'lodash/isEqual';
+import _pull from 'lodash/pull';
 
 
 class LoadRegistersComponent extends Component {
@@ -18,7 +20,7 @@ class LoadRegistersComponent extends Component {
 					success: null,
 					deviceName: "",
 					deviceAddress: "",
-					groupsToSave: []
+					subdevicesToSave: []
 		        }
 
 	  this.handleClick = this.handleClick.bind(this);
@@ -48,25 +50,48 @@ class LoadRegistersComponent extends Component {
 		      var xml = new XMLParser().parseFromString(
 		        new XMLSerializer().serializeToString(xmlStr.documentElement)
 		      )
+			console.log("XML", xml)
 			  this.setState({ deviceName : xml.attributes.deviceName,
 							  deviceAddress : xml.attributes.deviceAddress})
 					
-			  var groupRegistersXmlData = xml.getElementsByTagName('RegisterGroup')
+			  var subdevicesXmlData = xml.getElementsByTagName('Subdevice')
+			  var data = []
 			  var inGroupData = []
-			  if (groupRegistersXmlData.length != 0) {
-			      groupRegistersXmlData.forEach(e => {
-					var xmlDataGroup = e.getElementsByTagName('Register')
-					inGroupData = inGroupData.concat(this.handleXMLData(xmlDataGroup, e.attributes.name))
-					var groupsToSave = this.state.groupsToSave
-					groupsToSave.push(e.attributes.name)
-					this.setState({ data : inGroupData,
-									groupsToSave: groupsToSave})
-				})
-				  
+			  var subDevices = []
+			  if (subdevicesXmlData.length != 0) {
+			      subdevicesXmlData.forEach(e => {
+					var xmlDataRegisters = e.getElementsByTagName('Register')
+					var xmlDataRegisterGroups = e.getElementsByTagName('RegisterGroup')
+					var swap = xmlDataRegisters
+					console.log("xmlDataRegisters before", xmlDataRegisters)
+					swap.forEach(e => {
+						xmlDataRegisterGroups.forEach(e2 => {
+							e2.getElementsByTagName('Register').forEach(e3 => {
+								if (_isEqual(e3, e)) {
+									console.log("EQUAL")
+									_pull(xmlDataRegisters, e)
+								}
+							})					
+						})
+					})
+					console.log("xmlDataRegisters after", xmlDataRegisters)
+					var registerGroups = []
+					var subdevice = {
+						name: e.attributes.name,
+						address: e.attributes.address,
+						function: e.attributes.function
+					}
+					subDevices.push(subdevice)
+					xmlDataRegisterGroups.forEach(gr => {
+						var groupName = gr.attributes.name
+						data = data.concat(this.handleXMLData(gr.getElementsByTagName('Register'), subdevice, groupName))
+					})
+					
+					e.getElementsByTagName('Register').forEach(r => {
+						data = data.concat(this.handleXMLData(r.getElementsByTagName('Register'), subdevice))
+					})					
+				})			  
 			  }
-			  
-			  var xmlData = xml.getElementsByTagName('Register')
-			  var data = this.handleXMLData(xmlData).concat(inGroupData)
 			  
 			
 			this.setState({ error: [], success: null})
@@ -101,7 +126,7 @@ class LoadRegistersComponent extends Component {
     	};
 	}
 	
-	handleXMLData(xmlData, registerGroup) {
+	handleXMLData(xmlData, subdevice, registerGroup) {
 		var data = [];
 			  xmlData.forEach(element => {
 				var dataElement = {};
@@ -146,7 +171,10 @@ class LoadRegistersComponent extends Component {
 					}
 				})
 				if (registerGroup != undefined) dataElement.registerGroup = registerGroup
-				if (this.state.data.find(e => { return e.address === dataElement.address}) == undefined) data.push(dataElement)			
+				if (this.state.data.find(e => { return e.address === dataElement.address}) == undefined) data.push(dataElement)		
+				dataElement.subDevice = subdevice	
+				console.log("dataElement", dataElement)
+				console.log("registerGroup", registerGroup)
 			})
 			return data
 	}
@@ -317,7 +345,7 @@ class LoadRegistersComponent extends Component {
         }
 
 		var groupData = []
-		this.state.groupsToSave.forEach(e => groupData.push({name: e}))
+		this.state.subdevicesToSave.forEach(e => groupData.push({name: e}))
 
 		GroupRegistersService.save(groupData)
 			.then(
