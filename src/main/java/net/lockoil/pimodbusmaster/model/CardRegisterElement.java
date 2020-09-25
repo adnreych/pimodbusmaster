@@ -65,10 +65,22 @@ public class CardRegisterElement {
 	private Boolean isRead;
 	
 	/**
+	 * Функция чтения регистра
+	 */
+	@Column(name = "read_function")
+	private Integer readFunction;
+	
+	/**
 	 * Возможность записи регистра
 	 */
 	@Column(name = "is_write")
 	private Boolean isWrite;
+	
+	/**
+	 * Функция записи регистра
+	 */
+	@Column(name = "write_function")
+	private Integer writeFunction;
 	
 	/**
 	 * Тип {@link AbstractModbusType} регистра
@@ -101,10 +113,11 @@ public class CardRegisterElement {
 	private Long maxValue;
 	
 	/**
-	 * Название вкладки, в которой состоит регистр
+	 * Дочернее устройство, которому принадлежит регистр
 	 */
-	@Column(name = "register_tab")
-	private String group;
+	@ManyToOne
+	@JoinColumn(name = "subdevice_id")
+	private SubDevice subDevice;
 	
 	/**
 	 * JSON, в котором хранится более подробная информация о регистре, если в ней есть необходимость
