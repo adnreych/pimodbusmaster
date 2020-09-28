@@ -50,7 +50,6 @@ class LoadRegistersComponent extends Component {
 		      var xml = new XMLParser().parseFromString(
 		        new XMLSerializer().serializeToString(xmlStr.documentElement)
 		      )
-			console.log("XML", xml)
 			  this.setState({ deviceName : xml.attributes.deviceName,
 							  deviceAddress : xml.attributes.deviceAddress})
 					
@@ -64,19 +63,16 @@ class LoadRegistersComponent extends Component {
 					var xmlDataRegisterGroups = e.getElementsByTagName('RegisterGroup')
 					var swap = xmlDataRegisters
 					var arrToPull = []
-					console.log("xmlDataRegisters before", xmlDataRegisters)
 					swap.forEach(e1 => {
 						xmlDataRegisterGroups.forEach(e2 => {
 							e2.getElementsByTagName('Register').forEach(e3 => {
 								if (_isEqual(e3, e1)) {
-									console.log("EQUAL")
 									arrToPull.push(e1)								
 								}
 							})					
 						})
 					})
 					_pullAll(xmlDataRegisters, arrToPull)
-					console.log("xmlDataRegisters after", xmlDataRegisters)
 					var registerGroups = []
 					var subdevice = {
 						name: e.attributes.name,
@@ -99,7 +95,6 @@ class LoadRegistersComponent extends Component {
 			data.forEach(element => {
 				
 			});
-			console.log("DATA", data)
 			data.forEach((element, index) => {
 				if (element.registerGroup != undefined) {				
 					if((index != data.length -1) && (data[index + 1].registerGroup != undefined) && (element.address + element.count != data[index + 1].address)) {
@@ -174,8 +169,6 @@ class LoadRegistersComponent extends Component {
 				if (registerGroup != undefined) dataElement.registerGroup = registerGroup
 				if (this.state.data.find(e => { return e.address === dataElement.address}) == undefined) data.push(dataElement)		
 				dataElement.subDevice = subdevice	
-				console.log("dataElement", dataElement)
-				console.log("registerGroup", registerGroup)
 			})
 			return data
 	}
@@ -338,7 +331,6 @@ class LoadRegistersComponent extends Component {
   	handleClick() {    
 		var data = this.state.data;
 		this.setState({ loading: true });
-		console.log("DEVICE: ", this.state.deviceName);
 		
 		let device = {
             name: this.state.deviceName,
@@ -347,7 +339,6 @@ class LoadRegistersComponent extends Component {
 		
 		DeviceService.save(device)
 		.then((request) => {
-			 console.log("data before load: ", data);
 			 data.forEach(element => {
 				element.device = request.data;
 					if (element.legends != null) element.legends = JSON.stringify(element.legends);

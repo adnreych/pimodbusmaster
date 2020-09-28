@@ -33,4 +33,9 @@ public class WriteRequest {
 	 * Не равно null, если {@link isCSD} true
 	 */
 	AtConnectionRequest atConnectionRequest;
+	
+	/**
+	 * Номер функции
+	 */
+	Integer function;
 }

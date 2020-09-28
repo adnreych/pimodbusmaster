@@ -1,17 +1,13 @@
 import React, { Component } from 'react';
-import ReactTextCollapse from 'react-text-collapse'
 import * as Strings from '../helpers/strings';
 import LoadRegistersService from '../service/LoadRegistersService';
 import ModbusService from '../service/ModbusService';
 import DeviceService from '../service/DeviceService';
-import SpecialModbusTypesComponent from './SpecialModbusTypesComponent';
 import BitTypeValuesComponent from './BitTypeValuesComponent';
 import BoxTypeComponent from './BoxTypeComponent';
 import MultipleTypeComponent from './MultipleTypeComponent';
 import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css'; 
-import Option from 'muicss/lib/react/option';
-import Select from 'muicss/lib/react/select';
 import _pull from 'lodash/pull';
 import _times from 'lodash/times';
 
@@ -99,8 +95,8 @@ class DeviceComponent extends Component {
 								
 				if (this.state.device[0] != null) {
 					this.setState({ 
-						name: this.state.device[0].device.name, 
-						address: this.state.device[0].device.address, 
+						name: this.state.device[0].subDevice.device.name, 
+						address: this.state.device[0].subDevice.device.address, 
 						loading: false,
 						inputValues: new Array(this.state.device.length),
 						dataFromSpecialType: [],
@@ -188,8 +184,11 @@ class DeviceComponent extends Component {
 		
 		this.setState({ loading: true })
 		
+		var slave = this.state.device[index].subDevice.address == 0 ? this.state.address : this.state.device[index].subDevice.address
+		var funcNumber = this.state.device[index].subDevice.address == 0 ? 3 : this.state.device[index].subDevice.function
+		
 		let readRequest = {
-            slave: this.state.address,
+            slave: slave,
            	address: address,
 			deviceId: this.state.deviceId,
 			count: count,
@@ -197,6 +196,7 @@ class DeviceComponent extends Component {
 			isCSD: this.state.CSD,
 			atConnectionRequest: this.state.ATRequest,
 			readGroups: readGroups == undefined ? false : readGroups,	
+			function: funcNumber
         }
 
 		console.log("readRequest: ", readRequest);
@@ -230,13 +230,17 @@ class DeviceComponent extends Component {
 			
 		this.setState({ loading: true })
 		
+		var slave = this.state.device[index].subDevice.address == 0 ? this.state.address : this.state.device[index].subDevice.address
+		var funcNumber = this.state.device[index].subDevice.address == 0 ? 10 : this.state.device[index].subDevice.function
+		
 		let writeRequest = {
-            slave: this.state.address,
+            slave: slave,
            	address: address,
 			values: Array.isArray(value) ? value : [value],
 			type: this.state.device[index].type,
 			isCSD: this.state.CSD,
-			atConnectionRequest: this.state.ATRequest
+			atConnectionRequest: this.state.ATRequest,
+			function: funcNumber
         }
 
 		console.log("writeRequest: ", writeRequest);
@@ -414,27 +418,24 @@ class DeviceComponent extends Component {
 		.map(
 			(current) => {		
 			 const {loading, editedNow} = this.state;
-	         const {id, name, address, count, isRead, isWrite, type, multiplier, suffix, minValue, maxValue, group, legends} = current;
+	         const {id, name, address, count, isRead, isWrite, type, registerGroup, legends} = current;
+			 
 			 var index = this.state.device.indexOf(this.state.device.filter(e => { return e.address === address })[0])
-			 var boxLegends = {}
 			 var lastGroupElement = false	
 			 var borderClass = ""
 			 var registerGroupName = ""
 		
 		     var groupElCount = this.state.device
 									.filter(e => ((e.group == currentGroup.name) 
-												&& (e.registerGroup != null) && (current.registerGroup != null) 
-												&& (current.registerGroup.name == e.registerGroup.name))).length
-				
-				console.log("current",current)								
-			console.log("groupElCount",groupElCount)
+												&& (e.registerGroup != null) && (registerGroup != null) 
+												&& (registerGroup.name == e.registerGroup.name))).length
 		
-			 if (current.registerGroup == null) {
+			 if (registerGroup == null) {
 				outerGroupElCount = 0;
 				registerGroupName = null
 				borderClass = "no-borderless-td-val"
 			 } else {
-				registerGroupName = current.registerGroup.name
+				registerGroupName = registerGroup.name
 				if (groupNameData.find(e => e == registerGroupName) == undefined) {
 					groupNameData.push(registerGroupName)				
 				}
@@ -445,8 +446,7 @@ class DeviceComponent extends Component {
 					}
 				borderClass = "borderless-td-val"		
 			 }
-		console.log("groupNameData",groupNameData)
-					 	
+
 			 if (type=="Multiple") {
 				return(				
 					<MultipleTypeComponent 
@@ -461,10 +461,6 @@ class DeviceComponent extends Component {
 				)
 			 }
 			
-			 if (type=="Box") {
-				console.log(legends)
-				boxLegends = JSON.parse(legends)
-			 }
 	         return (
 				<>
 	            <tr key={index}>
@@ -515,8 +511,8 @@ class DeviceComponent extends Component {
 											<td></td>
 											<td></td>
 											<td>
-												<button className="btn btn-primary" onClick={() => this.handleReadGroup(current.registerGroup.id)}>Чтение всей группы ({registerGroupName})</button>
-												<button className="btn btn-primary" onClick={() => this.handleWriteGroup(current.registerGroup.id)}>Запись всей группы ({registerGroupName})</button>
+												<button className="btn btn-primary" onClick={() => this.handleReadGroup(registerGroup.id)}>Чтение всей группы ({registerGroupName})</button>
+												<button className="btn btn-primary" onClick={() => this.handleWriteGroup(registerGroup.id)}>Запись всей группы ({registerGroupName})</button>
 											</td>
 										</tr> }	
 				</>
@@ -555,7 +551,7 @@ class DeviceComponent extends Component {
 	
 	render() {	
 		const {loading, error, success, name, address} = this.state;
-		
+		console.log("DEVICE", this.state.device)
 	    return (
 			<div>
 				{error &&

@@ -49,4 +49,9 @@ public class ReadRequest {
 	 * true - если читается группа регистров
 	 */
 	boolean readGroups;
+	
+	/**
+	 * Номер функции
+	 */
+	Integer function;
 }

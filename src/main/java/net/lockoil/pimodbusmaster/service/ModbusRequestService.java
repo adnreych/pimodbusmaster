@@ -188,8 +188,9 @@ public class ModbusRequestService {
 			int count = cardRegisterElement.getCount();
 			String type = cardRegisterElement.getType();
 			boolean isCSD = modbusReadRequest.isCSD();
+			Integer funcNumber = cardRegisterElement.getReadFunction();
 			AtConnectionRequest atConnectionRequest = isCSD ? modbusReadRequest.getAtConnectionRequest() : null;		
-			ReadRequest innerReadRequest = new ReadRequest(slave, address, deviceId, count, type, isCSD, atConnectionRequest, false);
+			ReadRequest innerReadRequest = new ReadRequest(slave, address, deviceId, count, type, isCSD, atConnectionRequest, false, funcNumber);
 			System.out.println("innerReadRequest" + innerReadRequest.toString());
 			switch (innerReadRequest.getType()) {
 			
