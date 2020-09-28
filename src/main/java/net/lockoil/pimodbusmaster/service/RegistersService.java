@@ -9,18 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import net.lockoil.pimodbusmaster.exceptions.DeviceNotFoundException;
 import net.lockoil.pimodbusmaster.model.CardRegisterElement;
 import net.lockoil.pimodbusmaster.model.Device;
 import net.lockoil.pimodbusmaster.model.LoadRegistersResource;
-import net.lockoil.pimodbusmaster.model.RegisterGroup;
-import net.lockoil.pimodbusmaster.model.RegisterGroupResource;
 import net.lockoil.pimodbusmaster.model.SubDevice;
-import net.lockoil.pimodbusmaster.model.modbustypes.TypeSupportable;
 import net.lockoil.pimodbusmaster.repository.RegistersRepository;
 
 /**
@@ -35,9 +28,6 @@ public class RegistersService {
 	
 	@Autowired
 	private DeviceService deviceService;
-	
-	@Autowired
-	private RegisterGroupService registerGroupService;
 	
 	@Autowired
 	private SubDeviceService subDeviceService;
@@ -88,6 +78,8 @@ public class RegistersService {
 		Integer count = loadRegistersResource.getCount();
 		Boolean isWrite = loadRegistersResource.getIsWrite();
 		Boolean isRead = loadRegistersResource.getIsRead();
+		Integer readFunction = loadRegistersResource.getReadFunction();
+		Integer writeFunction = loadRegistersResource.getWriteFunction();
 		String type = loadRegistersResource.getType();
 		String suffix = loadRegistersResource.getSuffix() != null ? loadRegistersResource.getSuffix() : null;
 		Long min = loadRegistersResource.getMinValue() != null ? loadRegistersResource.getMinValue() : null;
@@ -95,15 +87,10 @@ public class RegistersService {
 		Long multiplier = loadRegistersResource.getMultiplier() != null ? loadRegistersResource.getMultiplier() : null;
 		SubDevice subDevice = loadRegistersResource.getSubDevice();
 		String legends = loadRegistersResource.getLegends() != null ? loadRegistersResource.getLegends() : null;
+		String registerGroup = loadRegistersResource.getRegisterGroup() != null ? loadRegistersResource.getRegisterGroup() : null;
 		
-		RegisterGroup registerGroup = null;
-		
-		if (loadRegistersResource.getRegisterGroup() != null) {
-			String registerGroupId = loadRegistersResource.getRegisterGroup();
-			registerGroup = registerGroupService.findById(Long.valueOf(registerGroupId));
-		}
 
-		SubDevice subDeviceFromDb = subDeviceService.getByAddressAndDeviceId(subDevice.getAddress(), subDevice.getDeviceId());
+		SubDevice subDeviceFromDb = subDeviceService.getByAddressAndDeviceId(subDevice.getAddress(), subDevice.getDevice().getId());
 		if (subDeviceFromDb == null) {
 			subDeviceFromDb = subDeviceService.save(subDevice);
 		}
@@ -121,6 +108,8 @@ public class RegistersService {
 			cardRegisterElement.setCount(count);
 			cardRegisterElement.setIsRead(isRead);
 			cardRegisterElement.setIsWrite(isWrite);
+			cardRegisterElement.setReadFunction(readFunction);
+			cardRegisterElement.setWriteFunction(writeFunction);
 			cardRegisterElement.setType(type);
 			cardRegisterElement.setSuffix(suffix);
 			cardRegisterElement.setMinValue(min);

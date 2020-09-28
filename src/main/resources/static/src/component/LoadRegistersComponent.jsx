@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import LoadRegistersService from '../service/LoadRegistersService';
 import DeviceService from '../service/DeviceService';
-import GroupRegistersService from '../service/GroupRegistersService';
+import SubDevicesService from '../service/SubDevicesService';
 import * as Strings from '../helpers/strings';
 import _isEqual from 'lodash/isEqual';
-import _pull from 'lodash/pull';
+import _pullAll from 'lodash/pullAll';
 
 
 class LoadRegistersComponent extends Component {
@@ -63,17 +63,19 @@ class LoadRegistersComponent extends Component {
 					var xmlDataRegisters = e.getElementsByTagName('Register')
 					var xmlDataRegisterGroups = e.getElementsByTagName('RegisterGroup')
 					var swap = xmlDataRegisters
+					var arrToPull = []
 					console.log("xmlDataRegisters before", xmlDataRegisters)
-					swap.forEach(e => {
+					swap.forEach(e1 => {
 						xmlDataRegisterGroups.forEach(e2 => {
 							e2.getElementsByTagName('Register').forEach(e3 => {
-								if (_isEqual(e3, e)) {
+								if (_isEqual(e3, e1)) {
 									console.log("EQUAL")
-									_pull(xmlDataRegisters, e)
+									arrToPull.push(e1)								
 								}
 							})					
 						})
 					})
+					_pullAll(xmlDataRegisters, arrToPull)
 					console.log("xmlDataRegisters after", xmlDataRegisters)
 					var registerGroups = []
 					var subdevice = {
@@ -87,14 +89,11 @@ class LoadRegistersComponent extends Component {
 						data = data.concat(this.handleXMLData(gr.getElementsByTagName('Register'), subdevice, groupName))
 					})
 					
-					e.getElementsByTagName('Register').forEach(r => {
-						data = data.concat(this.handleXMLData(r.getElementsByTagName('Register'), subdevice))
-					})					
+					data = data.concat(this.handleXMLData(xmlDataRegisters, subdevice))				
 				})			  
 			  }
-			  
-			
-			this.setState({ error: [], success: null})
+					
+			this.setState({ error: [], success: null, subdevicesToSave: subDevices})
 			//xml validation 
 			var groupValidationMap = {}
 			data.forEach(element => {
@@ -133,41 +132,43 @@ class LoadRegistersComponent extends Component {
 				element.children.forEach(e =>  {				
 					switch(e.name) {
 						case "Name":
-							dataElement.name = e.value;
-							break;
+							dataElement.name = e.value
+							break
 						case "Address":
-							dataElement.address = Number(e.value);
-							break;
+							dataElement.address = Number(e.value)
+							break
 						case "Count":
-							dataElement.count = Number(e.value);
-							break;
+							dataElement.count = Number(e.value)
+							break
 						case "IsRead":
-							dataElement.isRead = e.value;
-							break;
+							dataElement.isRead = e.value
+							dataElement.readFunction = Number(e.attributes.function)
+							break
 						case "IsWrite":
-							dataElement.isWrite = e.value;
-							break;
+							dataElement.isWrite = e.value
+							dataElement.writeFunction = Number(e.attributes.function)
+							break
 						case "Type":
-							dataElement.type = e.value; 
+							dataElement.type = e.value
 							// обработка нестандартных типов
 							if (e.value == "Bit" || e.value == "Variable" || e.value == "Box" || e.value == "Multiple" || e.value == "CommaFloat") 
-								dataElement.legends = this.handleModbusTypeLegend(element, e.value);
+								dataElement.legends = this.handleModbusTypeLegend(element, e.value)
 							break;
 						case "Multiplier":
-							dataElement.multiplier = Number(e.value);
-							break;
+							dataElement.multiplier = Number(e.value) == 0 ? 1 : Number(e.value)
+							break
 						case "Suffix":
-							dataElement.suffix = e.value;
-							break;
+							dataElement.suffix = e.value
+							break
 						case "Min":
-							dataElement.minValue = Number(e.value);
-							break;
+							dataElement.minValue = Number(e.value)
+							break
 						case "Max":
-							dataElement.maxValue = Number(e.value);
-							break;
+							dataElement.maxValue = Number(e.value)
+							break
 						case "Group":
-							dataElement.group = e.value == "" ? "Без группы" : e.value;
-							break;
+							dataElement.group = e.value == "" ? "Без группы" : e.value
+							break
 					}
 				})
 				if (registerGroup != undefined) dataElement.registerGroup = registerGroup
@@ -343,58 +344,57 @@ class LoadRegistersComponent extends Component {
             name: this.state.deviceName,
            	address: this.state.deviceAddress
         }
-
-		var groupData = []
-		this.state.subdevicesToSave.forEach(e => groupData.push({name: e}))
-
-		GroupRegistersService.save(groupData)
-			.then(
-				(response) => {
-						console.log("group response data: ", response.data);
-						data.forEach(element => {
-							response.data.forEach(e => {
-								if (element.registerGroup == e.name) {
-									element.registerGroup = e.id
-								}
-							})
-						})
-						console.log("data after group add: ", data);
-						
-						DeviceService.save(device)
-						.then(
-			                (request) => {
-								console.log("data before load: ", data);
-								data.forEach(element => {
+		
+		DeviceService.save(device)
+		.then((request) => {
+			 console.log("data before load: ", data);
+			 data.forEach(element => {
 									element.device = request.data;
 									if (element.legends != null) element.legends = JSON.stringify(element.legends);
 								})
-			                    LoadRegistersService.load(data)
+								var subdevicesToSave = this.state.subdevicesToSave
+								subdevicesToSave.forEach(element => {
+									element.device = request.data;
+								
+								})
+								this.setState({subdevicesToSave: subdevicesToSave})
+								
+								SubDevicesService.save(this.state.subdevicesToSave)
+								.then(
+										(response) => {
+											var subdevices = response.data
+											data.forEach(element => {
+												element.subDevice = subdevices.filter(e => e.name == element.subDevice.name)[0]
+											})
+											
+											LoadRegistersService.load(data)
 											.then(
 								                () => {
-													data.forEach(element => {
-														element.device = request.data;
-														if (element.legends != null) element.legends = JSON.parse(element.legends);
-													})
 								                    this.setState( prevState => ({ success: ["Данные успешно загружены"], loading: false}));
 								                }
 								            )
 											.catch((err) => {
-												  console.log("ERROR: ", err);
-													this.setState( prevState => ({ error: ["Ошибка загрузки данных"], loading: false}));
+												    console.log("ERROR: ", err);
+												    this.setState( prevState => ({ error: ["Ошибка загрузки данных"], loading: false}));
 											  });
-								}
-            )
-			.catch((err) => {
-				  console.log("ERROR: ", err);
-					this.setState( prevState => ({ error: ["Ошибка загрузки данных"], loading: false}));
-			  });
+								})
+								.catch((err) => {
+												  console.log("ERROR: ", err);
+												  this.setState( prevState => ({ error: ["Ошибка сохранения дочернего устройства"], loading: false}));
+											  });
+		})
+			                
+		.catch((err) => {
+			console.log("ERROR: ", err);
+			this.setState( prevState => ({ error: ["Ошибка сохранения устройства"], loading: false}));
+		});						
+			                    
 						
-				}) 
-			.catch((err) => {
-							  console.log("ERROR: ", err);
-								this.setState( prevState => ({ error: ["Ошибка добавления новой группы"], loading: false}));
-						  });
-				
+									
+						
+						
+						
+						
 		
 	}
 	

@@ -40,5 +40,9 @@ public class SubDeviceService {
 	public SubDevice save(SubDevice subDevice) {
 		return subDeviceRepository.save(subDevice);
 	}
+	
+	public List<SubDevice> saveAll(List<SubDevice> subDevices) {
+		return subDeviceRepository.saveAll(subDevices);
+	}
 
 }

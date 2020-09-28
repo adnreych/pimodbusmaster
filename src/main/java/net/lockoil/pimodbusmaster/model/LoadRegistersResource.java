@@ -28,6 +28,8 @@ public class LoadRegistersResource {
 	private Integer count;
 	private Boolean isRead;
 	private Boolean isWrite;
+	private Integer readFunction;
+	private Integer writeFunction;
 	private String type;
 	private String suffix;
 	private Long multiplier;

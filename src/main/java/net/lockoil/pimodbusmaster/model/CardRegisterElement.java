@@ -1,7 +1,5 @@
 package net.lockoil.pimodbusmaster.model;
 
-import java.util.List;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -12,10 +10,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 import lombok.Data;
-import net.lockoil.pimodbusmaster.model.modbustypes.TypeSupportable;
 
 /**
  * Описание регистра
@@ -128,8 +123,6 @@ public class CardRegisterElement {
 	/**
 	 * Группа регистров
 	 */
-	@ManyToOne
-	@JoinColumn(name = "register_group_id")
-	private RegisterGroup registerGroup;
+	private String registerGroup;
 
 }

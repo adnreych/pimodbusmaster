@@ -2,9 +2,12 @@ package net.lockoil.pimodbusmaster.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import lombok.Data;
@@ -14,7 +17,7 @@ import lombok.Data;
  */
 @Entity
 @Data
-@Table(name = "device")
+@Table(name = "sub_device")
 public class SubDevice {
 
 	/**
@@ -28,8 +31,9 @@ public class SubDevice {
 	/**
 	 * id основного устройства
 	 */
-	@Column(name = "device_id")
-	private Long deviceId;
+	@ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "device_id")
+	private Device device;
 	
 	/**
 	 * Название устройства
