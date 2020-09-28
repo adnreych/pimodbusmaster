@@ -349,41 +349,37 @@ class LoadRegistersComponent extends Component {
 		.then((request) => {
 			 console.log("data before load: ", data);
 			 data.forEach(element => {
-									element.device = request.data;
-									if (element.legends != null) element.legends = JSON.stringify(element.legends);
-								})
-								var subdevicesToSave = this.state.subdevicesToSave
-								subdevicesToSave.forEach(element => {
-									element.device = request.data;
+				element.device = request.data;
+					if (element.legends != null) element.legends = JSON.stringify(element.legends);
+				})
+				var subdevicesToSave = this.state.subdevicesToSave
+				subdevicesToSave.forEach(element => {
+					element.device = request.data;
+				})
+				this.setState({subdevicesToSave: subdevicesToSave})
 								
-								})
-								this.setState({subdevicesToSave: subdevicesToSave})
-								
-								SubDevicesService.save(this.state.subdevicesToSave)
-								.then(
-										(response) => {
-											var subdevices = response.data
-											data.forEach(element => {
-												element.subDevice = subdevices.filter(e => e.name == element.subDevice.name)[0]
-											})
+				SubDevicesService.save(this.state.subdevicesToSave)
+				.then((response) => {
+					var subdevices = response.data
+					data.forEach(element => {
+						element.subDevice = subdevices.filter(e => e.name == element.subDevice.name)[0]
+					})
 											
-											LoadRegistersService.load(data)
-											.then(
-								                () => {
-								                    this.setState( prevState => ({ success: ["Данные успешно загружены"], loading: false}));
-								                }
-								            )
-											.catch((err) => {
-												    console.log("ERROR: ", err);
-												    this.setState( prevState => ({ error: ["Ошибка загрузки данных"], loading: false}));
-											  });
-								})
-								.catch((err) => {
-												  console.log("ERROR: ", err);
-												  this.setState( prevState => ({ error: ["Ошибка сохранения дочернего устройства"], loading: false}));
-											  });
-		})
-			                
+						LoadRegistersService.load(data)
+						.then(
+							() => {
+								this.setState( prevState => ({ success: ["Данные успешно загружены"], loading: false}));
+							})
+						.catch((err) => {
+								console.log("ERROR: ", err);
+								this.setState( prevState => ({ error: ["Ошибка загрузки данных"], loading: false}));
+						});
+					})
+					.catch((err) => {
+						console.log("ERROR: ", err);
+						this.setState( prevState => ({ error: ["Ошибка сохранения дочернего устройства"], loading: false}));
+					});
+		})		                
 		.catch((err) => {
 			console.log("ERROR: ", err);
 			this.setState( prevState => ({ error: ["Ошибка сохранения устройства"], loading: false}));
@@ -411,25 +407,11 @@ class LoadRegistersComponent extends Component {
 	
 	renderTableData() {
       return this.state.data.map((current, index) => {
-         const { name, address, count, isRead, isWrite, type, multiplier, suffix, minValue, maxValue, group, legends } = current;
-		var legendStrings = []
-		if (type == "Variable") {
-			legends.forEach(e => {
-				var str = `${e.description} : ${e.value} \n`
-				legendStrings.push(str)
-			})
-		} else if (type == "Bit") {
-			legends.forEach(e => {
-				var end = Number(e.startBit) + Number(e.bitQuantity) - 1;
-				var str = `${e.description} (биты ${e.startBit} - ${end}) : ${e.possibleValues} \n`
-				legendStrings.push(str)
-			})
-		}
+         const { name, address, count, isRead, isWrite, type, multiplier, suffix, minValue, maxValue, group } = current;
          return (
             <tr key={index}>
                <td>{name}</td>
                <td>{address}</td>
-			   <td>{legendStrings}</td>
                <td>{count}</td>
                <td>{String(isRead)}</td>
 			   <td>{String(isWrite)}</td>
@@ -495,7 +477,6 @@ class LoadRegistersComponent extends Component {
 			   <tr>
 				<th>Название</th>
 			    <th>Адрес</th>
-				<th>Описание</th>
 			    <th>Количество</th>
 			    <th>Чтение</th>
 			    <th>Запись</th>

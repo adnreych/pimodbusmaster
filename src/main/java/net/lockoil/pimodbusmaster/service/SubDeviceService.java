@@ -37,6 +37,11 @@ public class SubDeviceService {
 		
 	}
 	
+	public List<SubDevice>getAllByDeviceId(Long deviceId) {
+		List<SubDevice> subDevices = subDeviceRepository.findAllByDeviceId(deviceId);
+		return subDevices;	
+	}
+	
 	public SubDevice save(SubDevice subDevice) {
 		return subDeviceRepository.save(subDevice);
 	}

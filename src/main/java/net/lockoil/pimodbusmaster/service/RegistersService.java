@@ -1,17 +1,17 @@
 package net.lockoil.pimodbusmaster.service;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import net.lockoil.pimodbusmaster.exceptions.DeviceNotFoundException;
 import net.lockoil.pimodbusmaster.model.CardRegisterElement;
-import net.lockoil.pimodbusmaster.model.Device;
 import net.lockoil.pimodbusmaster.model.LoadRegistersResource;
 import net.lockoil.pimodbusmaster.model.SubDevice;
 import net.lockoil.pimodbusmaster.repository.RegistersRepository;
@@ -43,7 +43,12 @@ public class RegistersService {
 	}
 	
 	public List<CardRegisterElement> getDeviceRegisters(Long id) {
-		return registerRepository.findByDeviceId(id);
+		List<SubDevice> subDevices = subDeviceService.getAllByDeviceId(id);	
+		return subDevices
+				.stream()
+				.map(e -> registerRepository.findBySubDeviceId(e.getId()))
+				.flatMap(Collection::stream)
+				.collect(Collectors.toList());
 	}
 	
 	public void deleteByDeviceId(Long id) {
@@ -67,12 +72,11 @@ public class RegistersService {
 	
 	@Transactional
 	public CardRegisterElement getRegister(Long deviceId, Integer registerAddress) {
-		return Optional.of(registerRepository.findByAddressAndDeviceId(registerAddress, deviceId).get(0)).get();
+		return Optional.of(registerRepository.findByAddressAndSubDeviceId(registerAddress, deviceId).get(0)).get();
 	}
 	
 	public CardRegisterElement parseRegisterElement(LoadRegistersResource loadRegistersResource) {
 		
-		Long deviceId = loadRegistersResource.getDevice();
 		String name = loadRegistersResource.getName();
 		Integer address = loadRegistersResource.getAddress();
 		Integer count = loadRegistersResource.getCount();
@@ -97,30 +101,23 @@ public class RegistersService {
 		
 		
 		CardRegisterElement cardRegisterElement = new CardRegisterElement();
-		Device device;
 		
-		try {
-			if (loadRegistersResource.getId() != null) cardRegisterElement.setId(loadRegistersResource.getId());
-			device = deviceService.findById(deviceId);		
-			cardRegisterElement.setDevice(device);
-			cardRegisterElement.setName(name);
-			cardRegisterElement.setAddress(address);
-			cardRegisterElement.setCount(count);
-			cardRegisterElement.setIsRead(isRead);
-			cardRegisterElement.setIsWrite(isWrite);
-			cardRegisterElement.setReadFunction(readFunction);
-			cardRegisterElement.setWriteFunction(writeFunction);
-			cardRegisterElement.setType(type);
-			cardRegisterElement.setSuffix(suffix);
-			cardRegisterElement.setMinValue(min);
-			cardRegisterElement.setMaxValue(max);
-			cardRegisterElement.setMultiplier(multiplier);
-			cardRegisterElement.setSubDevice(subDeviceFromDb);;
-			cardRegisterElement.setLegends(legends);
-			cardRegisterElement.setRegisterGroup(registerGroup);
-		} catch (DeviceNotFoundException e) {
-			e.printStackTrace();
-		} 
+		if (loadRegistersResource.getId() != null) cardRegisterElement.setId(loadRegistersResource.getId());
+		cardRegisterElement.setName(name);
+		cardRegisterElement.setAddress(address);
+		cardRegisterElement.setCount(count);
+		cardRegisterElement.setIsRead(isRead);
+		cardRegisterElement.setIsWrite(isWrite);
+		cardRegisterElement.setReadFunction(readFunction);
+		cardRegisterElement.setWriteFunction(writeFunction);
+		cardRegisterElement.setType(type);
+		cardRegisterElement.setSuffix(suffix);
+		cardRegisterElement.setMinValue(min);
+		cardRegisterElement.setMaxValue(max);
+		cardRegisterElement.setMultiplier(multiplier);
+		cardRegisterElement.setSubDevice(subDeviceFromDb);;
+		cardRegisterElement.setLegends(legends);
+		cardRegisterElement.setRegisterGroup(registerGroup);
 		
 		
 		return cardRegisterElement;

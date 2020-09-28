@@ -29,13 +29,6 @@ public class CardRegisterElement {
 	private Long id;
 	
 	/**
-	 * Устройство {@link Device} связанное с регистром
-	 */
-	@ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "device_id")
-	private Device device;
-	
-	/**
 	 * Описание регистра
 	 */
 	@Column(name = "register_name")

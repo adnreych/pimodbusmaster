@@ -28,11 +28,11 @@ public class DeviceController {
 	@Autowired
 	DeviceService deviceService;
 	
-	@ApiOperation(value = "Добавляет новое устройство, возвращаего его id", response = Long.class)
+	@ApiOperation(value = "Добавляет новое устройство, возвращаего его id", response = Device.class)
 	@PostMapping("/api/savedevice/")
-	  public Long saveDevice(@RequestBody Device device) {	
+	  public Device saveDevice(@RequestBody Device device) {	
 		log.debug("SAVEDEVICE " + device.toString());
-		return deviceService.save(device).getId();
+		return deviceService.save(device);
 	  }
 	
 	@ApiOperation(value = "Возвращает список всех устройств", response = Device.class, responseContainer = "List")

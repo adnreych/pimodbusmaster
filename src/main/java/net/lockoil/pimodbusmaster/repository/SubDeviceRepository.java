@@ -8,6 +8,7 @@ import net.lockoil.pimodbusmaster.model.SubDevice;
 
 public interface SubDeviceRepository extends JpaRepository<SubDevice, Long> {
 	
-	List<SubDevice> findByAddressAndDeviceId(Integer address, Long deviceId);
+	List<SubDevice> findByAddressAndDeviceId(Integer address, Long deviceId);	
+	List<SubDevice> findAllByDeviceId(Long deviceId);
 }
 

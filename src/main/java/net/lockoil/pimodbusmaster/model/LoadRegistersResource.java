@@ -22,7 +22,6 @@ import net.lockoil.pimodbusmaster.model.modbustypes.TypeSupportable;
 public class LoadRegistersResource {
 	
 	private Long id;
-	private Long device;
 	private String name;
 	private Integer address;
 	private Integer count;
