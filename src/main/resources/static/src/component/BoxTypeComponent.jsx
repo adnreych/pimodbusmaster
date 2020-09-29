@@ -28,10 +28,7 @@ class BoxTypeComponent extends Component {
 	}
 
 
-	renderBoxType() {
-		
-		console.log("STATE BOX TYPE", this.state)
-		
+	renderBoxType() {		
 		return(
 			<div>
 								
