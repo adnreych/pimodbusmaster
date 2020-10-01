@@ -96,14 +96,17 @@ class LoadRegistersComponent extends Component {
 				
 			});
 			data.forEach((element, index) => {
-				if (element.registerGroup != undefined) {				
-					if((index != data.length -1) && (data[index + 1].registerGroup != undefined) && (element.address + element.count != data[index + 1].address)) {
-						this.setState( prevState => ({ error: [...prevState.error, "Регистры, состоящие в одной группе должны идти друг за другом."]}))
+				if (element.registerGroup != "") {				
+					if((index != data.length -1) 
+						&& (data[index + 1].registerGroup != "") 
+						&& (data[index + 1].registerGroup == element.registerGroup) 
+						&& (element.address + element.count != data[index + 1].address)) {
+						this.setState( prevState => ({ error: [...prevState.error, "Регистры, состоящие в одной группе должны идти друг за другом (" + element.name + ")"]}))
 					} 
-					if (groupValidationMap[element.registerGroup] != undefined && (groupValidationMap[element.registerGroup] != element.group)) {
+					if (groupValidationMap[element.registerGroup] != undefined && (groupValidationMap[element.registerGroup] != element.subDevice.name)) {
 						this.setState( prevState => ({ error: [...prevState.error, "Регистры, состоящие в одной группе не должны принадлежать разным вкладкам."]}))
 					} else {
-						groupValidationMap[element.registerGroup] = element.group
+						groupValidationMap[element.registerGroup] = element.subDevice.name
 					}				
 				}
 				if (+element.max < +element.min) this.setState( prevState => ({ error: [...prevState.error, "Ошибка в регистре " + element.address + " Максимальное значение не может быть меньше минимального"]}));
@@ -161,12 +164,13 @@ class LoadRegistersComponent extends Component {
 						case "Max":
 							dataElement.maxValue = Number(e.value)
 							break
-						case "Group":
-							dataElement.group = e.value == "" ? "Без группы" : e.value
-							break
 					}
 				})
-				if (registerGroup != undefined) dataElement.registerGroup = registerGroup
+				if (registerGroup != undefined) {
+					dataElement.registerGroup = registerGroup
+				} else {
+					dataElement.registerGroup = ""
+				}
 				if (this.state.data.find(e => { return e.address === dataElement.address}) == undefined) data.push(dataElement)		
 				dataElement.subDevice = subdevice	
 			})

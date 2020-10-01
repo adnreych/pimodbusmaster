@@ -10,6 +10,8 @@ import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css'; 
 import _pull from 'lodash/pull';
 import _times from 'lodash/times';
+import RGL, { WidthProvider } from "react-grid-layout";
+const ReactGridLayout = WidthProvider(RGL);
 
 
 class DeviceComponent extends Component {
@@ -73,9 +75,9 @@ class DeviceComponent extends Component {
 			.then(device => {
 				var groups = [];
 				device.data.forEach(element => {
-					if (groups.filter(e => e.name == element.group).length == 0) {
+					if (groups.filter(e => e.name == element.subDevice.name).length == 0) {
 						groups.push({
-							name : element.group,
+							name : element.subDevice.name,
 							checked: true
 						})
 					}
@@ -102,10 +104,6 @@ class DeviceComponent extends Component {
 						dataFromSpecialType: [],
 						editedNow: Array.apply(false, Array(this.state.device.length))});
 				}
-				var dv = this.state.device;			
-				dv.forEach(element => {
-					element.device = element.device.id;
-				});
 			})
 			.catch((err) => {
 					  console.log("ERROR: ", err);
@@ -138,9 +136,9 @@ class DeviceComponent extends Component {
 		this.handleClickWrite(address, value, index)		
 	}
 	
-	handleReadGroup(groupId) {
+	handleReadGroup(group) {
 		var targetRegisters = this.state.device
-			.filter(e => e.registerGroup != null && e.registerGroup.id == groupId)
+			.filter(e => e.registerGroup == group)
 			.sort((a, b) => a.address - b.address)
 		console.log("targetRegisters", targetRegisters)
 		if (targetRegisters.length != 0) {
@@ -149,10 +147,10 @@ class DeviceComponent extends Component {
 		}	
 	}
 	
-	handleWriteGroup(groupId) {
+	handleWriteGroup(group) {
 		var values = []
 		var targetRegisters = this.state.device
-			.filter(e => e.registerGroup != null && e.registerGroup.id == groupId)
+			.filter(e => e.registerGroup == group)
 			.sort((a, b) => a.address - b.address)
 				
 		if (targetRegisters.length != 0) {
@@ -409,41 +407,19 @@ class DeviceComponent extends Component {
 
 	
 	renderTableData(currentGroup) {
-		var groupNameData = []
-		var outerGroupElCount = 0;
-		var currGrName = null;
-		return this.state.device
-		.filter(e => e.group == currentGroup.name)
-		.sort((a, b) => (a.registerGroup != null && b.registerGroup != null) ? a.registerGroup.id - b.registerGroup.id : 0)
+		console.log("currentGroup",currentGroup)
+		return currentGroup
 		.map(
 			(current) => {		
 			 const {loading, editedNow} = this.state;
 	         const {id, name, address, count, isRead, isWrite, type, registerGroup, legends} = current;
-			 
+			 console.log("current",current)
 			 var index = this.state.device.indexOf(this.state.device.filter(e => { return e.address === address })[0])
-			 var lastGroupElement = false	
 			 var borderClass = ""
-			 var registerGroupName = ""
 		
-		     var groupElCount = this.state.device
-									.filter(e => ((e.group == currentGroup.name) 
-												&& (e.registerGroup != null) && (registerGroup != null) 
-												&& (registerGroup.name == e.registerGroup.name))).length
-		
-			 if (registerGroup == null) {
-				outerGroupElCount = 0;
-				registerGroupName = null
+			 if (registerGroup == "") {
 				borderClass = "no-borderless-td-val"
 			 } else {
-				registerGroupName = registerGroup.name
-				if (groupNameData.find(e => e == registerGroupName) == undefined) {
-					groupNameData.push(registerGroupName)				
-				}
-				outerGroupElCount++;
-				if (outerGroupElCount == groupElCount) {
-						lastGroupElement = true
-						outerGroupElCount = 0
-					}
 				borderClass = "borderless-td-val"		
 			 }
 
@@ -507,12 +483,12 @@ class DeviceComponent extends Component {
 								
 								          								
 	            </tr>
-				{(lastGroupElement) && <tr align="right">
+				{(registerGroup != "") && (address == currentGroup[currentGroup.length - 1].address) && <tr align="right">
 											<td></td>
 											<td></td>
 											<td>
-												<button className="btn btn-primary" onClick={() => this.handleReadGroup(registerGroup.id)}>Чтение всей группы ({registerGroupName})</button>
-												<button className="btn btn-primary" onClick={() => this.handleWriteGroup(registerGroup.id)}>Запись всей группы ({registerGroupName})</button>
+												<button className="btn btn-primary" onClick={() => this.handleReadGroup(registerGroup)}>Чтение всей группы ({registerGroup})</button>
+												<button className="btn btn-primary" onClick={() => this.handleWriteGroup(registerGroup)}>Запись всей группы ({registerGroup})</button>
 											</td>
 										</tr> }	
 				</>
@@ -531,21 +507,57 @@ class DeviceComponent extends Component {
 	
 	renderCurrentGroup(index) {
 		if (this.state.groups.length > 0) {
-			return (
-					<div>
-						<p>{this.state.groups[index].name}</p>
-						<table border="1">
-								<tr>
-									<th>Название</th>
-							   </tr>
-							<tbody>	
-								{this.renderTableData(this.state.groups[index])}			  												
-							</tbody>
-						</table>				
-					</div>
-			)
+			var registerGroups = new Set();
+			var registersByGroups = []
+			var currGroupRegisters = this.state.device.filter(e => e.subDevice.name == this.state.groups[index].name)
+			console.log("currGroupRegisters",currGroupRegisters)
+			currGroupRegisters.forEach(e => registerGroups.add(e.registerGroup))
+			console.log("registerGroups",registerGroups)
+			registerGroups.forEach(e => registersByGroups.push(currGroupRegisters.filter(e2 => e2.registerGroup == e)))
+			console.log("registersByGroups",registersByGroups)
+			return (		
+					<ReactGridLayout
+							          className="layout"
+							          cols="4"
+							          rowHeight="3"
+							        >	
+						{this.renderRegistersGrid(registersByGroups)}						
+					</ReactGridLayout>
+				)		
 		}
 		
+	}
+	
+	renderRegistersGrid(registersByGroups) {
+		var key = 1
+		var y = 0
+		var x = 0
+		return registersByGroups.map(
+						(current) => {
+							key = key + 1
+							if (key % 2 == 0) {
+								x = 0
+								if (key != 2) y = y + 1
+							} else {
+								x = 3
+							}
+							
+							return (							
+							<div key={key} data-grid={{ w: 1, h: 1, x: x, y: y }}>
+								<table border="1">
+										<tr>
+											<th>{current[0].registerGroup}</th>
+									   </tr>
+									<tbody>
+										{this.renderTableData(current)}			  												
+									</tbody>
+								</table>
+									
+							</div>
+							
+							)
+						}
+					)
 	}
 	
 	
@@ -562,7 +574,6 @@ class DeviceComponent extends Component {
 	                        <div className={'alert alert-success'}>{this.state.success}</div>
 	                    }
 
-				
 
 				<p>Устройство {name}. Адрес {address}.</p>
 
