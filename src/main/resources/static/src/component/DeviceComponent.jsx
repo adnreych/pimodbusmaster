@@ -465,7 +465,7 @@ class DeviceComponent extends Component {
 								/>}
 							
 							{(type!="Bit" && type!="Box") && 
-							<input type="text" placeholder="Значение" 
+							<input size="10" type="text" placeholder="Значение" 
 							value={this.state.inputValues[index]} 
 							ref={index}
 							onChange={(event) => this.handleChange(event, index)} />}
@@ -487,8 +487,8 @@ class DeviceComponent extends Component {
 											<td></td>
 											<td></td>
 											<td>
-												<button className="btn btn-primary" onClick={() => this.handleReadGroup(registerGroup)}>Чтение всей группы ({registerGroup})</button>
-												<button className="btn btn-primary" onClick={() => this.handleWriteGroup(registerGroup)}>Запись всей группы ({registerGroup})</button>
+												<button className="btn btn-primary" onClick={() => this.handleReadGroup(registerGroup)}>Прочитать все</button>
+												<button className="btn btn-primary" onClick={() => this.handleWriteGroup(registerGroup)}>Записать все</button>
 											</td>
 										</tr> }	
 				</>
@@ -547,7 +547,7 @@ class DeviceComponent extends Component {
 							<div key={key} data-grid={{ w: 1, h: current.length + 1, x: x, y: y }}>
 								<table border="1">
 										<tr>
-											<th>{current[0].registerGroup}</th>
+											<th colspan="3" align="center">{current[0].registerGroup}</th>
 									   </tr>
 									<tbody>
 										{this.renderTableData(current)}			  												

@@ -18,6 +18,8 @@ html {
 
 table {
 	border-collapse: collapse;
+	table-layout: fixed;
+	white-space: nowrap;
 }
 
 th, td {
@@ -61,7 +63,6 @@ select, textarea, input, button {
 }
 
 .no-borderless-td-val {
-	
 }
 
 .borderless-td {
