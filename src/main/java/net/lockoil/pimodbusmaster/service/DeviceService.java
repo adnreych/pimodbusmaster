@@ -13,6 +13,7 @@ import net.lockoil.pimodbusmaster.csd.ATConnect;
 import net.lockoil.pimodbusmaster.exceptions.DeviceNotFoundException;
 import net.lockoil.pimodbusmaster.model.AtConnectionRequest;
 import net.lockoil.pimodbusmaster.model.Device;
+import net.lockoil.pimodbusmaster.model.SubDevice;
 import net.lockoil.pimodbusmaster.repository.DeviceRepository;
 
 /**
@@ -30,6 +31,9 @@ public class DeviceService {
 	
 	@Autowired
 	private RegistersService loadNewCardService;
+	
+	@Autowired
+	private SubDeviceService subDeviceService;
 
 	@Autowired
 	public DeviceService(DeviceRepository deviceRepository) {
@@ -52,6 +56,10 @@ public class DeviceService {
 	@Transactional
 	public void delete(Long id) {
 		loadNewCardService.deleteByDeviceId(id);
+		List<SubDevice> subDevices = subDeviceService.getAllByDeviceId(id);
+		if (!subDevices.isEmpty()) {
+			subDeviceService.deleteAll(subDevices);
+		}
 		deviceRepository.deleteById(id);
 	}
 	

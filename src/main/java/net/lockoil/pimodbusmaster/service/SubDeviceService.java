@@ -37,7 +37,7 @@ public class SubDeviceService {
 		
 	}
 	
-	public List<SubDevice>getAllByDeviceId(Long deviceId) {
+	public List<SubDevice> getAllByDeviceId(Long deviceId) {
 		List<SubDevice> subDevices = subDeviceRepository.findAllByDeviceId(deviceId);
 		return subDevices;	
 	}
@@ -48,6 +48,10 @@ public class SubDeviceService {
 	
 	public List<SubDevice> saveAll(List<SubDevice> subDevices) {
 		return subDeviceRepository.saveAll(subDevices);
+	}
+	
+	public void deleteAll(List<SubDevice> subDevices) {
+		subDeviceRepository.deleteAll(subDevices);
 	}
 
 }

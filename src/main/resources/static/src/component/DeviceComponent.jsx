@@ -519,7 +519,7 @@ class DeviceComponent extends Component {
 					<ReactGridLayout
 							          className="layout"
 							          cols="4"
-							          rowHeight="3"
+							          rowHeight="1"
 							        >	
 						{this.renderRegistersGrid(registersByGroups)}						
 					</ReactGridLayout>
@@ -537,13 +537,14 @@ class DeviceComponent extends Component {
 							key = key + 1
 							if (key % 2 == 0) {
 								x = 0
-								if (key != 2) y = y + 1
+								if (key != 2) y = y + current.length + 1
 							} else {
 								x = 3
+								if (key != 1) y = y + current.length + 1
 							}
 							
 							return (							
-							<div key={key} data-grid={{ w: 1, h: 1, x: x, y: y }}>
+							<div key={key} data-grid={{ w: 1, h: current.length + 1, x: x, y: y }}>
 								<table border="1">
 										<tr>
 											<th>{current[0].registerGroup}</th>
@@ -576,16 +577,17 @@ class DeviceComponent extends Component {
 
 
 				<p>Устройство {name}. Адрес {address}.</p>
-
-				{this.renderGroupsTabs()}	
-				{this.renderCurrentGroup(this.state.currGroup)}	
-					
+				
 				<div className="form-group">
 	                        <button className="btn btn-primary" onClick={() => this.deleteDevice(this.props.match.params.id)} >Удалить устройство</button>
 	                        {loading &&
 	                            <img src={Strings.LOADING} />
 	                        }
 	            </div>
+
+				{this.renderGroupsTabs()}	
+				{this.renderCurrentGroup(this.state.currGroup)}	
+					
 			</div>
 	    )
 	  }
