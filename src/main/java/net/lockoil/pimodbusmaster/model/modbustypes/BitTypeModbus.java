@@ -7,6 +7,11 @@ import java.util.Map;
 
 import com.google.common.base.Strings;
 
+/*
+ * Хранит несколько значений в виде бит. Количество бит в 
+ * {@link BitTypeLegend} равно количеству возможных значений
+ * 
+ */
 public class BitTypeModbus implements AbstractModbusType<Integer, Map<String, String>> {
 	
 	private Integer value;

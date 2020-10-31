@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+/*
+ * Тип, значение элемента массива которого соответствует конкретному описанию 
+ */
 public class VarTypeModbus implements AbstractModbusType<Integer, Integer> {
 
 	private Integer value;

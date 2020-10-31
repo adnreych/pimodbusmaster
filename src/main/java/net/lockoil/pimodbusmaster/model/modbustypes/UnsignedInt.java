@@ -1,5 +1,8 @@
 package net.lockoil.pimodbusmaster.model.modbustypes;
 
+/*
+ * Реализация целого без знака
+ */
 public class UnsignedInt implements AbstractModbusType<Integer, Integer> {
 	
 	private Integer value;

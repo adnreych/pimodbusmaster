@@ -5,6 +5,9 @@ import java.util.Locale;
 
 import org.springframework.data.util.Pair;
 
+/*
+ * Реализация modbus-типа Float
+ */
 public class FloatModbus implements AbstractModbusType<Double, Double> {
 	
 	private Pair<Integer, Integer> value;

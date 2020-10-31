@@ -18,7 +18,7 @@ public interface AbstractModbusType<Input, Output> {
 	Output readValue();
 	
 	/**
-	 * Готовит заданное значение к записи в контроллер (Input - это почти всегда Integer)
+	 * Готовит заданное значение к записи в контроллер (Input - это почти всегда {@link Integer})
 	 */	
 	void writeValue(Input value);
 }

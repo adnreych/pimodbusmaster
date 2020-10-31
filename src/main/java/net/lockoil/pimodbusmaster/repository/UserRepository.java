@@ -6,6 +6,9 @@ import org.springframework.data.repository.CrudRepository;
 
 import net.lockoil.pimodbusmaster.model.User;
 
+/*
+ * Репозиторий для работы с пользователями
+ */
 public interface UserRepository extends CrudRepository<User, Long> {
 	
 	User findByUsername(String username);

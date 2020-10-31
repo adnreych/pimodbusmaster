@@ -1,5 +1,8 @@
 package net.lockoil.pimodbusmaster.model.modbustypes;
 
+/*
+ * Реализация целого со знаком
+ */
 public class SignedInt implements AbstractModbusType<Integer, Integer> {
 	
 	private Integer value;

@@ -7,6 +7,9 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import lombok.Data;
 
+/*
+ * Элемент описания типа {@link BitTypeModbus}
+ */
 @JsonTypeInfo(
 	    use=JsonTypeInfo.Id.NAME,
 	    include=JsonTypeInfo.As.PROPERTY,
