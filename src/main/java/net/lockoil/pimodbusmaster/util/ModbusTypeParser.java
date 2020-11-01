@@ -179,7 +179,7 @@ public class ModbusTypeParser {
 		return null;		
 	}
 	
-	private AbstractModbusType parsePairElement(JsonNode pairElement, int value) 
+	public AbstractModbusType parsePairElement(JsonNode pairElement, int value) 
 			 {
 		ObjectMapper objectMapper = new ObjectMapper();
 		switch (pairElement.get("type").asText()) {
